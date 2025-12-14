@@ -982,24 +982,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fzlbpmsadmin"
-version = "0.1.0"
-dependencies = [
- "bollard",
- "dotenvy",
- "futures",
- "reqwest",
- "serde",
- "serde_json",
- "serde_yaml",
- "tauri",
- "tauri-build",
- "tauri-plugin-http",
- "tauri-plugin-shell",
- "tokio",
-]
-
-[[package]]
 name = "gdk"
 version = "0.18.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1106,6 +1088,25 @@ checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
 dependencies = [
  "typenum",
  "version_check",
+]
+
+[[package]]
+name = "gepisopendata"
+version = "0.1.0"
+dependencies = [
+ "bollard",
+ "dotenvy",
+ "futures",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-fs",
+ "tauri-plugin-http",
+ "tauri-plugin-shell",
+ "tokio",
 ]
 
 [[package]]

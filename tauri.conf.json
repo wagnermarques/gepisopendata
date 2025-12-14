@@ -1,18 +1,19 @@
 {
-  "productName": "fzlbpmsadmin",
+  "productName": "gepisopendata",
   "version": "0.1.0",
-  "identifier": "com.tauri.moodle-admin",
+  "identifier": "com.gepisopendata.gepisopendata",
   "build": {
     "frontendDist": "www/browser"
   },
   "app": {
     "windows": [
       {
-        "title": "Moodle Admin",
+        "title": "Gepis OpenData",
         "width": 1200,
         "height": 800
       }
     ],
+    "withGlobalTauri": true,
     "security": {
       "csp": null
     }

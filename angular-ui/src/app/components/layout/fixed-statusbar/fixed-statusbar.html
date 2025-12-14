@@ -3,8 +3,11 @@
       <mat-icon>wifi</mat-icon>
       Connected
     </span>
+    <span class="status-item">
+      {{ environmentText() }}
+    </span>
     <span class="spacer"></span>
     <span class="status-item">
       {{ currentTime() | date: 'HH:mm:ss' }}
     </span>
-  </mat-toolbar>
+</mat-toolbar>

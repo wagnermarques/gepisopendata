@@ -1,5 +1,5 @@
 [package]
-name = "fzlbpmsadmin"
+name = "gepisopendata"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,6 +8,7 @@ edition = "2021"
 tauri = { version = "2.0.0", features = ["tray-icon"] }
 tauri-plugin-http = "2.0.0"
 tauri-plugin-shell = "2.0.0"
+tauri-plugin-fs = "2.0.0"
 
 # Suas dependÃªncias originais
 serde = { version = "1.0", features = ["derive"] }

@@ -49,6 +49,10 @@
 
     <mat-drawer-content>
         <div class="content-wrapper">
+            <div style="padding: 20px;">
+              <h2>Loaded Configuration:</h2>
+              <pre>{{ config() | json }}</pre>
+            </div>
             <router-outlet />
         </div>
     </mat-drawer-content>
