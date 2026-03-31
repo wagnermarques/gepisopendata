@@ -1,9 +1,269 @@
-#+Title: Fzlbpms Administrator
+#+Title: GEPIS OpenData
+#+LANGUAGE: pt_BR
+#+DATE: 2026-03-27
 
-It is a rust tauri application
+* Visão Geral do Projeto
 
-* to build it and run
-to build: cd tauri-src/ && cargo tauri build
-to run: cd tauri-src/ && cargo tauri dev
-or run the binary: ./target/release/binaryappcreated
+- *Nome*: gepisopendata
+- *Tipo*: Aplicativo desktop usando Tauri v2 (Release Candidate)
+- *Frontend*: Angular 20.3.0
+- *Backend*: Rust
+- *Plataforma*: Multiplataforma (Linux, Windows, macOS via Tauri)
+- *Versão*: 0.1.0
+
+
+* Arquitetura
+
+** Pilha Tecnológica
+- *Framework Desktop*: Tauri v2 (RC) - Framework baseado em Rust para aplicativos desktop
+- *Frontend*: Angular 20 com TypeScript
+- *Backend*: Rust com runtime assíncrono (Tokio)
+- *Cliente HTTP*: Reqwest 0.12 (cliente HTTP assíncrono)
+- *Suporte a Containers*: Bollard 0.19.4 (cliente da API Docker)
+- *Configuração*: Suporte YAML via serde_yaml
+- *Ferramenta de Build*: Cargo (Rust)
+
+
+** Plugins Ativados do Tauri
+- ~tauri-plugin-shell~ - Execução de comandos shell
+- ~tauri-plugin-http~ - Requisições HTTP
+- ~tauri-plugin-fs~ - Operações de sistema de arquivos
+
+
+* Estrutura do Projeto
+
+#+BEGIN_SRC
+gepisopendata/
+├── src/                           # Código backend em Rust
+│   └── main.rs                    # Ponto de entrada da aplicação Tauri
+├── angular-ui/                    # Aplicação frontend Angular
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── components/
+│   │   │   │   ├── layout/        # Cabeçalho fixo e barra de status
+│   │   │   │   └── views/         # Telas da aplicação
+│   │   │   │       ├── apps-home-view
+│   │   │   │       ├── desktop-home-view
+│   │   │   │       ├── view-base
+│   │   │   │       ├── view-config
+│   │   │   │       └── view-home
+│   │   │   └── services/          # Serviços de configuração
+│   │   └── main.ts
+│   └── angular.json
+├── gen/                           # Esquemas gerados
+│   └── schemas/                   # Esquemas JSON para validação
+├── icons/                         # Ícones da aplicação
+├── build.rs                       # Script de build do Cargo
+├── Cargo.toml                     # Dependências Rust
+├── tauri.conf.json                # Configuração do Tauri
+└── package.json                   # Configuração npm (nível raiz)
+#+END_SRC
+
+** Estrutura da Aplicação Angular
+
+- *Views*: apps-home-view, desktop-home-view, view-base, view-config, view-home
+- *Serviços*: config.service, environment, tauri-config, web-config
+- *Componentes de Layout*: fixed-head, fixed-statusbar
+- *Estilos*: custom-theme.scss, styles.css
+
+
+* Build e Desenvolvimento
+
+** Comandos de Build
+
+#+END_SRC
+#+name: echo $(pwd)
+#+begin_src shell :session s1 :exports both :results output
+  export projdir="/home/wgn/WORKING/Projects-Srcs/Projects-Srcs-GEPIS/gepisopendata"
+  cd $projdir/angular-ui
+  npm start
+#+end_src
+
+#+RESULTS: echo $(pwd)
+
+
+#+BEGIN_SRC bash
+# Desenvolvimento com recarga automática
+npm run tauri:dev
+cargo tauri dev
+
+# Build para produção
+npm run tauri:prod
+cargo tauri build
+
+# Apenas frontend
+npm run ng-build-dev              # Build de desenvolvimento
+npm run ng-build-prod             # Build de produção
+npm run start                      # ng serve para desenvolvimento web
+
+# Build e execução de produção
+npm run start:prod
+
+#+END_SRC
+#+name: 
+#+begin_src shell :session s1 :exports both :results output
+  npm run tauri:dev
+#+end_src
+
+
+** Saída de Build
+
+- *Frontend*: Compila para ~www/browser~ (configurado em tauri.conf.json)
+- *Binário*: ~target/release/gepisopendata~
+- *Pacotes*: RPM e DEB
+
+
+* Configuração da Aplicação
+
+** Configurações da Janela
+
+- *Título*: "Gepis OpenData"
+- *Tamanho Padrão*: 1200x800 pixels
+- *API Tauri*: Disponível globalmente
+
+
+** Segurança
+
+- *CSP (Content Security Policy)*: Nula (desabilitada)
+- *Plugin Shell*: Restrito a URLs https apenas
+
+
+** Ícones
+
+- *Formatos Suportados*: PNG (32x32, 128x128), ICNS (macOS), ICO (Windows)
+- *Localização*: Diretório ~icons/~
+
+
+* Dependências Principais
+
+** Crates Rust Essenciais
+
+| Crate            | Versão | Propósito                              |
+|------------------+--------+----------------------------------------|
+| tauri            |  2.0.0 | Framework principal + tray-icon        |
+| tokio            |      1 | Runtime assíncrono (todas as features) |
+| reqwest          |   0.12 | Cliente HTTP com suporte JSON          |
+| bollard          | 0.19.4 | Cliente API Docker                     |
+| serde/serde_json |    1.0 | Serialização/desserialização           |
+| serde_yaml       | 0.9.34 | Suporte a configuração em YAML         |
+| dotenvy          | 0.15.7 | Carregamento de arquivos .env          |
+
+
+** Angular
+- *Angular*: 20.3.0 (versão mais recente)
+- *TypeScript*: Configurado para compilação rigorosa
+
+
+* Padrões de Desenvolvimento
+
+** Comunicação Frontend-Backend
+
+- Usa o plugin HTTP do Tauri para chamadas à API backend
+- Serviços interface com o sistema de configuração Tauri
+- Dependência de configuração via ambiente (arquivos .env presentes)
+
+
+** Gerenciamento de Configuração
+
+- Arquivos ~.env~ e ~.env-template~ presentes
+- Suporte a configuração em YAML no backend
+- Configuração baseada em serviços (tauri-config.service, web-config.service)
+
+
+** Qualidade de Código
+
+- Prettier configurado: largura 100 caracteres, aspas simples
+- Parser Angular para arquivos HTML
+- TypeScript em modo strict
+- Suporte a testes do Angular CLI
+
+
+* Recursos Gerados
+
+JSON schemas presentes em ~gen/schemas/~ para:
+- acl-manifests.json
+- capabilities.json
+- desktop-schema.json
+- linux-schema.json
+
+
+* Observações Importantes
+
+1. *Integração Docker*: Dependência Bollard sugere que a aplicação gerencia/interage com containers Docker
+
+2. *Suporte Multiplataforma*: Tauri empacota com suporte a RPM, DEB e geração de ícones para todas as plataformas
+
+3. *Versão de Ponta*: Tauri v2 RC - versão inicial/experimental
+
+4. *Build Concorrente*: Usa ~concurrently~ para builds paralelos de Angular + Tauri
+
+5. *Orientado a Configuração*: Ênfase em configuração por ambiente e baseada em serviços
+
+6. *Validação de Esquema*: Esquemas JSON sugerem validação de dados estruturados
+
+
+* Possível Caso de Uso
+
+Aplicação de dashboard/administrador para gerenciar "GEPIS" (possivelmente sistema de dados geoespaciais) com capacidades de orquestração de containers, usando Tauri para entrega multiplataforma em desktop.
+
+
+* Como Construir e Executar
+
+** Pré-requisitos
+
+- Toolchain Rust (para compilação com Cargo/Tauri)
+- Node.js/npm (para Angular)
+- Docker (provavelmente necessário para integração com bollard)
+
+** Desenvolvimento
+
+#+BEGIN_SRC bash
+# Instalar dependências
+cd angular-ui
+npm install
+
+cd ..
+
+# Desenvolvimento com recarga automática (recomendado)
+npm run tauri:dev
+
+# Ou apenas frontend (Angular)
+npm run start
+#+END_SRC
+
+
+** Homolog
+
+** Produção
+
+#+BEGIN_SRC bash
+# Build completo para produção
+npm run tauri:prod
+
+# Executar binário compilado
+../target/release/gepisopendata
+
+# Ou usar o script de produção
+npm run start:prod
+#+END_SRC
+
+
+* Arquivos de Configuração Importantes
+
+| Arquivo | Propósito |
+|---------|-----------|
+| ~src/main.rs~ | Ponto de entrada Tauri, inicialização de plugins |
+| ~angular-ui/src/app/~ | Componentes e roteamento Angular |
+| ~tauri.conf.json~ | Configuração de janela, bundle, permissões |
+| ~Cargo.toml~ | Dependências Rust e configuração de build |
+| ~angular-ui/package.json~ | Scripts npm e dependências Angular |
+| ~.env~ | Variáveis de ambiente para produção |
+| ~.env-template~ | Template para configuração de ambiente |
+
+
+* Publicação de Pacotes
+
+Os pacotes distribuidores são configurados como:
+- *RPM* - Para distribuições Fedora/RHEL
+- *DEB* - Para distribuições Debian/Ubuntu
 
