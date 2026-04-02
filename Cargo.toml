@@ -1,5 +1,5 @@
 [package]
-name = "gepisopendata"
+name = "gepis-dados-abertos"
 version = "0.1.0"
 edition = "2021"
 

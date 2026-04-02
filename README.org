@@ -1,10 +1,17 @@
-#+Title: GEPIS OpenData
+#+Title: Gepis Dados Abertos
 #+LANGUAGE: pt_BR
 #+DATE: 2026-03-27
 
+
+* Introdução
+
+Este projeto é uma iniciativa do grupo de pesquisa Gepis no sentido de promover a utilização de dados abertos.
+
+
+
 * Visão Geral do Projeto
 
-- *Nome*: gepisopendata
+- Nome*: gepis-dados-abertos
 - *Tipo*: Aplicativo desktop usando Tauri v2 (Release Candidate)
 - *Frontend*: Angular 20.3.0
 - *Backend*: Rust
@@ -33,7 +40,7 @@
 * Estrutura do Projeto
 
 #+BEGIN_SRC
-gepisopendata/
+gepis-dados-abertos/
 ├── src/                           # Código backend em Rust
 │   └── main.rs                    # Ponto de entrada da aplicação Tauri
 ├── angular-ui/                    # Aplicação frontend Angular
@@ -74,22 +81,24 @@ gepisopendata/
 #+END_SRC
 #+name: echo $(pwd)
 #+begin_src shell :session s1 :exports both :results output
-  export projdir="/home/wgn/WORKING/Projects-Srcs/Projects-Srcs-GEPIS/gepisopendata"
+  export projdir="/home/wgn/WORKING/Projects-Srcs/Projects-Srcs-GEPIS/gepis-dados-abertos"
   cd $projdir/angular-ui
   npm start
 #+end_src
 
 #+RESULTS: echo $(pwd)
-
+** Comandos de Build
 
 #+BEGIN_SRC bash
 # Desenvolvimento com recarga automática
+npm run start:dev
 npm run tauri:dev
 cargo tauri dev
 
 # Build para produção
 npm run tauri:prod
 cargo tauri build
+
 
 # Apenas frontend
 npm run ng-build-dev              # Build de desenvolvimento
@@ -109,7 +118,7 @@ npm run start:prod
 ** Saída de Build
 
 - *Frontend*: Compila para ~www/browser~ (configurado em tauri.conf.json)
-- *Binário*: ~target/release/gepisopendata~
+- *Binário*: ~target/release/gepis-dados-abertos~
 - *Pacotes*: RPM e DEB
 
 
@@ -117,7 +126,7 @@ npm run start:prod
 
 ** Configurações da Janela
 
-- *Título*: "Gepis OpenData"
+- *Título*: "Gepis Dados Abertos"
 - *Tamanho Padrão*: 1200x800 pixels
 - *API Tauri*: Disponível globalmente
 
@@ -212,6 +221,27 @@ Aplicação de dashboard/administrador para gerenciar "GEPIS" (possivelmente sis
 ** Pré-requisitos
 
 - Toolchain Rust (para compilação com Cargo/Tauri)
+  #+BEGIN_SRC bash
+  # Instalar Rust (Linux/macOS)
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  # Configurar ambiente (ou reinicie o terminal)
+  source "$HOME/.cargo/env"
+  # Instalar CLI do Tauri
+  cargo install tauri-cli
+  #+END_SRC
+
+- Dependências de Sistema (Linux/Fedora)
+  #+BEGIN_SRC bash
+  sudo dnf install webkit2gtk4.1-devel \
+      openssl-devel \
+      curl \
+      wget \
+      libayatana-appindicator3-devel \
+      librsvg2-devel \
+      gtk3-devel \
+      glib2-devel
+  #+END_SRC
+
 - Node.js/npm (para Angular)
 - Docker (provavelmente necessário para integração com bollard)
 
@@ -241,7 +271,7 @@ npm run start
 npm run tauri:prod
 
 # Executar binário compilado
-../target/release/gepisopendata
+../target/release/gepis-dados-abertos
 
 # Ou usar o script de produção
 npm run start:prod
