@@ -10,19 +10,23 @@
       "sourceRoot": "src",
       "prefix": "app",
       "architect": {
-        "build": {
-          "builder": "@angular/build:application",
-          "options": {
-            "outputPath": "../www",
-            "browser": "src/main.ts",
-            "tsConfig": "tsconfig.app.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
+      "build": {
+      "builder": "@angular/build:application",
+      "options": {
+        "outputPath": "../www",
+        "browser": "src/main.ts",
+        "tsConfig": "tsconfig.app.json",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "public"
+          },
+          {
+            "glob": "index.html",
+            "input": "src",
+            "output": "404.html"
+          }
+        ],            "styles": [
               "src/custom-theme.scss",
               "src/styles.css"
             ]
