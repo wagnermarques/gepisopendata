@@ -1,13 +1,11 @@
 import {
   ApplicationConfig,
   inject,
-  provideBrowserGlobalErrorListeners,
-  provideZonelessChangeDetection,
+  provideZoneChangeDetection,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { provideAnimations } from '@angular/platform-browser/animations';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatExpansionModule } from '@angular/material/expansion';
+import { provideRouter, withHashLocation } from '@angular/router';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideHttpClient } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { ConfigService } from './services/config.service';
@@ -17,12 +15,10 @@ import { TauriConfigService } from './services/tauri-config.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideAnimations(),
-    provideBrowserGlobalErrorListeners(),
-    provideZonelessChangeDetection(),
-    provideRouter(routes),
-    MatTabsModule,
-    MatExpansionModule,
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes, withHashLocation()),
+    provideAnimationsAsync(),
+    provideHttpClient(),
     WebConfigService,
     TauriConfigService,
     {

@@ -1,6 +1,5 @@
 import { Component, ViewChild, HostListener, inject, OnInit, signal } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
-import { invoke } from '@tauri-apps/api/core';
 import { FixedHead } from './components/layout/fixed-head/fixed-head';
 import { FixedStatusbar } from "./components/layout/fixed-statusbar/fixed-statusbar";
 
