@@ -1,6 +1,5 @@
 name: Deploy Angular App to GitHub Pages
 
-# Run this workflow every time a new commit is pushed to the `main` branch
 on:
   push:
     branches:
@@ -21,6 +20,9 @@ concurrency:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     
     # These steps are executed as part of the job
     steps:
@@ -42,9 +44,8 @@ jobs:
         working-directory: ./angular-ui
 
       # Step 4: Build the Angular application for production
-      # IMPORTANT: Replace 'gepisopendata' with your GitHub repository name if it's different.
       - name: Build application
-        run: npm run build -- --base-href /gepisopendata/ --configuration production
+        run: npm run build -- --base-href /gepis-dados-abertos/ --configuration production
         working-directory: ./angular-ui
 
       # Step 5: Prepare the deployment artifact
@@ -56,7 +57,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # This path should match the `outputPath` in your angular.json, which is ../www from the angular-ui dir
-          path: './www'
+          path: './www/browser'
 
       # Step 7: Deploy the artifact to GitHub Pages
       - name: Deploy to GitHub Pages
