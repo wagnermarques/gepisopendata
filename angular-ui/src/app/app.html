@@ -35,6 +35,35 @@
 
             <mat-divider></mat-divider>
 
+            <mat-accordion>
+                <mat-expansion-panel class="mat-elevation-z0 menu-expansion-panel">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <mat-icon matListItemIcon>analytics</mat-icon>
+                            <span>EstatÃsticas</span>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <mat-nav-list>
+                        <a mat-list-item 
+                           matTooltip="Estudo dos dados sobre EvoluÃ§Ã£o das MatrÃculas" 
+                           matTooltipPosition="right"
+                           (click)="drawer.close()">
+                            <mat-icon matListItemIcon>trending_up</mat-icon>
+                            <span matListItemTitle>EvoluÃ§Ã£o Matriculas</span>
+                        </a>
+
+                        <a mat-list-item 
+                           (click)="drawer.close()">
+                            <mat-icon matListItemIcon>payments</mat-icon>
+                            <span matListItemTitle>Financiamento da EducaÃ§Ã£o</span>
+                        </a>
+                    </mat-nav-list>
+                </mat-expansion-panel>
+            </mat-accordion>
+
+            <mat-divider></mat-divider>
+
             <a mat-list-item routerLink="/baseview" (click)="drawer.close()">
                 <mat-icon matListItemIcon>help</mat-icon>
                 <span matListItemTitle>angular base view</span>

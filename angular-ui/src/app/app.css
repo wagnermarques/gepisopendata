@@ -43,3 +43,31 @@
 :host ::ng-deep .mat-mdc-list-item:hover {
   background-color: rgba(0, 0, 0, 0.04);
 }
+
+/* Expansion Panel Styles for Menu */
+.menu-expansion-panel {
+  background: transparent !important;
+}
+
+.menu-expansion-panel ::ng-deep .mat-expansion-panel-body {
+  padding: 0 0 0 16px !important;
+}
+
+.menu-expansion-panel ::ng-deep .mat-expansion-panel-header {
+  padding: 0 16px !important;
+  height: 48px !important;
+}
+
+.menu-expansion-panel mat-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.menu-expansion-panel mat-panel-title mat-icon {
+  margin-right: 16px;
+  color: rgba(0, 0, 0, 0.54);
+}
