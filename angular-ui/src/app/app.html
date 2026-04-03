@@ -24,16 +24,6 @@
 
     <mat-drawer-content>
         <div class="content-wrapper">
-            <div style="padding: 10px; border-bottom: 1px solid #ccc; font-size: 12px; font-family: monospace;">
-              Debug info: 
-              isTauri: {{ isTauriDebug() }} | 
-              configType: {{ configTypeDebug() }} |
-              lastEvent: {{ lastMenuEvent() || 'none' }}
-            </div>
-            <div style="padding: 20px;">
-              <h2>Loaded Configuration:</h2>
-              <pre>{{ config() | json }}</pre>
-            </div>
             <router-outlet />
         </div>
     </mat-drawer-content>

@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, isDevMode } from '@angular/core';
 import { catchError, from, map, Observable, of, Subject } from 'rxjs';
 import { ConfigService } from './config.service';
 import { BaseDirectory, readTextFile } from '@tauri-apps/plugin-fs';
@@ -19,7 +19,9 @@ export class TauriConfigService extends ConfigService {
   private async initMenuListener() {
     try {
       await listen<string>('menu-navigation', (event) => {
-        console.log('Menu navigation event received:', event.payload);
+        if (isDevMode()) {
+          console.log('Menu navigation event received:', event.payload);
+        }
         this.menuNavigationSubject.next(event.payload);
       });
     } catch (err) {
@@ -28,7 +30,9 @@ export class TauriConfigService extends ConfigService {
   }
 
   loadConfig(): Observable<Record<string, unknown>> {
-    console.log('Loading configuration from TauriConfigService');
+    if (isDevMode()) {
+      console.log('Loading configuration from TauriConfigService');
+    }
 
     const defaultConfig = {
       source: 'tauri-default',

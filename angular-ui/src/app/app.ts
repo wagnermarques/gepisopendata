@@ -1,4 +1,4 @@
-import { Component, ViewChild, HostListener, inject, OnInit, signal, OnDestroy, computed } from '@angular/core';
+import { Component, ViewChild, HostListener, inject, OnInit, signal, OnDestroy, computed, isDevMode } from '@angular/core';
 import { RouterOutlet, RouterLink, Router } from '@angular/router';
 import { FixedHead } from './components/layout/fixed-head/fixed-head';
 import { FixedStatusbar } from './components/layout/fixed-statusbar/fixed-statusbar';
@@ -41,12 +41,6 @@ export class App implements OnInit, OnDestroy {
   router = inject(Router);
   config = signal<Record<string, unknown> | null>(null);
   lastMenuEvent = signal<string | null>(null);
-  
-  isTauriDebug = computed(() => isTauri());
-  configTypeDebug = computed(() => {
-    if (this.configService instanceof TauriConfigService) return 'TauriConfigService';
-    return 'WebConfigService';
-  });
 
   private menuSub?: Subscription;
 
@@ -57,11 +51,20 @@ export class App implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.configService.loadConfig().subscribe((config) => {
       this.config.set(config);
+      if (isDevMode()) {
+        console.log('App Configuration:', config);
+        console.log('Environment Info:', {
+          isTauri: isTauri(),
+          configServiceType: this.configService instanceof TauriConfigService ? 'Tauri' : 'Web'
+        });
+      }
     });
 
     if (this.configService instanceof TauriConfigService) {
       this.menuSub = this.configService.menuNavigation$.subscribe((menuId) => {
-        console.log('Received menu event in App component:', menuId);
+        if (isDevMode()) {
+          console.log('Received menu event in App component:', menuId);
+        }
         this.lastMenuEvent.set(menuId);
         this.handleMenuNavigation(menuId);
       });
@@ -73,7 +76,9 @@ export class App implements OnInit, OnDestroy {
   }
 
   private handleMenuNavigation(menuId: string) {
-    console.log(`Handling menu navigation for ID: ${menuId}`);
+    if (isDevMode()) {
+      console.log(`Handling menu navigation for ID: ${menuId}`);
+    }
     let route = '';
     switch (menuId) {
       case 'obter_dados':
@@ -100,11 +105,15 @@ export class App implements OnInit, OnDestroy {
     }
 
     if (route) {
-      console.log(`Attempting to navigate to: ${route}`);
+      if (isDevMode()) {
+        console.log(`Attempting to navigate to: ${route}`);
+      }
       this.router.navigate([route]).then(
         (success) => {
           if (success) {
-            console.log(`Navigation to ${route} succeeded`);
+            if (isDevMode()) {
+              console.log(`Navigation to ${route} succeeded`);
+            }
           } else {
             console.error(`Navigation to ${route} failed (denied or already there)`);
           }
