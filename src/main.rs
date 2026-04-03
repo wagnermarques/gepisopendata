@@ -12,6 +12,7 @@ fn main() {
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_mcp_gui::init())
         .setup(|app| {
             // Create the "Sobre" menu item
             let sobre_item = MenuItem::with_id(app, "sobre", "Sobre", true, None::<&str>)?;
@@ -58,6 +59,7 @@ fn main() {
 
             // Handle menu events
             app.on_menu_event(move |app, event| {
+                println!("Menu event triggered: {:?}", event.id);
                 if event.id == "sobre" {
                     app.dialog()
                         .message("Gepis Dados Abertos\nVersão 0.1.0\n\nEste projeto é uma iniciativa do grupo de pesquisa Gepis para promover a utilização de dados abertos.")
@@ -66,7 +68,10 @@ fn main() {
                         .show(|_result| {});
                 } else {
                     // Emit navigation event for all other menu items
-                    app.emit("menu-navigation", event.id.0.as_str()).unwrap();
+                    println!("Emitting menu-navigation event for: {}", event.id.0.as_str());
+                    if let Err(e) = app.emit("menu-navigation", event.id.0.as_str()) {
+                        eprintln!("Failed to emit menu-navigation event: {}", e);
+                    }
                 }
             });            //only debug this code in debug mode
             #[cfg(debug_assertions)]
