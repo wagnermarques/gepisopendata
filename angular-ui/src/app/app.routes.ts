@@ -1,10 +1,6 @@
 import { Routes } from '@angular/router';
-import { ViewHome } from './components/views/view-home/view-home';
-import { ViewConfig } from './components/views/view-config/view-config';
-import { ViewBase }   from './components/views/view-base/view-base';
-
-import { DesktopHomeView } from './components/views/desktop-home-view/desktop-home-view';
-import { AppsHomeView } from './components/views/apps-home-view/apps-home-view';
+import { ViewHome } from './components/views/web/view-home/view-home';
+import { DesktopHomeView } from './components/views/desktop/desktop-home-view/desktop-home-view';
 import { isTauriGuard } from './guards/is-tauri.guard';
 
 export const routes: Routes = [
@@ -13,25 +9,13 @@ export const routes: Routes = [
     component: ViewHome,
   },
   {
-    path: 'baseview',
-    component: ViewBase,
-  },
-  {
-    path: 'configs',
-    component: ViewConfig,
-  },
-  {
-    path: 'appshomevew',
-    component: AppsHomeView,
-  },
-  {
-    path: 'desktophomeview',
-    component: DesktopHomeView,
-  },
-  {
     path: 'desktop',
     canActivate: [isTauriGuard],
     children: [
+      {
+        path: '',
+        component: DesktopHomeView,
+      },
       {
         path: 'datasets/get',
         loadComponent: () =>
