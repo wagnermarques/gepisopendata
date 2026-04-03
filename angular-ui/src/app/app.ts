@@ -1,7 +1,7 @@
-import { Component, ViewChild, HostListener, inject, OnInit, signal } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { Component, ViewChild, HostListener, inject, OnInit, signal, OnDestroy, computed } from '@angular/core';
+import { RouterOutlet, RouterLink, Router } from '@angular/router';
 import { FixedHead } from './components/layout/fixed-head/fixed-head';
-import { FixedStatusbar } from "./components/layout/fixed-statusbar/fixed-statusbar";
+import { FixedStatusbar } from './components/layout/fixed-statusbar/fixed-statusbar';
 
 import { MatSidenavModule, MatDrawer } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
@@ -10,7 +10,10 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfigService } from './services/config.service';
+import { TauriConfigService } from './services/tauri-config.service';
+import { isTauri } from './services/environment';
 import { JsonPipe } from '@angular/common';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -30,12 +33,22 @@ import { JsonPipe } from '@angular/common';
     JsonPipe,
   ],
 })
-export class App implements OnInit {
+export class App implements OnInit, OnDestroy {
   @ViewChild('drawer') drawer!: MatDrawer;
   isSmallScreen = false;
 
   configService = inject(ConfigService);
+  router = inject(Router);
   config = signal<Record<string, unknown> | null>(null);
+  lastMenuEvent = signal<string | null>(null);
+  
+  isTauriDebug = computed(() => isTauri());
+  configTypeDebug = computed(() => {
+    if (this.configService instanceof TauriConfigService) return 'TauriConfigService';
+    return 'WebConfigService';
+  });
+
+  private menuSub?: Subscription;
 
   constructor() {
     this.checkScreenSize();
@@ -45,6 +58,41 @@ export class App implements OnInit {
     this.configService.loadConfig().subscribe((config) => {
       this.config.set(config);
     });
+
+    if (this.configService instanceof TauriConfigService) {
+      this.menuSub = this.configService.menuNavigation$.subscribe((menuId) => {
+        console.log('Received menu event in App component:', menuId);
+        this.lastMenuEvent.set(menuId);
+        this.handleMenuNavigation(menuId);
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.menuSub?.unsubscribe();
+  }
+
+  private handleMenuNavigation(menuId: string) {
+    switch (menuId) {
+      case 'obter_dados':
+        this.router.navigate(['/desktop/datasets/get']);
+        break;
+      case 'listar_dados':
+        this.router.navigate(['/desktop/datasets/list']);
+        break;
+      case 'gerenciar_dados':
+        this.router.navigate(['/desktop/datasets/manage']);
+        break;
+      case 'selecionar_dados':
+        this.router.navigate(['/desktop/analysis/select']);
+        break;
+      case 'configurar_variaveis':
+        this.router.navigate(['/desktop/analysis/config']);
+        break;
+      case 'analises_descritivas':
+        this.router.navigate(['/desktop/analysis/descritiva']);
+        break;
+    }
   }
 
   @HostListener('window:resize', ['$event'])

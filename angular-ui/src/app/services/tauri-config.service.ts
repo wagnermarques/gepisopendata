@@ -1,12 +1,32 @@
-import { Injectable } from '@angular/core';
-import { catchError, from, map, Observable, of } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { catchError, from, map, Observable, of, Subject } from 'rxjs';
 import { ConfigService } from './config.service';
 import { BaseDirectory, readTextFile } from '@tauri-apps/plugin-fs';
+import { listen } from '@tauri-apps/api/event';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TauriConfigService extends ConfigService {
+  private menuNavigationSubject = new Subject<string>();
+  menuNavigation$ = this.menuNavigationSubject.asObservable();
+
+  constructor() {
+    super();
+    this.initMenuListener();
+  }
+
+  private async initMenuListener() {
+    try {
+      await listen<string>('menu-navigation', (event) => {
+        console.log('Menu navigation event received:', event.payload);
+        this.menuNavigationSubject.next(event.payload);
+      });
+    } catch (err) {
+      console.error('Failed to listen to menu-navigation events:', err);
+    }
+  }
+
   loadConfig(): Observable<Record<string, unknown>> {
     console.log('Loading configuration from TauriConfigService');
 

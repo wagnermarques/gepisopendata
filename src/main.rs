@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use tauri::{
     menu::{Menu, MenuItem, Submenu},
-    Manager,
+    Emitter, Manager,
 };
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
@@ -64,18 +64,9 @@ fn main() {
                         .title("Sobre o Gepis Dados Abertos")
                         .kind(MessageDialogKind::Info)
                         .show(|_result| {});
-                } else if event.id == "obter_dados" {
-                    // Placeholder for "Obter Conj. Dados"
-                } else if event.id == "listar_dados" {
-                    // Placeholder for "Listar Conjunto De Dados"
-                } else if event.id == "gerenciar_dados" {
-                    // Placeholder for "Gerenciar Conjunto de dados"
-                } else if event.id == "selecionar_dados" {
-                    // Placeholder for "Selecionar Conjunto de Dados"
-                } else if event.id == "configurar_variaveis" {
-                    // Placeholder for "Configurar Variaveis"
-                } else if event.id == "analises_descritivas" {
-                    // Placeholder for "Analises Descritivas"
+                } else {
+                    // Emit navigation event for all other menu items
+                    app.emit("menu-navigation", event.id.0.as_str()).unwrap();
                 }
             });            //only debug this code in debug mode
             #[cfg(debug_assertions)]

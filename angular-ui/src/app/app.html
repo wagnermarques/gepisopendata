@@ -39,6 +39,24 @@
                 <mat-expansion-panel class="mat-elevation-z0 menu-expansion-panel">
                     <mat-expansion-panel-header>
                         <mat-panel-title>
+                            <mat-icon matListItemIcon>dataset</mat-icon>
+                            <span>Conjuntos de Dados</span>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <mat-nav-list>
+                        <a mat-list-item 
+                           routerLink="/desktop/datasets/get"
+                           (click)="drawer.close()">
+                            <mat-icon matListItemIcon>download</mat-icon>
+                            <span matListItemTitle>Obter Conj. Dados</span>
+                        </a>
+                    </mat-nav-list>
+                </mat-expansion-panel>
+
+                <mat-expansion-panel class="mat-elevation-z0 menu-expansion-panel">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
                             <mat-icon matListItemIcon>analytics</mat-icon>
                             <span>EstatÃsticas</span>
                         </mat-panel-title>
@@ -78,6 +96,12 @@
 
     <mat-drawer-content>
         <div class="content-wrapper">
+            <div style="padding: 10px; border-bottom: 1px solid #ccc; font-size: 12px; font-family: monospace;">
+              Debug info: 
+              isTauri: {{ isTauriDebug() }} | 
+              configType: {{ configTypeDebug() }} |
+              lastEvent: {{ lastMenuEvent() || 'none' }}
+            </div>
             <div style="padding: 20px;">
               <h2>Loaded Configuration:</h2>
               <pre>{{ config() | json }}</pre>
