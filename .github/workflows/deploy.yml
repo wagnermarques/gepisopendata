@@ -45,8 +45,12 @@ jobs:
 
       # Step 4: Build the Angular application for production
       - name: Build application
-        run: npm run build -- --base-href /gepis-dados-abertos/ --configuration production
+        run: npm run build -- --base-href /gepisopendata/ --configuration production
         working-directory: ./angular-ui
+
+      # Step 4.1: Create 404.html from index.html for SPA routing
+      - name: Create 404.html
+        run: cp www/browser/index.html www/browser/404.html
 
       # Step 5: Prepare the deployment artifact
       - name: Setup Pages
