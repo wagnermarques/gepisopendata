@@ -3,9 +3,15 @@
   "version": "0.1.0",
   "identifier": "com.gepis.dadosabertos",
   "build": {
-    "frontendDist": "../www/browser"
+    "frontendDist": "www/browser"
   },
   "app": {
+    "security": {
+      "capabilities": [
+        "default"
+      ],
+      "csp": null
+    },
     "windows": [
       {
         "title": "Gepis Dados Abertos",

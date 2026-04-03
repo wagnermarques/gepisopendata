@@ -73,25 +73,46 @@ export class App implements OnInit, OnDestroy {
   }
 
   private handleMenuNavigation(menuId: string) {
+    console.log(`Handling menu navigation for ID: ${menuId}`);
+    let route = '';
     switch (menuId) {
       case 'obter_dados':
-        this.router.navigate(['/desktop/datasets/get']);
+        route = '/desktop/datasets/get';
         break;
       case 'listar_dados':
-        this.router.navigate(['/desktop/datasets/list']);
+        route = '/desktop/datasets/list';
         break;
       case 'gerenciar_dados':
-        this.router.navigate(['/desktop/datasets/manage']);
+        route = '/desktop/datasets/manage';
         break;
       case 'selecionar_dados':
-        this.router.navigate(['/desktop/analysis/select']);
+        route = '/desktop/analysis/select';
         break;
       case 'configurar_variaveis':
-        this.router.navigate(['/desktop/analysis/config']);
+        route = '/desktop/analysis/config';
         break;
       case 'analises_descritivas':
-        this.router.navigate(['/desktop/analysis/descritiva']);
+        route = '/desktop/analysis/descritiva';
         break;
+      default:
+        console.warn(`Unrecognized menu ID: ${menuId}`);
+        return;
+    }
+
+    if (route) {
+      console.log(`Attempting to navigate to: ${route}`);
+      this.router.navigate([route]).then(
+        (success) => {
+          if (success) {
+            console.log(`Navigation to ${route} succeeded`);
+          } else {
+            console.error(`Navigation to ${route} failed (denied or already there)`);
+          }
+        },
+        (error) => {
+          console.error(`Navigation to ${route} errored:`, error);
+        }
+      );
     }
   }
 
