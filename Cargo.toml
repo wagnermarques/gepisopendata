@@ -2,6 +2,11 @@
 name = "gepis-dados-abertos"
 version = "0.1.0"
 edition = "2021"
+build = "src-tauri/build.rs"
+
+[[bin]]
+name = "gepis-dados-abertos"
+path = "src-tauri/src/main.rs"
 
 [dependencies]
 # DependÃªncias do Tauri v2 (RC - Release Candidate)
