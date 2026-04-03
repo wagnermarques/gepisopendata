@@ -13,53 +13,30 @@
                 <span matListItemTitle>Home</span>
             </a>
 
-            <a mat-list-item routerLink="/desktop" (click)="drawer.close()">
-                <mat-icon matListItemIcon>workspaces</mat-icon>
-                <span matListItemTitle>Desktop Home</span>
-            </a>
-
             <mat-divider></mat-divider>
 
             <mat-accordion>
                 <mat-expansion-panel class="mat-elevation-z0 menu-expansion-panel">
                     <mat-expansion-panel-header>
                         <mat-panel-title>
-                            <mat-icon matListItemIcon>dataset</mat-icon>
-                            <span>Conjuntos de Dados</span>
-                        </mat-panel-title>
-                    </mat-expansion-panel-header>
-
-                    <mat-nav-list>
-                        <a mat-list-item 
-                           routerLink="/desktop/datasets/get"
-                           (click)="drawer.close()">
-                            <mat-icon matListItemIcon>download</mat-icon>
-                            <span matListItemTitle>Obter Conj. Dados</span>
-                        </a>
-                    </mat-nav-list>
-                </mat-expansion-panel>
-
-                <mat-expansion-panel class="mat-elevation-z0 menu-expansion-panel">
-                    <mat-expansion-panel-header>
-                        <mat-panel-title>
                             <mat-icon matListItemIcon>analytics</mat-icon>
-                            <span>EstatÃsticas</span>
+                            <span>Estatísticas</span>
                         </mat-panel-title>
                     </mat-expansion-panel-header>
 
                     <mat-nav-list>
                         <a mat-list-item 
-                           matTooltip="Estudo dos dados sobre EvoluÃ§Ã£o das MatrÃculas" 
+                           matTooltip="Estudo dos dados sobre Evolução das Matrículas" 
                            matTooltipPosition="right"
                            (click)="drawer.close()">
                             <mat-icon matListItemIcon>trending_up</mat-icon>
-                            <span matListItemTitle>EvoluÃ§Ã£o Matriculas</span>
+                            <span matListItemTitle>Evolução Matriculas</span>
                         </a>
 
                         <a mat-list-item 
                            (click)="drawer.close()">
                             <mat-icon matListItemIcon>payments</mat-icon>
-                            <span matListItemTitle>Financiamento da EducaÃ§Ã£o</span>
+                            <span matListItemTitle>Financiamento da Educação</span>
                         </a>
                     </mat-nav-list>
                 </mat-expansion-panel>
