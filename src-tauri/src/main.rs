@@ -1,8 +1,10 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use tauri::{
-    menu::{Menu, MenuItem, Submenu},
-    Emitter, Manager,
+        menu::{
+           Menu, MenuItem, Submenu
+        },
+        Emitter, Manager,
 };
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 
@@ -59,10 +61,10 @@ fn main() {
 
             // Handle menu events
             app.on_menu_event(move |app, event| {
-                println!("Menu event triggered: {:?}", event.id);
+                println!("main.rs => Menu event triggered: {:?}", event.id);
                 if event.id == "sobre" {
                     app.dialog()
-                        .message("Gepis Dados Abertos\nVersão 0.1.0\n\nEste projeto é uma iniciativa do grupo de pesquisa Gepis para promover a utilização de dados abertos.")
+                        .message("Gepis Dados Abertos\nVersÃ£o 0.1.0\n\nEste projeto Ã© uma iniciativa do grupo de pesquisa Gepis para promover a utilizaÃ§Ã£o de dados abertos.")
                         .title("Sobre o Gepis Dados Abertos")
                         .kind(MessageDialogKind::Info)
                         .show(|_result| {});

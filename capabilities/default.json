@@ -6,7 +6,7 @@
     "core:default",
     "core:event:allow-listen",
     "core:event:allow-emit",
-    "core:webview:allow-open-devtools",
+    "core:webview:allow-internal-toggle-devtools",
     "shell:default",
     "fs:allow-app-read-recursive",
     "fs:allow-appconfig-read-recursive",
