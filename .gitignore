@@ -12,4 +12,4 @@ www
 *.json.metadata.json
 downloads/
 data/
-!angular-ui/src/assets/data/datasets-registry.json
+!angular-ui/data/datasets-registry.json

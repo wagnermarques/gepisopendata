@@ -80,8 +80,6 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
         if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
             let project_assets = PathBuf::from(manifest_dir)
                 .join("angular-ui")
-                .join("src")
-                .join("assets")
                 .join("data")
                 .join("datasets-registry.json");
             registry_paths.push(project_assets);
@@ -136,6 +134,33 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
     Ok(file_name.to_string())
 }
 
+#[tauri::command]
+async fn get_registry(app_handle: tauri::AppHandle) -> Result<Vec<serde_json::Value>, String> {
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    let mut registry_path = app_data_dir.join("datasets-registry.json");
+
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            let dev_path = PathBuf::from(manifest_dir)
+                .join("angular-ui")
+                .join("data")
+                .join("datasets-registry.json");
+            if dev_path.exists() {
+                registry_path = dev_path;
+            }
+        }
+    }
+
+    if registry_path.exists() {
+        let file = File::open(&registry_path).map_err(|e| e.to_string())?;
+        let registry: Vec<serde_json::Value> = serde_json::from_reader(file).map_err(|e| e.to_string())?;
+        Ok(registry)
+    } else {
+        Ok(vec![])
+    }
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
@@ -143,7 +168,7 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_mcp_gui::init())
-        .invoke_handler(tauri::generate_handler![download_dataset])
+        .invoke_handler(tauri::generate_handler![download_dataset, get_registry])
         .setup(|app| {
             // Create the "Sobre" menu item
             let sobre_item = MenuItem::with_id(app, "sobre", "Sobre", true, None::<&str>)?;

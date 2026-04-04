@@ -6,7 +6,13 @@
     "frontendDist": "www/browser",
     "devUrl": "http://localhost:4200",
     "beforeDevCommand": "npm run start:dev",
-    "beforeBuildCommand": "npm run build"
+    "beforeBuildCommand": "npm run build",
+    "watch": {
+      "ignore": [
+        "downloads/**",
+        "angular-ui/public/data/**"
+      ]
+    }
   },
   "app": {
     "windows": [

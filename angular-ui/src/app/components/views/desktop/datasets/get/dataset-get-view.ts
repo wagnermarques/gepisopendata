@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,8 +10,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { invoke } from '@tauri-apps/api/core';
 import { message } from '@tauri-apps/plugin-dialog';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-dataset-get-view',
@@ -28,6 +31,7 @@ import { message } from '@tauri-apps/plugin-dialog';
     MatProgressBarModule,
     MatCheckboxModule,
     MatDividerModule,
+    MatAutocompleteModule,
   ],
   template: `
     <div class="container">
@@ -44,7 +48,17 @@ import { message } from '@tauri-apps/plugin-dialog';
             <div class="row multi-col">
               <mat-form-field appearance="outline">
                 <mat-label>Grupo / Coleção</mat-label>
-                <input matInput formControlName="grupo" placeholder="Ex: Censo Escolar, Comércio Exterior">
+                <input type="text"
+                       placeholder="Ex: Censo Escolar, Comércio Exterior"
+                       aria-label="Grupo"
+                       matInput
+                       formControlName="grupo"
+                       [matAutocomplete]="auto">
+                <mat-autocomplete #auto="matAutocomplete">
+                  @for (option of filteredGroups(); track option) {
+                    <mat-option [value]="option">{{option}}</mat-option>
+                  }
+                </mat-autocomplete>
                 <mat-hint>Nome para agrupar múltiplos arquivos relacionados</mat-hint>
               </mat-form-field>
 
@@ -160,9 +174,10 @@ import { message } from '@tauri-apps/plugin-dialog';
     mat-card-title { font-weight: bold; color: #3f51b5; }
   `]
 })
-export class DatasetGetView {
+export class DatasetGetView implements OnInit {
   private fb = inject(FormBuilder);
   isDownloading = signal(false);
+  allGroups = signal<string[]>([]);
 
   datasetForm = this.fb.group({
     grupo: [''],
@@ -179,6 +194,31 @@ export class DatasetGetView {
     tags: [''],
   });
 
+  // Signal to track the current value of the grupo control
+  grupoValue = toSignal(this.datasetForm.get('grupo')!.valueChanges.pipe(startWith('')));
+
+  // Computed signal for filtered options
+  filteredGroups = computed(() => {
+    const filterValue = (this.grupoValue() || '').toLowerCase();
+    return this.allGroups().filter(option => option.toLowerCase().includes(filterValue));
+  });
+
+  ngOnInit() {
+    this.loadExistingGroups();
+  }
+
+  async loadExistingGroups() {
+    try {
+      const data = await invoke<any[]>('get_registry');
+      const groups = data
+        .map(item => item.grupo)
+        .filter((value, index, self) => value && self.indexOf(value) === index);
+      this.allGroups.set(groups);
+    } catch (err) {
+      console.warn('Could not load existing groups from registry', err);
+    }
+  }
+
   async downloadDataset() {
     if (this.datasetForm.invalid) return;
 
@@ -193,12 +233,9 @@ export class DatasetGetView {
     this.isDownloading.set(true);
 
     try {
-      // For each URL, we call the Rust command
-      // The Rust command now also handles the JSON registry update
       for (const url of urlList) {
         console.log(`Solicitando processamento via Rust: ${url}`);
         
-        // Pass the metadata along with the URL
         await invoke('download_dataset', { 
           url, 
           metadata: this.datasetForm.value 
@@ -210,6 +247,9 @@ export class DatasetGetView {
         kind: 'info',
       });
       
+      // Refresh groups after success
+      await this.loadExistingGroups();
+
       this.datasetForm.reset({
         frequencia: 'Anual',
         isSerieHistorica: false,
