@@ -9,6 +9,7 @@ use tauri::{
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 use std::fs::File;
 use std::io::{copy, Write};
+use std::path::PathBuf;
 
 // Rust command to download a file and update the registry
 #[tauri::command]
@@ -18,7 +19,7 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
     // 1. Get the filename from the URL
     let file_name = url.split('/').last().unwrap_or("dataset.zip");
     
-    // 2. Resolve AppData path and ensure it exists
+    // 2. Resolve AppData path for the large binary files (not committed)
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
     let downloads_dir = app_data_dir.join("downloads");
     std::fs::create_dir_all(&downloads_dir).map_err(|e| e.to_string())?;
@@ -42,30 +43,53 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
     let mut file = File::create(&dest_path).map_err(|e| format!("Erro ao criar arquivo local: {}", e))?;
     copy(&mut content.as_ref(), &mut file).map_err(|e| format!("Erro ao salvar arquivo: {}", e))?;
 
-    // 4. Update the Registry JSON File in Rust
-    let registry_path = app_data_dir.join("datasets-registry.json");
-    let mut registry: Vec<serde_json::Value> = if registry_path.exists() {
-        let file = File::open(&registry_path).map_err(|e| e.to_string())?;
-        serde_json::from_reader(file).unwrap_or_else(|_| vec![])
-    } else {
-        vec![]
-    };
-
-    // Add entry to registry
-    let mut entry = metadata.clone();
-    if let Some(obj) = entry.as_object_mut() {
-        obj.insert("id".to_string(), serde_json::json!(uuid::Uuid::new_v4().to_string()));
-        obj.insert("dateAdded".to_string(), serde_json::json!(chrono::Utc::now().to_rfc3339()));
-        obj.insert("file".to_string(), serde_json::json!(file_name));
+    // 4. Resolve the Registry Path (The portable/committable part)
+    // In DEVELOPMENT, we also write to the source tree assets folder
+    let mut registry_paths = vec![app_data_dir.join("datasets-registry.json")];
+    
+    #[cfg(debug_assertions)]
+    {
+        // Try to find the project root during development to sync the JSON
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            let project_assets = PathBuf::from(manifest_dir)
+                .join("..")
+                .join("angular-ui")
+                .join("src")
+                .join("assets")
+                .join("data")
+                .join("datasets-registry.json");
+            
+            println!("Rust Dev => Syncing registry to source: {:?}", project_assets);
+            registry_paths.push(project_assets);
+        }
     }
-    registry.push(entry);
 
-    // Write back to registry
-    let mut file = File::create(&registry_path).map_err(|e| e.to_string())?;
-    let json = serde_json::to_string_pretty(&registry).map_err(|e| e.to_string())?;
-    file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+    // 5. Update Registry in all resolved paths
+    for path in registry_paths {
+        if let Some(parent) = path.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
 
-    println!("Rust => Registry updated and Download complete: {:?}", file_name);
+        let mut registry: Vec<serde_json::Value> = if path.exists() {
+            let file = File::open(&path).map_err(|e| e.to_string())?;
+            serde_json::from_reader(file).unwrap_or_else(|_| vec![])
+        } else {
+            vec![]
+        };
+
+        let mut entry = metadata.clone();
+        if let Some(obj) = entry.as_object_mut() {
+            obj.insert("id".to_string(), serde_json::json!(uuid::Uuid::new_v4().to_string()));
+            obj.insert("dateAdded".to_string(), serde_json::json!(chrono::Utc::now().to_rfc3339()));
+            obj.insert("file".to_string(), serde_json::json!(file_name));
+        }
+        registry.push(entry);
+
+        let mut file = File::create(&path).map_err(|e| e.to_string())?;
+        let json = serde_json::to_string_pretty(&registry).map_err(|e| e.to_string())?;
+        file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+    }
+
     Ok(file_name.to_string())
 }
 
@@ -126,7 +150,7 @@ fn main() {
                 println!("main.rs => Menu event triggered: {:?}", event.id);
                 if event.id == "sobre" {
                     app.dialog()
-                        .message("Gepis Dados Abertos\nVersÃ£o 0.1.0\n\nEste projeto Ã© uma iniciativa do grupo de pesquisa Gepis para promover a utilizaÃ§Ã£o de dados abertos.")
+                        .message("Gepis Dados Abertos\nVersão 0.1.0\n\nEste projeto é uma iniciativa do grupo de pesquisa Gepis para promover a utilização de dados abertos.")
                         .title("Sobre o Gepis Dados Abertos")
                         .kind(MessageDialogKind::Info)
                         .show(|_result| {});
