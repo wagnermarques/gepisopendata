@@ -2,7 +2,7 @@ import {
   ApplicationConfig,
   inject,
   provideZoneChangeDetection,
-  provideZonelessChangeDetection,
+  provideZonelessChangeDetection, isDevMode,
 } from '@angular/core';
 import { provideRouter, withHashLocation } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
@@ -13,6 +13,7 @@ import { ConfigService } from './services/config.service';
 import { isTauri } from './services/environment';
 import { WebConfigService } from './services/web-config.service';
 import { TauriConfigService } from './services/tauri-config.service';
+import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,6 +27,9 @@ export const appConfig: ApplicationConfig = {
       provide: ConfigService,
       useFactory: () =>
         isTauri() ? inject(TauriConfigService) : inject(WebConfigService),
-    },
+    }, provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          }),
   ],
 };
