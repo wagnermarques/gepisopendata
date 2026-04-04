@@ -7,6 +7,67 @@ use tauri::{
         Emitter, Manager,
 };
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
+use std::fs::File;
+use std::io::{copy, Write};
+
+// Rust command to download a file and update the registry
+#[tauri::command]
+async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: serde_json::Value) -> Result<String, String> {
+    println!("Rust => Downloading from URL: {}", url);
+    
+    // 1. Get the filename from the URL
+    let file_name = url.split('/').last().unwrap_or("dataset.zip");
+    
+    // 2. Resolve AppData path and ensure it exists
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    let downloads_dir = app_data_dir.join("downloads");
+    std::fs::create_dir_all(&downloads_dir).map_err(|e| e.to_string())?;
+    
+    let dest_path = downloads_dir.join(file_name);
+
+    // 3. Perform the download
+    let client = reqwest::Client::builder()
+        .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+        .danger_accept_invalid_certs(true) 
+        .build()
+        .map_err(|e| format!("Erro ao criar cliente HTTP: {}", e))?;
+
+    let response = client.get(&url).send().await.map_err(|e| format!("Erro na requisição: {}", e))?;
+    
+    if !response.status().is_success() {
+        return Err(format!("Servidor retornou erro {}: {}", response.status(), url));
+    }
+
+    let content = response.bytes().await.map_err(|e| format!("Erro ao ler bytes: {}", e))?;
+    let mut file = File::create(&dest_path).map_err(|e| format!("Erro ao criar arquivo local: {}", e))?;
+    copy(&mut content.as_ref(), &mut file).map_err(|e| format!("Erro ao salvar arquivo: {}", e))?;
+
+    // 4. Update the Registry JSON File in Rust
+    let registry_path = app_data_dir.join("datasets-registry.json");
+    let mut registry: Vec<serde_json::Value> = if registry_path.exists() {
+        let file = File::open(&registry_path).map_err(|e| e.to_string())?;
+        serde_json::from_reader(file).unwrap_or_else(|_| vec![])
+    } else {
+        vec![]
+    };
+
+    // Add entry to registry
+    let mut entry = metadata.clone();
+    if let Some(obj) = entry.as_object_mut() {
+        obj.insert("id".to_string(), serde_json::json!(uuid::Uuid::new_v4().to_string()));
+        obj.insert("dateAdded".to_string(), serde_json::json!(chrono::Utc::now().to_rfc3339()));
+        obj.insert("file".to_string(), serde_json::json!(file_name));
+    }
+    registry.push(entry);
+
+    // Write back to registry
+    let mut file = File::create(&registry_path).map_err(|e| e.to_string())?;
+    let json = serde_json::to_string_pretty(&registry).map_err(|e| e.to_string())?;
+    file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+
+    println!("Rust => Registry updated and Download complete: {:?}", file_name);
+    Ok(file_name.to_string())
+}
 
 fn main() {
     tauri::Builder::default()
@@ -15,6 +76,7 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_mcp_gui::init())
+        .invoke_handler(tauri::generate_handler![download_dataset])
         .setup(|app| {
             // Create the "Sobre" menu item
             let sobre_item = MenuItem::with_id(app, "sobre", "Sobre", true, None::<&str>)?;

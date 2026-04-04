@@ -25,6 +25,8 @@ dotenvy = "0.15.7"
 bollard = "0.19.4"
 futures = "0.3"
 serde_yaml = "0.9.34"
+uuid = { version = "1.7", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
 tauri-plugin-mcp-gui = "0.1.0"
 
 [build-dependencies]

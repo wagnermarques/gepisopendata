@@ -8,10 +8,14 @@
     "core:event:allow-emit",
     "core:webview:allow-internal-toggle-devtools",
     "shell:default",
-    "fs:allow-app-read-recursive",
-    "fs:allow-appconfig-read-recursive",
-    "fs:allow-read-text-file",
-    "fs:allow-write-text-file",
+    "fs:allow-appdata-read",
+    "fs:allow-appdata-write",
+    "fs:allow-appdata-read-recursive",
+    "fs:allow-appdata-write-recursive",
+    "fs:allow-appconfig-read",
+    "fs:allow-appconfig-write",
+    "fs:allow-read-file",
+    "fs:allow-write-file",
     "fs:allow-exists",
     "fs:allow-mkdir",
     {
@@ -19,7 +23,20 @@
       "allow": ["$APPCONFIG/**/*", "$APPDATA/**/*", "$HOME/**/*"]
     },
     "dialog:default",
-    "http:default",
+    {
+      "identifier": "http:default",
+      "allow": [
+        { "url": "https://download.inep.gov.br/**/*" },
+        { "url": "https://*.gov.br/**/*" }
+      ]
+    },
+    {
+      "identifier": "http:allow-fetch",
+      "allow": [
+        { "url": "https://download.inep.gov.br/**/*" },
+        { "url": "https://*.gov.br/**/*" }
+      ]
+    },
     "mcp-gui:default"
   ]
 }

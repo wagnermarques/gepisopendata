@@ -3,3 +3,13 @@ target
 #this code is generated from build of front-end by npm command
 #so we do not want to send it to github
 www
+
+# Ignore downloaded datasets
+*.zip
+*.csv
+*.xlsx
+*.parquet
+*.json.metadata.json
+downloads/
+data/
+!angular-ui/src/assets/data/datasets-registry.json

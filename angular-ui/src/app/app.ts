@@ -30,7 +30,6 @@ import { Subscription } from 'rxjs';
     MatTooltipModule,
     FixedHead,
     FixedStatusbar,
-    JsonPipe,
   ],
 })
 export class App implements OnInit, OnDestroy {

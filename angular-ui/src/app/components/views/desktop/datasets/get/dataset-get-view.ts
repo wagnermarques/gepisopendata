@@ -9,8 +9,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { fetch } from '@tauri-apps/plugin-http';
-import { BaseDirectory, writeFile } from '@tauri-apps/plugin-fs';
+import { MatDividerModule } from '@angular/material/divider';
+import { invoke } from '@tauri-apps/api/core';
 import { message } from '@tauri-apps/plugin-dialog';
 
 @Component({
@@ -27,6 +27,7 @@ import { message } from '@tauri-apps/plugin-dialog';
     MatIconModule,
     MatProgressBarModule,
     MatCheckboxModule,
+    MatDividerModule,
   ],
   template: `
     <div class="container">
@@ -39,7 +40,6 @@ import { message } from '@tauri-apps/plugin-dialog';
         <mat-card-content>
           <form [formGroup]="datasetForm" (ngSubmit)="downloadDataset()" class="form-container">
             
-            <!-- Seção de Agrupamento -->
             <div class="section-title">Agrupamento e Série</div>
             <div class="row multi-col">
               <mat-form-field appearance="outline">
@@ -133,14 +133,14 @@ import { message } from '@tauri-apps/plugin-dialog';
 
             @if (isDownloading()) {
               <div class="progress-section">
-                <p>Baixando dados... por favor aguarde.</p>
+                <p>Processando via Rust (Download e Metadados)... por favor aguarde.</p>
                 <mat-progress-bar mode="indeterminate"></mat-progress-bar>
               </div>
             }
 
             <div class="actions">
               <button mat-raised-button color="primary" type="submit" [disabled]="datasetForm.invalid || isDownloading()">
-                <mat-icon>save_alt</mat-icon> Baixar e Salvar Metadados
+                <mat-icon>cloud_download</mat-icon> Registrar e Baixar
               </button>
             </div>
           </form>
@@ -193,28 +193,19 @@ export class DatasetGetView {
     this.isDownloading.set(true);
 
     try {
+      // For each URL, we call the Rust command
+      // The Rust command now also handles the JSON registry update
       for (const url of urlList) {
-        console.log(`Iniciando download de: ${url}`);
-        const response = await fetch(url, { method: 'GET' });
-
-        if (!response.ok) throw new Error(`Falha no download da URL: ${url}`);
-
-        const arrayBuffer = await response.arrayBuffer();
-        const data = new Uint8Array(arrayBuffer);
-        const fileName = url.split('/').pop() || `dataset_${Date.now()}.zip`;
-
-        await writeFile(fileName, data, { baseDir: BaseDirectory.AppData });
+        console.log(`Solicitando processamento via Rust: ${url}`);
+        
+        // Pass the metadata along with the URL
+        await invoke('download_dataset', { 
+          url, 
+          metadata: this.datasetForm.value 
+        });
       }
 
-      const metadata = this.datasetForm.value;
-      const metadataFileName = `${tituloCurto?.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_metadata.json`;
-      await writeFile(
-        metadataFileName, 
-        new TextEncoder().encode(JSON.stringify(metadata, null, 2)), 
-        { baseDir: BaseDirectory.AppData }
-      );
-
-      await message(`Conjunto de dados "${tituloCurto}" e seus metadados foram salvos com sucesso!`, {
+      await message(`Conjunto de dados "${tituloCurto}" registrado e baixado com sucesso!`, {
         title: 'Sucesso',
         kind: 'info',
       });
@@ -226,8 +217,8 @@ export class DatasetGetView {
       });
 
     } catch (err) {
-      console.error(err);
-      await message(`Erro ao processar conjunto de dados: ${err}`, {
+      console.error('Download/Registry error:', err);
+      await message(`Erro no processamento: ${err}`, {
         title: 'Erro',
         kind: 'error',
       });
