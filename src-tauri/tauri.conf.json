@@ -3,16 +3,7 @@
   "version": "0.1.0",
   "identifier": "com.gepis.dadosabertos",
   "build": {
-    "frontendDist": "www/browser",
-    "devUrl": "http://localhost:4200",
-    "beforeDevCommand": "npm run start:dev",
-    "beforeBuildCommand": "npm run build",
-    "watch": {
-      "ignore": [
-        "downloads/**",
-        "angular-ui/public/data/**"
-      ]
-    }
+    "frontendDist": "www/browser"
   },
   "app": {
     "windows": [
