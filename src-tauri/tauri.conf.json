@@ -6,14 +6,9 @@
     "frontendDist": "www/browser"
   },
   "app": {
-    "security": {
-      "capabilities": [
-        "default"
-      ],
-      "csp": null
-    },
     "windows": [
       {
+        "label": "main",
         "title": "Gepis Dados Abertos",
         "width": 1200,
         "height": 800
@@ -21,6 +16,9 @@
     ],
     "withGlobalTauri": true,
     "security": {
+      "capabilities": [
+        "default"
+      ],
       "csp": null
     }
   },
