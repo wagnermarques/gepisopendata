@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { fetch } from '@tauri-apps/plugin-http';
 import { BaseDirectory, writeFile } from '@tauri-apps/plugin-fs';
 import { message } from '@tauri-apps/plugin-dialog';
@@ -25,58 +26,108 @@ import { message } from '@tauri-apps/plugin-dialog';
     MatCardModule,
     MatIconModule,
     MatProgressBarModule,
+    MatCheckboxModule,
   ],
   template: `
     <div class="container">
-      <mat-card>
+      <mat-card appearance="outlined">
         <mat-card-header>
-          <mat-card-title>Obter Conjunto de Dados (INEP)</mat-card-title>
-          <mat-card-subtitle>Configure os metadados e baixe os microdados do Censo Escolar</mat-card-subtitle>
+          <mat-card-title>Obter Conjunto de Dados</mat-card-title>
+          <mat-card-subtitle>Cadastre os metadados e realize o download dos arquivos</mat-card-subtitle>
         </mat-card-header>
         
         <mat-card-content>
           <form [formGroup]="datasetForm" (ngSubmit)="downloadDataset()" class="form-container">
+            
+            <!-- Seção de Agrupamento -->
+            <div class="section-title">Agrupamento e Série</div>
+            <div class="row multi-col">
+              <mat-form-field appearance="outline">
+                <mat-label>Grupo / Coleção</mat-label>
+                <input matInput formControlName="grupo" placeholder="Ex: Censo Escolar, Comércio Exterior">
+                <mat-hint>Nome para agrupar múltiplos arquivos relacionados</mat-hint>
+              </mat-form-field>
+
+              <div class="checkbox-container">
+                <mat-checkbox formControlName="isSerieHistorica">Este dado faz parte de uma série histórica?</mat-checkbox>
+              </div>
+            </div>
+
+            <mat-divider style="margin: 16px 0;"></mat-divider>
+
+            <div class="section-title">Informações Básicas</div>
             <div class="row">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Título</mat-label>
-                <input matInput formControlName="titulo" placeholder="Ex: Microdados do Censo Escolar 2023">
+                <mat-label>Título Curto</mat-label>
+                <input matInput formControlName="tituloCurto" placeholder="Ex: Censo Escolar 2023">
+                <mat-error *ngIf="datasetForm.get('tituloCurto')?.hasError('required')">O título curto é obrigatório</mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Título Longo</mat-label>
+                <input matInput formControlName="tituloLongo" placeholder="Ex: Microdados do Censo Escolar da Educação Básica 2023">
+                <mat-error *ngIf="datasetForm.get('tituloLongo')?.hasError('required')">O título longo é obrigatório</mat-error>
               </mat-form-field>
             </div>
 
             <div class="row">
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Descrição</mat-label>
-                <textarea matInput formControlName="descricao" rows="3"></textarea>
+                <textarea matInput formControlName="descricao" rows="3" placeholder="Breve descrição do conjunto de dados"></textarea>
               </mat-form-field>
             </div>
 
             <div class="row multi-col">
               <mat-form-field appearance="outline">
-                <mat-label>Ano de Referência</mat-label>
-                <input matInput formControlName="ano" type="number">
+                <mat-label>Órgão Emissor</mat-label>
+                <input matInput formControlName="orgaoEmissao" placeholder="Ex: INEP">
+                <mat-error *ngIf="datasetForm.get('orgaoEmissao')?.hasError('required')">O órgão emissor é obrigatório</mat-error>
               </mat-form-field>
 
+              <mat-form-field appearance="outline">
+                <mat-label>Data de Referência</mat-label>
+                <input matInput formControlName="dataReferencia" placeholder="Ex: 2023 ou 01/2023">
+                <mat-error *ngIf="datasetForm.get('dataReferencia')?.hasError('required')">A data de referência é obrigatória</mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="row multi-col">
               <mat-form-field appearance="outline">
                 <mat-label>Frequência de Atualização</mat-label>
                 <mat-select formControlName="frequencia">
                   <mat-option value="Anual">Anual</mat-option>
                   <mat-option value="Mensal">Mensal</mat-option>
+                  <mat-option value="Diário">Diário</mat-option>
                   <mat-option value="Irregular">Irregular</mat-option>
                 </mat-select>
               </mat-form-field>
-            </div>
 
-            <div class="row">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>URL de Download (ZIP)</mat-label>
-                <input matInput formControlName="url" placeholder="https://download.inep.gov.br/...">
+              <mat-form-field appearance="outline">
+                <mat-label>Licença</mat-label>
+                <input matInput formControlName="licenca" placeholder="Ex: ODbL, CC-BY">
               </mat-form-field>
             </div>
 
+            <div class="section-title">Download</div>
             <div class="row">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Licença</mat-label>
-                <input matInput formControlName="licenca">
+                <mat-label>URLs para Download (uma por linha)</mat-label>
+                <textarea matInput formControlName="urls" rows="3" placeholder="https://exemplo.gov.br/dados.zip"></textarea>
+                <mat-error *ngIf="datasetForm.get('urls')?.hasError('required')">Pelo menos uma URL é obrigatória</mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="row multi-col">
+              <mat-form-field appearance="outline">
+                <mat-label>Autor/Responsável</mat-label>
+                <input matInput formControlName="autor">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Tags (separadas por vírgula)</mat-label>
+                <input matInput formControlName="tags" placeholder="Ex: educação, censo, brasil">
               </mat-form-field>
             </div>
 
@@ -89,7 +140,7 @@ import { message } from '@tauri-apps/plugin-dialog';
 
             <div class="actions">
               <button mat-raised-button color="primary" type="submit" [disabled]="datasetForm.invalid || isDownloading()">
-                <mat-icon>download</mat-icon> Baixar e Salvar Metadados
+                <mat-icon>save_alt</mat-icon> Baixar e Salvar Metadados
               </button>
             </div>
           </form>
@@ -98,12 +149,15 @@ import { message } from '@tauri-apps/plugin-dialog';
     </div>
   `,
   styles: [`
-    .container { padding: 20px; max-width: 800px; margin: 0 auto; }
-    .form-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+    .container { padding: 20px; max-width: 900px; margin: 0 auto; }
+    .form-container { display: flex; flex-direction: column; gap: 4px; margin-top: 10px; }
     .full-width { width: 100%; }
-    .multi-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .multi-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; }
     .actions { display: flex; justify-content: flex-end; margin-top: 20px; }
     .progress-section { margin: 20px 0; }
+    .section-title { font-size: 0.9rem; font-weight: 500; color: #666; margin: 10px 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
+    .checkbox-container { padding-bottom: 20px; }
+    mat-card-title { font-weight: bold; color: #3f51b5; }
   `]
 })
 export class DatasetGetView {
@@ -111,55 +165,69 @@ export class DatasetGetView {
   isDownloading = signal(false);
 
   datasetForm = this.fb.group({
-    titulo: ['Microdados do Censo Escolar 2023', Validators.required],
-    descricao: ['Dados detalhados sobre estabelecimentos de ensino, turmas, alunos e profissionais escolares.', Validators.required],
-    ano: [2023, [Validators.required, Validators.min(1900)]],
-    frequencia: ['Anual', Validators.required],
-    url: ['https://download.inep.gov.br/microdados/microdados_censo_escolar_2023.zip', [Validators.required, Validators.pattern('https?://.*')]],
-    licenca: ['Open Data Commons Open Database License (ODbL)', Validators.required],
-    autor: ['INEP - Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira'],
-    tags: ['Censo Escolar, Educação Básica, Microdados'],
+    grupo: [''],
+    isSerieHistorica: [false],
+    tituloCurto: ['', Validators.required],
+    tituloLongo: ['', Validators.required],
+    descricao: [''],
+    orgaoEmissao: ['', Validators.required],
+    dataReferencia: ['', Validators.required],
+    frequencia: ['Anual'],
+    licenca: [''],
+    urls: ['', [Validators.required]],
+    autor: [''],
+    tags: [''],
   });
 
   async downloadDataset() {
     if (this.datasetForm.invalid) return;
 
-    const { url, titulo } = this.datasetForm.value;
+    const { urls, tituloCurto } = this.datasetForm.value;
+    const urlList = urls!.split('\n').map(u => u.trim()).filter(u => u.length > 0);
+    
+    if (urlList.length === 0) {
+      await message('Por favor, insira pelo menos uma URL válida.', { title: 'Erro', kind: 'error' });
+      return;
+    }
+
     this.isDownloading.set(true);
 
     try {
-      // 1. Download the file using Tauri v2 HTTP plugin
-      // In v2, fetch works more like the standard web fetch but with extra capabilities
-      const response = await fetch(url!, {
-        method: 'GET',
-      });
+      for (const url of urlList) {
+        console.log(`Iniciando download de: ${url}`);
+        const response = await fetch(url, { method: 'GET' });
 
-      if (!response.ok) throw new Error('Falha no download');
+        if (!response.ok) throw new Error(`Falha no download da URL: ${url}`);
 
-      const arrayBuffer = await response.arrayBuffer();
-      const data = new Uint8Array(arrayBuffer);
-      const fileName = url!.split('/').pop() || 'dataset.zip';
+        const arrayBuffer = await response.arrayBuffer();
+        const data = new Uint8Array(arrayBuffer);
+        const fileName = url.split('/').pop() || `dataset_${Date.now()}.zip`;
 
-      // 2. Save file to app data directory
-      await writeFile(fileName, data, { baseDir: BaseDirectory.AppData });
+        await writeFile(fileName, data, { baseDir: BaseDirectory.AppData });
+      }
 
-      // 3. Save metadata as JSON
       const metadata = this.datasetForm.value;
-      const metadataFileName = `${fileName}.metadata.json`;
+      const metadataFileName = `${tituloCurto?.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_metadata.json`;
       await writeFile(
         metadataFileName, 
         new TextEncoder().encode(JSON.stringify(metadata, null, 2)), 
         { baseDir: BaseDirectory.AppData }
       );
 
-      await message(`Conjunto de dados "${titulo}" baixado com sucesso em AppData!`, {
+      await message(`Conjunto de dados "${tituloCurto}" e seus metadados foram salvos com sucesso!`, {
         title: 'Sucesso',
         kind: 'info',
       });
       
+      this.datasetForm.reset({
+        frequencia: 'Anual',
+        isSerieHistorica: false,
+        grupo: ''
+      });
+
     } catch (err) {
       console.error(err);
-      await message(`Erro ao baixar conjunto de dados: ${err}`, {
+      await message(`Erro ao processar conjunto de dados: ${err}`, {
         title: 'Erro',
         kind: 'error',
       });
