@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "identifier": "com.gepis.dadosabertos",
   "build": {
-    "frontendDist": "www/browser"
+    "frontendDist": "www/browser",
+    "devUrl": "http://localhost:4200",
+    "beforeDevCommand": "npm run start:dev",
+    "beforeBuildCommand": "npm run build"
   },
   "app": {
     "windows": [

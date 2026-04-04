@@ -11,22 +11,50 @@ use std::fs::File;
 use std::io::{copy, Write};
 use std::path::PathBuf;
 
-// Rust command to download a file and update the registry
+// Helper to sanitize filenames
+fn sanitize_filename(name: &str) -> String {
+    name.chars()
+        .map(|c| if c.is_alphanumeric() || c == '-' || c == '_' { c } else { '_' })
+        .collect::<String>()
+        .to_lowercase()
+}
+
+// Rust command to download a file and update the registry with organized folders
 #[tauri::command]
 async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: serde_json::Value) -> Result<String, String> {
-    println!("Rust => Downloading from URL: {}", url);
+    println!("Rust => Processing download for: {}", url);
     
-    // 1. Get the filename from the URL
-    let file_name = url.split('/').last().unwrap_or("dataset.zip");
-    
-    // 2. Resolve AppData path for the large binary files (not committed)
-    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
-    let downloads_dir = app_data_dir.join("downloads");
-    std::fs::create_dir_all(&downloads_dir).map_err(|e| e.to_string())?;
-    
-    let dest_path = downloads_dir.join(file_name);
+    // 1. Extract info from metadata
+    let titulo_curto = metadata["tituloCurto"].as_str().unwrap_or("sem-titulo");
+    let grupo = metadata["grupo"].as_str().unwrap_or("sem-grupo");
+    let grupo_folder = if grupo.trim().is_empty() { "sem-grupo".to_string() } else { sanitize_filename(grupo) };
+    let dataset_folder = sanitize_filename(titulo_curto);
 
-    // 3. Perform the download
+    // 2. Resolve Base Downloads Directory
+    // In Dev: [ProjectRoot]/downloads/datasets
+    // In Prod: [AppData]/downloads/datasets
+    let mut base_downloads_path = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            // manifest_dir is the root where Cargo.toml lives
+            base_downloads_path = PathBuf::from(manifest_dir).join("downloads");
+        }
+    }
+
+    // 3. Create the specific structure: datasets/{grupo}/{titulo_curto}
+    let target_dir = base_downloads_path
+        .join("datasets")
+        .join(&grupo_folder)
+        .join(&dataset_folder);
+    
+    std::fs::create_dir_all(&target_dir).map_err(|e| format!("Erro ao criar pastas: {}", e))?;
+
+    // 4. Perform the download
+    let file_name = url.split('/').last().unwrap_or("dataset.zip");
+    let dest_path = target_dir.join(file_name);
+
     let client = reqwest::Client::builder()
         .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
         .danger_accept_invalid_certs(true) 
@@ -43,28 +71,23 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
     let mut file = File::create(&dest_path).map_err(|e| format!("Erro ao criar arquivo local: {}", e))?;
     copy(&mut content.as_ref(), &mut file).map_err(|e| format!("Erro ao salvar arquivo: {}", e))?;
 
-    // 4. Resolve the Registry Path (The portable/committable part)
-    // In DEVELOPMENT, we also write to the source tree assets folder
+    // 5. Update Registry (Committable assets)
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
     let mut registry_paths = vec![app_data_dir.join("datasets-registry.json")];
     
     #[cfg(debug_assertions)]
     {
-        // Try to find the project root during development to sync the JSON
         if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
             let project_assets = PathBuf::from(manifest_dir)
-                .join("..")
                 .join("angular-ui")
                 .join("src")
                 .join("assets")
                 .join("data")
                 .join("datasets-registry.json");
-            
-            println!("Rust Dev => Syncing registry to source: {:?}", project_assets);
             registry_paths.push(project_assets);
         }
     }
 
-    // 5. Update Registry in all resolved paths
     for path in registry_paths {
         if let Some(parent) = path.parent() {
             let _ = std::fs::create_dir_all(parent);
@@ -77,13 +100,33 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
             vec![]
         };
 
-        let mut entry = metadata.clone();
-        if let Some(obj) = entry.as_object_mut() {
-            obj.insert("id".to_string(), serde_json::json!(uuid::Uuid::new_v4().to_string()));
-            obj.insert("dateAdded".to_string(), serde_json::json!(chrono::Utc::now().to_rfc3339()));
-            obj.insert("file".to_string(), serde_json::json!(file_name));
+        // Check if entry already exists to avoid duplicates in the same run
+        let mut entry_exists = false;
+        let entry_id = format!("{}-{}", sanitize_filename(grupo), sanitize_filename(titulo_curto));
+        
+        for item in registry.iter_mut() {
+            if item["id"].as_str() == Some(&entry_id) {
+                // Update files list if it's a new file in same dataset
+                if let Some(files) = item["files"].as_array_mut() {
+                    if !files.contains(&serde_json::json!(file_name)) {
+                        files.push(serde_json::json!(file_name));
+                    }
+                }
+                entry_exists = true;
+                break;
+            }
         }
-        registry.push(entry);
+
+        if !entry_exists {
+            let mut entry = metadata.clone();
+            if let Some(obj) = entry.as_object_mut() {
+                obj.insert("id".to_string(), serde_json::json!(entry_id));
+                obj.insert("dateAdded".to_string(), serde_json::json!(chrono::Utc::now().to_rfc3339()));
+                obj.insert("files".to_string(), serde_json::json!(vec![file_name]));
+                obj.insert("localPath".to_string(), serde_json::json!(target_dir.to_string_lossy()));
+            }
+            registry.push(entry);
+        }
 
         let mut file = File::create(&path).map_err(|e| e.to_string())?;
         let json = serde_json::to_string_pretty(&registry).map_err(|e| e.to_string())?;
