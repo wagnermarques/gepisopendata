@@ -35,6 +35,27 @@ export const routes: Routes = [
             (m) => m.DatasetListView
           ),
       },
+      {
+        path: 'analysis/select',
+        loadComponent: () =>
+          import('./components/views/desktop/analysis/select/dataset-select-view').then(
+            (m) => m.DatasetSelectView
+          ),
+      },
+      {
+        path: 'analysis/config',
+        loadComponent: () =>
+          import('./components/views/desktop/analysis/config/variable-config-view').then(
+            (m) => m.VariableConfigView
+          ),
+      },
+      {
+        path: 'analysis/descritiva',
+        loadComponent: () =>
+          import('./components/views/desktop/analysis/descritiva/descritiva-view').then(
+            (m) => m.DescritivaView
+          ),
+      },
     ],
   },
 ];

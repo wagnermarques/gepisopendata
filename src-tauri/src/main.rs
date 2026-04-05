@@ -10,7 +10,9 @@ use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 use std::fs::{File, self};
 use std::io::{copy, Write};
 use std::path::PathBuf;
+use std::collections::HashMap;
 use zip::ZipArchive;
+use calamine::{Reader, open_workbook_auto};
 
 // Helper to sanitize filenames
 fn sanitize_filename(name: &str) -> String {
@@ -106,8 +108,6 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
                 }
             }
         }
-        // Optional: remove the zip after extraction to save space
-        // let _ = fs::remove_file(&dest_path);
     }
 
     // 5. Update Registry
@@ -163,6 +163,336 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
     Ok(file_name.to_string())
 }
 
+#[derive(serde::Serialize)]
+struct ColumnInfo {
+    name: String,
+    #[serde(rename = "type")]
+    col_type: String,
+}
+
+#[derive(serde::Serialize)]
+struct GroupAnalysis {
+    files: Vec<String>,
+    common_columns: Vec<ColumnInfo>,
+    format: String,
+}
+
+fn find_files_recursive(dir: &PathBuf, extension: &str, files: &mut Vec<PathBuf>) -> Result<(), std::io::Error> {
+    if dir.is_dir() {
+        for entry in fs::read_dir(dir)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.is_dir() {
+                find_files_recursive(&path, extension, files)?;
+            } else if let Some(ext) = path.extension().and_then(|s| s.to_str()) {
+                if ext.to_lowercase() == extension.to_lowercase() {
+                    files.push(path);
+                }
+            }
+        }
+    }
+    Ok(())
+}
+
+#[tauri::command]
+async fn analyze_group(app_handle: tauri::AppHandle, group_name: String) -> Result<GroupAnalysis, String> {
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    let mut registry_path = app_data_dir.join("datasets-registry.json");
+
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("data").join("datasets-registry.json");
+            if dev_path.exists() { registry_path = dev_path; }
+        }
+    }
+
+    if !registry_path.exists() { return Err("Registro não encontrado".into()); }
+    
+    let file = File::open(&registry_path).map_err(|e| e.to_string())?;
+    let registry: Vec<serde_json::Value> = serde_json::from_reader(file).map_err(|e| e.to_string())?;
+    
+    let group_items: Vec<_> = registry.into_iter()
+        .filter(|item| item["grupo"].as_str().unwrap_or("") == group_name)
+        .collect();
+        
+    if group_items.is_empty() { return Err("Grupo não encontrado".into()); }
+
+    let format = group_items[0]["formato"].as_str().unwrap_or("csv").to_lowercase();
+    
+    let mut all_files = Vec::new();
+    let mut common_columns: Option<HashMap<String, String>> = None;
+
+    for item in group_items {
+        let local_path_str = item["localPath"].as_str().unwrap_or("");
+        if local_path_str.is_empty() { continue; }
+        let local_path = PathBuf::from(local_path_str);
+        if !local_path.exists() { continue; }
+
+        let mut item_files = Vec::new();
+        let _ = find_files_recursive(&local_path, &format, &mut item_files);
+        
+        for file_path in item_files {
+            let rel_path = file_path.strip_prefix(&local_path).unwrap_or(&file_path).to_string_lossy().into_owned();
+            all_files.push(rel_path);
+
+            if format == "csv" {
+                if let Ok(file) = File::open(&file_path) {
+                    let mut rdr = csv::ReaderBuilder::new()
+                        .has_headers(true)
+                        .delimiter(b';')
+                        .from_reader(file);
+
+                    if let Ok(headers) = rdr.headers().map(|h| h.clone()) {
+                        let mut current_file_cols = HashMap::new();
+                        
+                        let types = if let Some(Ok(record)) = rdr.records().next() {
+                            let mut t = Vec::new();
+                            for val in record.iter() {
+                                t.push(if val.parse::<f64>().is_ok() { "Número" } else { "Texto" });
+                            }
+                            t
+                        } else {
+                            vec!["Texto"; headers.len()]
+                        };
+
+                        for (i, h) in headers.iter().enumerate() {
+                            current_file_cols.insert(h.to_string(), types.get(i).unwrap_or(&"Texto").to_string());
+                        }
+
+                        if let Some(common) = common_columns {
+                            let mut new_common = HashMap::new();
+                            for (name, col_type) in common {
+                                if current_file_cols.contains_key(&name) {
+                                    new_common.insert(name, col_type);
+                                }
+                            }
+                            common_columns = Some(new_common);
+                        } else {
+                            common_columns = Some(current_file_cols);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    let final_columns = common_columns.unwrap_or_default().into_iter()
+        .map(|(name, col_type)| ColumnInfo { name, col_type })
+        .collect();
+
+    Ok(GroupAnalysis {
+        files: all_files,
+        common_columns: final_columns,
+        format,
+    })
+}
+
+#[tauri::command]
+async fn get_columns_for_files(app_handle: tauri::AppHandle, group_name: String, files: Vec<String>) -> Result<Vec<ColumnInfo>, String> {
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    let mut registry_path = app_data_dir.join("datasets-registry.json");
+
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("data").join("datasets-registry.json");
+            if dev_path.exists() { registry_path = dev_path; }
+        }
+    }
+
+    let file = File::open(&registry_path).map_err(|e| e.to_string())?;
+    let registry: Vec<serde_json::Value> = serde_json::from_reader(file).map_err(|e| e.to_string())?;
+    
+    let group_items: Vec<_> = registry.into_iter()
+        .filter(|item| item["grupo"].as_str().unwrap_or("") == group_name)
+        .collect();
+        
+    if group_items.is_empty() { return Err("Grupo não encontrado".into()); }
+
+    let mut common_columns: Option<HashMap<String, String>> = None;
+
+    for rel_path in files {
+        let mut found_full_path = None;
+        for item in &group_items {
+            let local_path = PathBuf::from(item["localPath"].as_str().unwrap_or(""));
+            let full_path = local_path.join(&rel_path);
+            if full_path.exists() {
+                found_full_path = Some(full_path);
+                break;
+            }
+        }
+
+        if let Some(full_path) = found_full_path {
+            if let Ok(file) = File::open(&full_path) {
+                let mut rdr = csv::ReaderBuilder::new()
+                    .has_headers(true)
+                    .delimiter(b';')
+                    .from_reader(file);
+
+                if let Ok(headers) = rdr.headers().map(|h| h.clone()) {
+                    let mut current_file_cols = HashMap::new();
+                    let types = if let Some(Ok(record)) = rdr.records().next() {
+                        let mut t = Vec::new();
+                        for val in record.iter() {
+                            t.push(if val.parse::<f64>().is_ok() { "Número" } else { "Texto" });
+                        }
+                        t
+                    } else {
+                        vec!["Texto"; headers.len()]
+                    };
+
+                    for (i, h) in headers.iter().enumerate() {
+                        current_file_cols.insert(h.to_string(), types.get(i).unwrap_or(&"Texto").to_string());
+                    }
+
+                    if let Some(common) = common_columns {
+                        let mut new_common = HashMap::new();
+                        for (name, col_type) in common {
+                            if current_file_cols.contains_key(&name) {
+                                new_common.insert(name, col_type);
+                            }
+                        }
+                        common_columns = Some(new_common);
+                    } else {
+                        common_columns = Some(current_file_cols);
+                    }
+                }
+            }
+        }
+    }
+
+    let result = common_columns.unwrap_or_default().into_iter()
+        .map(|(name, col_type)| ColumnInfo { name, col_type })
+        .collect();
+
+    Ok(result)
+}
+
+#[derive(serde::Serialize)]
+struct DictionaryEntry {
+    name: String,
+    description: String,
+    var_type: String,
+}
+
+#[tauri::command]
+async fn get_excel_files(app_handle: tauri::AppHandle, group_name: String) -> Result<Vec<String>, String> {
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    let mut registry_path = app_data_dir.join("datasets-registry.json");
+
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("data").join("datasets-registry.json");
+            if dev_path.exists() { registry_path = dev_path; }
+        }
+    }
+
+    let file = File::open(&registry_path).map_err(|e| e.to_string())?;
+    let registry: Vec<serde_json::Value> = serde_json::from_reader(file).map_err(|e| e.to_string())?;
+    
+    let group_items: Vec<_> = registry.into_iter()
+        .filter(|item| item["grupo"].as_str().unwrap_or("") == group_name)
+        .collect();
+        
+    if group_items.is_empty() { return Err("Grupo não encontrado".into()); }
+
+    let mut excel_files = Vec::new();
+
+    for item in group_items {
+        let local_path_str = item["localPath"].as_str().unwrap_or("");
+        if local_path_str.is_empty() { continue; }
+        let local_path = PathBuf::from(local_path_str);
+        if !local_path.exists() { continue; }
+
+        let mut item_files = Vec::new();
+        let _ = find_files_recursive(&local_path, "xlsx", &mut item_files);
+        let _ = find_files_recursive(&local_path, "xls", &mut item_files);
+        
+        for file_path in item_files {
+            let rel_path = file_path.strip_prefix(&local_path).unwrap_or(&file_path).to_string_lossy().into_owned();
+            excel_files.push(rel_path);
+        }
+    }
+
+    Ok(excel_files)
+}
+
+#[tauri::command]
+async fn parse_dictionary(app_handle: tauri::AppHandle, group_name: String, file_name: String) -> Result<Vec<DictionaryEntry>, String> {
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    let mut registry_path = app_data_dir.join("datasets-registry.json");
+
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("data").join("datasets-registry.json");
+            if dev_path.exists() { registry_path = dev_path; }
+        }
+    }
+
+    let file = File::open(&registry_path).map_err(|e| e.to_string())?;
+    let registry: Vec<serde_json::Value> = serde_json::from_reader(file).map_err(|e| e.to_string())?;
+    
+    let group_items: Vec<_> = registry.into_iter()
+        .filter(|item| item["grupo"].as_str().unwrap_or("") == group_name)
+        .collect();
+
+    let mut full_path = None;
+    for item in &group_items {
+        let local_path = PathBuf::from(item["localPath"].as_str().unwrap_or(""));
+        let test_path = local_path.join(&file_name);
+        if test_path.exists() {
+            full_path = Some(test_path);
+            break;
+        }
+    }
+
+    let full_path = full_path.ok_or("Arquivo não encontrado")?;
+    let mut workbook = open_workbook_auto(full_path).map_err(|e| e.to_string())?;
+    
+    let mut entries = Vec::new();
+    
+    let sheets = workbook.sheet_names().to_owned();
+    for sheet_name in sheets {
+        if let Ok(range) = workbook.worksheet_range(&sheet_name) {
+            let mut name_idx = None;
+            let mut desc_idx = None;
+            let mut type_idx = None;
+
+            for row in range.rows() {
+                if name_idx.is_none() || desc_idx.is_none() {
+                    for (col_idx, cell) in row.iter().enumerate() {
+                        let cell_val = cell.to_string().to_lowercase();
+                        if cell_val.contains("nome da variável") || cell_val.contains("nome da variavel") {
+                            name_idx = Some(col_idx);
+                        } else if cell_val.contains("descrição da variável") || cell_val.contains("descricao da variavel") {
+                            desc_idx = Some(col_idx);
+                        } else if cell_val == "tipo" {
+                            type_idx = Some(col_idx);
+                        }
+                    }
+                } else {
+                    let name = row.get(name_idx.unwrap()).map(|c| c.to_string()).unwrap_or_default();
+                    let description = row.get(desc_idx.unwrap()).map(|c| c.to_string()).unwrap_or_default();
+                    let v_type = type_idx.and_then(|idx| row.get(idx)).map(|c| c.to_string()).unwrap_or_else(|| "Desconhecido".to_string());
+                    
+                    if !name.trim().is_empty() {
+                        entries.push(DictionaryEntry {
+                            name: name.trim().to_string(),
+                            description: description.trim().to_string(),
+                            var_type: v_type.trim().to_string(),
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(entries)
+}
+
 #[tauri::command]
 async fn get_registry(app_handle: tauri::AppHandle) -> Result<Vec<serde_json::Value>, String> {
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
@@ -190,6 +520,78 @@ async fn check_path_exists(path: String) -> bool {
     std::path::Path::new(&path).exists()
 }
 
+#[tauri::command]
+async fn get_group_columns(app_handle: tauri::AppHandle, group_name: String) -> Result<Vec<serde_json::Value>, String> {
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    let registry_path = app_data_dir.join("datasets-registry.json");
+    
+    if !registry_path.exists() { return Err("Registro não encontrado".into()); }
+    
+    let file = File::open(&registry_path).map_err(|e| e.to_string())?;
+    let registry: Vec<serde_json::Value> = serde_json::from_reader(file).map_err(|e| e.to_string())?;
+    
+    let group_items: Vec<_> = registry.into_iter()
+        .filter(|item| item["grupo"].as_str().unwrap_or("") == group_name)
+        .collect();
+        
+    if group_items.is_empty() { return Err("Grupo não encontrado".into()); }
+
+    let mut common_columns: Option<HashMap<String, String>> = None;
+
+    for item in group_items {
+        let local_path = PathBuf::from(item["localPath"].as_str().unwrap_or(""));
+        let files = item["files"].as_array().ok_or("No files in item")?;
+        
+        // We only look at CSV files for column analysis
+        let csv_file = files.iter()
+            .find(|f| f.as_str().unwrap_or("").to_lowercase().ends_with(".csv"))
+            .map(|f| f.as_str().unwrap_or(""));
+
+        if let Some(file_name) = csv_file {
+            let full_path = local_path.join(file_name);
+            if !full_path.exists() { continue; }
+
+            let file = File::open(full_path).map_err(|e| e.to_string())?;
+            let mut rdr = csv::ReaderBuilder::new()
+                .has_headers(true)
+                .delimiter(b';') // common in brazilian gov datasets, we might need auto-detect
+                .from_reader(file);
+
+            let headers = rdr.headers().map_err(|e| e.to_string())?.clone();
+            
+            // Guess types from first data row
+            let mut current_file_cols = HashMap::new();
+            if let Some(result) = rdr.records().next() {
+                let record = result.map_err(|e| e.to_string())?;
+                for (i, header) in headers.iter().enumerate() {
+                    let val = record.get(i).unwrap_or("");
+                    let col_type = if val.parse::<f64>().is_ok() { "Número" } else { "Texto" };
+                    current_file_cols.insert(header.to_string(), col_type.to_string());
+                }
+            }
+
+            if let Some(common) = common_columns {
+                // Intersect with existing common columns
+                let mut new_common = HashMap::new();
+                for (name, col_type) in common {
+                    if current_file_cols.contains_key(&name) {
+                        new_common.insert(name, col_type);
+                    }
+                }
+                common_columns = Some(new_common);
+            } else {
+                common_columns = Some(current_file_cols);
+            }
+        }
+    }
+
+    let result = common_columns.unwrap_or_default().into_iter()
+        .map(|(name, col_type)| serde_json::json!({ "name": name, "type": col_type }))
+        .collect();
+
+    Ok(result)
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
@@ -197,7 +599,7 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_mcp_gui::init())
-        .invoke_handler(tauri::generate_handler![download_dataset, get_registry, check_path_exists])
+        .invoke_handler(tauri::generate_handler![download_dataset, get_registry, check_path_exists, get_group_columns, analyze_group, get_columns_for_files, get_excel_files, parse_dictionary])
         .setup(|app| {
             let sobre_item = MenuItem::with_id(app, "sobre", "Sobre", true, None::<&str>)?;
             let ajuda_submenu = Submenu::with_items(app, "Ajuda", true, &[&sobre_item])?;
