@@ -11,6 +11,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatChipsModule } from '@angular/material/chips';
 import { invoke } from '@tauri-apps/api/core';
 import { message } from '@tauri-apps/plugin-dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -32,6 +33,7 @@ import { startWith } from 'rxjs/operators';
     MatCheckboxModule,
     MatDividerModule,
     MatAutocompleteModule,
+    MatChipsModule,
   ],
   template: `
     <div class="container">
@@ -67,14 +69,38 @@ import { startWith } from 'rxjs/operators';
               </div>
             </div>
 
+            @if (datasetsInSelectedGroup().length > 0) {
+              <div class="existing-datasets">
+                <div class="small-label">Datasets já existentes neste grupo:</div>
+                <mat-chip-set>
+                  @for (dataset of datasetsInSelectedGroup(); track dataset) {
+                    <mat-chip>{{ dataset }}</mat-chip>
+                  }
+                </mat-chip-set>
+              </div>
+            }
+
             <mat-divider style="margin: 16px 0;"></mat-divider>
 
             <div class="section-title">Informações Básicas</div>
-            <div class="row">
-              <mat-form-field appearance="outline" class="full-width">
+            <div class="row multi-col">
+              <mat-form-field appearance="outline">
                 <mat-label>Título Curto</mat-label>
                 <input matInput formControlName="tituloCurto" placeholder="Ex: Censo Escolar 2023">
                 <mat-error *ngIf="datasetForm.get('tituloCurto')?.hasError('required')">O título curto é obrigatório</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Formato Esperado</mat-label>
+                <mat-select formControlName="formato">
+                  <mat-option value="csv">CSV</mat-option>
+                  <mat-option value="parquet">Parquet</mat-option>
+                  <mat-option value="json">JSON</mat-option>
+                  <mat-option value="xlsx">Excel (.xlsx)</mat-option>
+                  <mat-option value="zip">Arquivo Comprimido (.zip)</mat-option>
+                  <mat-option value="outro">Outro</mat-option>
+                </mat-select>
+                <mat-hint>Se for ZIP, tentaremos extrair este formato</mat-hint>
               </mat-form-field>
             </div>
 
@@ -147,7 +173,7 @@ import { startWith } from 'rxjs/operators';
 
             @if (isDownloading()) {
               <div class="progress-section">
-                <p>Processando via Rust (Download e Metadados)... por favor aguarde.</p>
+                <p>Processando via Rust (Download, Extração e Metadados)... por favor aguarde.</p>
                 <mat-progress-bar mode="indeterminate"></mat-progress-bar>
               </div>
             }
@@ -171,18 +197,26 @@ import { startWith } from 'rxjs/operators';
     .progress-section { margin: 20px 0; }
     .section-title { font-size: 0.9rem; font-weight: 500; color: #666; margin: 10px 0 5px 0; text-transform: uppercase; letter-spacing: 1px; }
     .checkbox-container { padding-bottom: 20px; }
+    .existing-datasets { margin: 8px 0; padding: 8px; background: #f5f5f5; border-radius: 4px; }
+    .small-label { font-size: 0.75rem; color: #777; margin-bottom: 4px; }
     mat-card-title { font-weight: bold; color: #3f51b5; }
   `]
 })
 export class DatasetGetView implements OnInit {
   private fb = inject(FormBuilder);
   isDownloading = signal(false);
+  
+  // Entire registry data
+  registry = signal<any[]>([]);
+  
+  // Unique groups for autocomplete
   allGroups = signal<string[]>([]);
 
   datasetForm = this.fb.group({
     grupo: [''],
     isSerieHistorica: [false],
     tituloCurto: ['', Validators.required],
+    formato: ['csv', Validators.required],
     tituloLongo: ['', Validators.required],
     descricao: [''],
     orgaoEmissao: ['', Validators.required],
@@ -194,28 +228,40 @@ export class DatasetGetView implements OnInit {
     tags: [''],
   });
 
-  // Signal to track the current value of the grupo control
+  // Track current group value
   grupoValue = toSignal(this.datasetForm.get('grupo')!.valueChanges.pipe(startWith('')));
 
-  // Computed signal for filtered options
+  // Filtered groups for autocomplete
   filteredGroups = computed(() => {
     const filterValue = (this.grupoValue() || '').toLowerCase();
     return this.allGroups().filter(option => option.toLowerCase().includes(filterValue));
   });
 
+  // Datasets belonging to the CURRENTLY TYPED group
+  datasetsInSelectedGroup = computed(() => {
+    const currentGroup = this.grupoValue();
+    if (!currentGroup) return [];
+    
+    return this.registry()
+      .filter(item => item.grupo === currentGroup)
+      .map(item => item.tituloCurto);
+  });
+
   ngOnInit() {
-    this.loadExistingGroups();
+    this.loadRegistry();
   }
 
-  async loadExistingGroups() {
+  async loadRegistry() {
     try {
       const data = await invoke<any[]>('get_registry');
+      this.registry.set(data);
+      
       const groups = data
         .map(item => item.grupo)
         .filter((value, index, self) => value && self.indexOf(value) === index);
       this.allGroups.set(groups);
     } catch (err) {
-      console.warn('Could not load existing groups from registry', err);
+      console.warn('Could not load registry', err);
     }
   }
 
@@ -234,26 +280,25 @@ export class DatasetGetView implements OnInit {
 
     try {
       for (const url of urlList) {
-        console.log(`Solicitando processamento via Rust: ${url}`);
-        
         await invoke('download_dataset', { 
           url, 
           metadata: this.datasetForm.value 
         });
       }
 
-      await message(`Conjunto de dados "${tituloCurto}" registrado e baixado com sucesso!`, {
+      await message(`Conjunto de dados "${tituloCurto}" registrado, baixado e processado com sucesso!`, {
         title: 'Sucesso',
         kind: 'info',
       });
       
-      // Refresh groups after success
-      await this.loadExistingGroups();
+      // Refresh registry and groups
+      await this.loadRegistry();
 
       this.datasetForm.reset({
         frequencia: 'Anual',
         isSerieHistorica: false,
-        grupo: ''
+        grupo: '',
+        formato: 'csv'
       });
 
     } catch (err) {
