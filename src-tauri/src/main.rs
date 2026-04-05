@@ -494,6 +494,94 @@ async fn parse_dictionary(app_handle: tauri::AppHandle, group_name: String, file
 }
 
 #[tauri::command]
+async fn save_analysis(app_handle: tauri::AppHandle, mut config: serde_json::Value) -> Result<(), String> {
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    let mut paths = vec![app_data_dir.join("analyses-history.json")];
+    
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            paths.push(PathBuf::from(manifest_dir).join("angular-ui").join("data").join("analyses-history.json"));
+        }
+    }
+
+    // Ensure we have an ID and timestamp
+    if config["id"].is_null() {
+        config["id"] = serde_json::json!(uuid::Uuid::new_v4().to_string());
+    }
+    config["updatedAt"] = serde_json::json!(chrono::Utc::now().to_rfc3339());
+
+    for path in paths {
+        if let Some(parent) = path.parent() { let _ = fs::create_dir_all(parent); }
+        
+        let mut history: Vec<serde_json::Value> = if path.exists() {
+            let file = File::open(&path).map_err(|e| e.to_string())?;
+            serde_json::from_reader(file).unwrap_or_else(|_| vec![])
+        } else { vec![] };
+
+        // Update existing or add new
+        if let Some(idx) = history.iter().position(|item| item["id"] == config["id"]) {
+            history[idx] = config.clone();
+        } else {
+            history.push(config.clone());
+        }
+
+        let mut file = File::create(&path).map_err(|e| e.to_string())?;
+        let json = serde_json::to_string_pretty(&history).map_err(|e| e.to_string())?;
+        file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+    }
+    Ok(())
+}
+
+#[tauri::command]
+async fn get_analyses(app_handle: tauri::AppHandle) -> Result<Vec<serde_json::Value>, String> {
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    let mut path = app_data_dir.join("analyses-history.json");
+
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("data").join("analyses-history.json");
+            if dev_path.exists() { path = dev_path; }
+        }
+    }
+
+    if path.exists() {
+        let file = File::open(&path).map_err(|e| e.to_string())?;
+        let history: Vec<serde_json::Value> = serde_json::from_reader(file).map_err(|e| e.to_string())?;
+        Ok(history)
+    } else {
+        Ok(vec![])
+    }
+}
+
+#[tauri::command]
+async fn delete_analysis(app_handle: tauri::AppHandle, id: String) -> Result<(), String> {
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    let mut paths = vec![app_data_dir.join("analyses-history.json")];
+    
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            paths.push(PathBuf::from(manifest_dir).join("angular-ui").join("data").join("analyses-history.json"));
+        }
+    }
+
+    for path in paths {
+        if path.exists() {
+            let file = File::open(&path).map_err(|e| e.to_string())?;
+            let mut history: Vec<serde_json::Value> = serde_json::from_reader(file).unwrap_or_else(|_| vec![]);
+            history.retain(|item| item["id"].as_str() != Some(&id));
+            
+            let mut file = File::create(&path).map_err(|e| e.to_string())?;
+            let json = serde_json::to_string_pretty(&history).map_err(|e| e.to_string())?;
+            file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+        }
+    }
+    Ok(())
+}
+
+#[tauri::command]
 async fn get_registry(app_handle: tauri::AppHandle) -> Result<Vec<serde_json::Value>, String> {
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
     let mut registry_path = app_data_dir.join("datasets-registry.json");
@@ -592,6 +680,9 @@ async fn get_group_columns(app_handle: tauri::AppHandle, group_name: String) -> 
     Ok(result)
 }
 
+mod data_processing;
+use data_processing::run_etl;
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
@@ -599,7 +690,20 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_mcp_gui::init())
-        .invoke_handler(tauri::generate_handler![download_dataset, get_registry, check_path_exists, get_group_columns, analyze_group, get_columns_for_files, get_excel_files, parse_dictionary])
+        .invoke_handler(tauri::generate_handler![
+            download_dataset, 
+            get_registry, 
+            check_path_exists, 
+            get_group_columns, 
+            analyze_group, 
+            get_columns_for_files, 
+            get_excel_files, 
+            parse_dictionary,
+            run_etl,
+            save_analysis,
+            get_analyses,
+            delete_analysis
+        ])
         .setup(|app| {
             let sobre_item = MenuItem::with_id(app, "sobre", "Sobre", true, None::<&str>)?;
             let ajuda_submenu = Submenu::with_items(app, "Ajuda", true, &[&sobre_item])?;

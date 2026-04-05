@@ -11,5 +11,5 @@ www
 *.parquet
 *.json.metadata.json
 downloads/
-data/
-!angular-ui/data/datasets-registry.json
+/data/
+!/angular-ui/data/*.json

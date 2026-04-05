@@ -1,0 +1,45 @@
+[
+  {
+    "dictionary": "microdados_censo_escolar_2025/Anexos/ANEXO I - Dicionário de Dados/dicionário_dados_educação_básica.xlsx",
+    "files": [
+      "microdados_ed_basica_2024.csv",
+      "microdados_ed_basica_2023.csv",
+      "microdados_ed_basica_2022.csv",
+      "microdados_ed_basica_2021.csv",
+      "microdados_ed_basica_2020.CSV",
+      "microdados_ed_basica_2019.csv",
+      "censo_escolar_2018.csv"
+    ],
+    "groupName": "censo_escolar_ed_basica_inep2",
+    "id": "cc5c9842-84a2-4799-8e3c-ac6614fcb070",
+    "name": "Matriculas 2018-2024",
+    "updatedAt": "2026-04-05T22:30:08.110774088+00:00",
+    "variables": [
+      {
+        "description": "Número de Matrículas do Ensino Fundamental - Anos Finais - Tempo Integral",
+        "name": "QT_MAT_FUND_AF_INT",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Matrículas do Ensino Fundamental - Tempo Integral",
+        "name": "QT_MAT_FUND_INT",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Matrículas da Educação Infantil - Pré-Escola - Tempo Integral",
+        "name": "QT_MAT_INF_PRE_INT",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Matrículas da Educação Infantil",
+        "name": "QT_MAT_INF",
+        "type": "Num"
+      },
+      {
+        "description": "Ano do Censo",
+        "name": "NU_ANO_CENSO",
+        "type": "Num"
+      }
+    ]
+  }
+]

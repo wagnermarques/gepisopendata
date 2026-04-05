@@ -14,6 +14,8 @@ import { TauriConfigService } from './services/tauri-config.service';
 import { isTauri } from './services/environment';
 import { JsonPipe } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { FixedSearch } from './components/layout/fixed-search/fixed-search';
+import { SearchInPageService } from './services/search-in-page.service';
 
 @Component({
   selector: 'app-root',
@@ -30,6 +32,7 @@ import { Subscription } from 'rxjs';
     MatTooltipModule,
     FixedHead,
     FixedStatusbar,
+    FixedSearch,
   ],
 })
 export class App implements OnInit, OnDestroy {
@@ -37,6 +40,7 @@ export class App implements OnInit, OnDestroy {
   isSmallScreen = false;
 
   configService = inject(ConfigService);
+  searchService = inject(SearchInPageService);
   router = inject(Router);
   config = signal<Record<string, unknown> | null>(null);
   lastMenuEvent = signal<string | null>(null);
@@ -127,6 +131,12 @@ export class App implements OnInit, OnDestroy {
   @HostListener('window:resize', ['$event'])
   onResize() {
     this.checkScreenSize();
+  }
+
+  @HostListener('window:keydown.control.f', ['$event'])
+  onCtrlF(event: KeyboardEvent) {
+    event.preventDefault();
+    this.searchService.toggle();
   }
 
   toggleDrawer() {

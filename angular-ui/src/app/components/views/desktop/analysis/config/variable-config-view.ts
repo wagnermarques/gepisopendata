@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { invoke } from '@tauri-apps/api/core';
 import { Router } from '@angular/router';
@@ -45,6 +46,7 @@ interface DictionaryEntry {
     MatProgressBarModule,
     MatSelectModule,
     MatFormFieldModule,
+    MatInputModule,
     MatSnackBarModule,
     FormsModule,
   ],
@@ -59,11 +61,24 @@ interface DictionaryEntry {
 
       <div class="content-grid">
         <div class="left-panel">
+          <mat-card appearance="outlined" class="config-meta-card">
+            <mat-card-header>
+              <mat-card-title>Nome da Análise</mat-card-title>
+              <mat-card-subtitle>Identifique esta configuração para uso futuro</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Nome da Análise</mat-label>
+                <input matInput [(ngModel)]="analysisName" placeholder="Ex: Análise de Saúde - Set/2024" />
+              </mat-form-field>
+            </mat-card-content>
+          </mat-card>
+
           <mat-card appearance="outlined" class="files-card">
             <mat-card-header>
               <mat-card-title>Arquivos Encontrados ({{ files().length }})</mat-card-title>
               <mat-card-subtitle>
-                Tipo de dado detectado: <strong class="format-badge">{{ format() | uppercase }}</strong>
+                Tipo de dado: <strong class="format-badge">{{ format() | uppercase }}</strong>
               </mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
@@ -87,9 +102,6 @@ interface DictionaryEntry {
                       <span class="file-name" [title]="file.name">{{ file.name }}</span>
                     </div>
                   }
-                  @if (files().length === 0 && !isLoadingFiles()) {
-                    <p class="empty-files">Nenhum arquivo encontrado com a extensão {{ format() }}</p>
-                  }
                 }
               </div>
             </mat-card-content>
@@ -98,19 +110,18 @@ interface DictionaryEntry {
           <mat-card appearance="outlined" class="dictionary-card">
             <mat-card-header>
               <mat-card-title>Dicionário de Dados</mat-card-title>
-              <mat-card-subtitle>Selecione um arquivo Excel para carregar as descrições e tipos</mat-card-subtitle>
+              <mat-card-subtitle>Descrições e tipos oficiais</mat-card-subtitle>
             </mat-card-header>
             <mat-card-content>
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Arquivo de Dicionário (.xlsx, .xls)</mat-label>
+                <mat-label>Arquivo de Dicionário</mat-label>
                 <mat-select [(ngModel)]="selectedDictionary" (selectionChange)="onDictionaryChange()">
-                  <mat-option [value]="null">Nenhum (Usar apenas nomes)</mat-option>
+                  <mat-option [value]="null">Nenhum</mat-option>
                   @for (dict of excelFiles(); track dict) {
                     <mat-option [value]="dict">{{ dict }}</mat-option>
                   }
                 </mat-select>
               </mat-form-field>
-
               @if (isLoadingDictionary()) {
                 <mat-progress-bar mode="indeterminate"></mat-progress-bar>
               }
@@ -120,53 +131,37 @@ interface DictionaryEntry {
 
         <mat-card appearance="outlined" class="columns-card">
           <mat-card-header>
-            <mat-card-title>Colunas Comuns Identificadas</mat-card-title>
+            <mat-card-title>Variáveis Identificadas</mat-card-title>
             <mat-card-subtitle>
               @if (selectedFilesCount() === 0) {
-                Selecione ao menos um arquivo para ver as colunas.
+                Selecione arquivos para ver colunas.
               } @else {
-                Colunas presentes em todos os {{ selectedFilesCount() }} arquivo(s) selecionado(s).
+                Presentes em {{ selectedFilesCount() }} arquivo(s).
                 <div class="header-info">
                   <mat-icon>info</mat-icon>
-                  <span>Considerando a <strong>primeira linha</strong> como cabeçalho e delimitador <strong>';'</strong></span>
+                  <span>Considerando a <strong>primeira linha</strong> como cabeçalho</span>
                 </div>
               }
             </mat-card-subtitle>
           </mat-card-header>
 
           <mat-card-content>
-            @if (columns().length > 0 && !isLoadingColumns()) {
-              <div class="table-actions-top">
-                <div class="selection-info">
-                  <strong>{{ selectedCount() }}</strong> variáveis selecionadas
-                </div>
-                <button mat-raised-button color="primary" [disabled]="selectedCount() === 0" (click)="saveConfig()">
-                  Salvar e Ir para Análises
-                  <mat-icon>assessment</mat-icon>
-                </button>
+            <div class="table-actions-top" *ngIf="columns().length > 0">
+              <div class="selection-info">
+                <strong>{{ selectedCount() }}</strong> selecionadas
               </div>
-            }
+              <button mat-raised-button color="primary" [disabled]="selectedCount() === 0" (click)="saveConfig()">
+                Salvar e Ir para Análises
+                <mat-icon>assessment</mat-icon>
+              </button>
+            </div>
 
             @if (isLoadingColumns()) {
               <div class="loading-state">
-                <p>Atualizando colunas...</p>
                 <mat-progress-bar mode="query"></mat-progress-bar>
-              </div>
-            } @else if (selectedFilesCount() > 0 && columns().length === 0) {
-              <div class="empty-state">
-                <mat-icon color="warn">warning</mat-icon>
-                <p>Nenhuma coluna comum encontrada entre os arquivos selecionados.</p>
-                <p class="hint">Certifique-se de que os arquivos possuem a mesma estrutura.</p>
-              </div>
-            } @else if (selectedFilesCount() === 0) {
-              <div class="empty-state">
-                <mat-icon>file_open</mat-icon>
-                <p>Nenhum arquivo selecionado.</p>
               </div>
             } @else {
               <table mat-table [dataSource]="columns()" class="full-width-table">
-                
-                <!-- Checkbox Column -->
                 <ng-container matColumnDef="select">
                   <th mat-header-cell *matHeaderCellDef>
                     <mat-checkbox (change)="$event ? toggleAll() : null"
@@ -180,9 +175,8 @@ interface DictionaryEntry {
                   </td>
                 </ng-container>
 
-                <!-- Column Name -->
                 <ng-container matColumnDef="name">
-                  <th mat-header-cell *matHeaderCellDef>Nome da Variável</th>
+                  <th mat-header-cell *matHeaderCellDef>Nome</th>
                   <td mat-cell *matCellDef="let row">
                     <div class="var-name-cell">
                       <span class="var-name">{{ row.name }}</span>
@@ -193,19 +187,15 @@ interface DictionaryEntry {
                   </td>
                 </ng-container>
 
-                <!-- Data Type -->
                 <ng-container matColumnDef="type">
-                  <th mat-header-cell *matHeaderCellDef>Tipo Sugerido</th>
+                  <th mat-header-cell *matHeaderCellDef>Tipo</th>
                   <td mat-cell *matCellDef="let row">
-                    <span class="type-badge" [class.number]="row.type === 'Número'">
-                      {{ row.type }}
-                    </span>
+                    <span class="type-badge" [class.number]="row.type === 'Número'">{{ row.type }}</span>
                   </td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
-                    [class.row-excluded]="!row.included"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" [class.row-excluded]="!row.included"></tr>
               </table>
             }
           </mat-card-content>
@@ -217,90 +207,23 @@ interface DictionaryEntry {
     .container { padding: 24px; max-width: 1400px; margin: 0 auto; }
     .header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
     .header h1 { margin: 0; color: #3f51b5; }
-
     .content-grid { display: grid; grid-template-columns: 350px 1fr; gap: 24px; align-items: start; }
     .left-panel { display: flex; flex-direction: column; gap: 24px; }
-
     .full-width { width: 100%; }
-    .dictionary-card { margin-top: 0; }
-
-    .file-list { 
-      max-height: 400px; 
-      overflow-y: auto; 
-      margin-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .file-list-actions {
-      padding: 8px;
-      border-bottom: 1px solid #eee;
-      margin-bottom: 8px;
-    }
-    .file-item { 
-      display: flex; 
-      align-items: center; 
-      gap: 4px; 
-      padding: 4px 8px; 
-      background: #f9f9f9; 
-      border-radius: 4px;
-      font-size: 0.85rem;
-    }
-    .file-item mat-icon { font-size: 18px; width: 18px; height: 18px; color: #777; }
+    .file-list { max-height: 300px; overflow-y: auto; margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+    .file-item { display: flex; align-items: center; gap: 4px; padding: 4px 8px; background: #f9f9f9; border-radius: 4px; font-size: 0.85rem; }
     .file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-    .format-badge { color: #3f51b5; }
-    .empty-files { font-size: 0.85rem; color: #999; font-style: italic; text-align: center; margin-top: 16px; }
-
-    .header-info { 
-      display: flex; 
-      align-items: center; 
-      gap: 6px; 
-      margin-top: 8px; 
-      color: #666; 
-      font-size: 0.8rem;
-      background: #f5f5f5;
-      padding: 4px 12px;
-      border-radius: 4px;
-      width: fit-content;
-    }
-    .header-info mat-icon { font-size: 16px; width: 16px; height: 16px; color: #3f51b5; }
-
-    .table-actions-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 16px;
-      background: #f8f9fa;
-      border-bottom: 1px solid #eee;
-      margin-bottom: 8px;
-    }
-
+    .table-actions-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f8f9fa; border-bottom: 1px solid #eee; margin-bottom: 8px; }
     .var-name-cell { display: flex; flex-direction: column; gap: 2px; padding: 4px 0; }
-    .var-name { font-weight: 500; color: #333; }
+    .var-name { font-weight: 500; }
     .var-description { font-size: 0.75rem; color: #666; font-style: italic; }
-
-    .full-width-table { width: 100%; margin-top: 16px; }
-    
-    .loading-state, .empty-state { text-align: center; padding: 40px; }
-    .empty-state mat-icon { font-size: 48px; width: 48px; height: 48px; margin-bottom: 16px; }
-    .hint { font-size: 0.85rem; color: #777; }
-
-    .type-badge {
-      font-size: 0.75rem;
-      padding: 2px 8px;
-      background: #f0f0f0;
-      border-radius: 4px;
-      color: #666;
-    }
+    .full-width-table { width: 100%; }
+    .type-badge { font-size: 0.75rem; padding: 2px 8px; background: #f0f0f0; border-radius: 4px; color: #666; }
     .type-badge.number { background: #e3f2fd; color: #1976d2; }
-
     .row-excluded { opacity: 0.5; }
-
-    .selection-info { font-size: 0.9rem; color: #666; font-style: italic; }
-
-    @media (max-width: 900px) {
-      .content-grid { grid-template-columns: 1fr; }
-    }
+    .header-info { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 0.75rem; color: #888; }
+    .header-info mat-icon { font-size: 14px; width: 14px; height: 14px; }
+    @media (max-width: 900px) { .content-grid { grid-template-columns: 1fr; } }
   `]
 })
 export class VariableConfigView implements OnInit {
@@ -309,6 +232,7 @@ export class VariableConfigView implements OnInit {
   private snackBar = inject(MatSnackBar);
   
   groupName = signal<string | null>(this.stateService.getSelectedGroup());
+  analysisName = '';
   columns = signal<ColumnInfo[]>([]);
   files = signal<FileInfo[]>([]);
   excelFiles = signal<string[]>([]);
@@ -338,7 +262,6 @@ export class VariableConfigView implements OnInit {
       const result = await invoke<any>('analyze_group', { groupName: name });
       this.format.set(result.format);
       this.files.set(result.files.map((f: string) => ({ name: f, selected: true })));
-      // Set included: false by default as requested
       this.columns.set(result.common_columns.map((c: any) => ({ ...c, included: false })));
     } catch (err) {
       console.error('Falha ao carregar grupo:', err);
@@ -365,7 +288,7 @@ export class VariableConfigView implements OnInit {
 
     if (!this.selectedDictionary) {
       this.dictionaryEntries = [];
-      this.resetToHeuristicTypes();
+      this.applyDescriptionsAndTypes();
       return;
     }
 
@@ -396,14 +319,6 @@ export class VariableConfigView implements OnInit {
     }));
   }
 
-  async resetToHeuristicTypes() {
-    // Re-run heuristic analysis for types if dictionary is removed
-    const selectedFiles = this.files().filter(f => f.selected).map(f => f.name);
-    if (selectedFiles.length > 0) {
-      await this.updateColumns();
-    }
-  }
-
   async updateColumns() {
     const name = this.groupName();
     const selectedFiles = this.files().filter(f => f.selected).map(f => f.name);
@@ -423,7 +338,6 @@ export class VariableConfigView implements OnInit {
       const currentCols = this.columns();
       const updatedCols = detected.map(c => {
         const prev = currentCols.find(p => p.name === c.name);
-        // Find dictionary match
         const dictEntry = this.dictionaryEntries.find(e => 
           e.name.toLowerCase().trim() === c.name.toLowerCase().trim()
         );
@@ -454,25 +368,14 @@ export class VariableConfigView implements OnInit {
     this.updateColumns();
   }
 
-  isAllFilesSelected() {
-    return this.files().length > 0 && this.files().every(f => f.selected);
-  }
-
-  isSomeFilesSelected() {
-    return this.files().some(f => f.selected) && !this.isAllFilesSelected();
-  }
-
-  selectedFilesCount() {
-    return this.files().filter(f => f.selected).length;
-  }
-
-  isAllSelected() {
-    return this.columns().length > 0 && this.columns().every(c => c.included);
-  }
+  isAllFilesSelected() { return this.files().length > 0 && this.files().every(f => f.selected); }
+  isSomeFilesSelected() { return this.files().some(f => f.selected) && !this.isAllFilesSelected(); }
+  selectedFilesCount() { return this.files().filter(f => f.selected).length; }
+  isAllSelected() { return this.columns().length > 0 && this.columns().every(c => c.included); }
 
   toggleAll() {
     if (!this.selectedDictionary && this.columns().length > 0) {
-      this.snackBar.open('Por favor, selecione primeiro um Dicionário de Dados para definir os tipos das variáveis.', 'OK', { duration: 5000 });
+      this.snackBar.open('Por favor, selecione primeiro um Dicionário de Dados.', 'OK', { duration: 5000 });
       return;
     }
     const target = !this.isAllSelected();
@@ -481,20 +384,22 @@ export class VariableConfigView implements OnInit {
 
   toggleRow(row: ColumnInfo) {
     if (!this.selectedDictionary && !row.included) {
-      this.snackBar.open('Por favor, selecione primeiro um Dicionário de Dados para definir os tipos das variáveis.', 'OK', { duration: 5000 });
+      this.snackBar.open('Por favor, selecione primeiro um Dicionário de Dados.', 'OK', { duration: 5000 });
       return;
     }
-    this.columns.update(cols => cols.map(c => 
-      c.name === row.name ? { ...c, included: !c.included } : c
-    ));
+    this.columns.update(cols => cols.map(c => c.name === row.name ? { ...c, included: !c.included } : c));
   }
 
-  selectedCount() {
-    return this.columns().filter(c => c.included).length;
-  }
+  selectedCount() { return this.columns().filter(c => c.included).length; }
 
-  saveConfig() {
+  async saveConfig() {
+    if (!this.analysisName.trim()) {
+      this.snackBar.open('Dê um nome para sua análise.', 'OK', { duration: 3000 });
+      return;
+    }
+
     const config = {
+      name: this.analysisName,
       groupName: this.groupName() || 'unknown',
       files: this.files().filter(f => f.selected).map(f => f.name),
       dictionary: this.selectedDictionary,
@@ -505,12 +410,9 @@ export class VariableConfigView implements OnInit {
       }))
     };
     
-    console.log('Configuração salva:', config);
-    this.stateService.setAnalysisConfig(config);
+    await this.stateService.saveAnalysis(config);
     this.router.navigate(['/desktop/analysis/descritiva']);
   }
 
-  goBack() {
-    this.router.navigate(['/desktop/analysis/select']);
-  }
+  goBack() { this.router.navigate(['/desktop/analysis/select']); }
 }
