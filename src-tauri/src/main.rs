@@ -185,6 +185,11 @@ async fn get_registry(app_handle: tauri::AppHandle) -> Result<Vec<serde_json::Va
     }
 }
 
+#[tauri::command]
+async fn check_path_exists(path: String) -> bool {
+    std::path::Path::new(&path).exists()
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
@@ -192,7 +197,7 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_mcp_gui::init())
-        .invoke_handler(tauri::generate_handler![download_dataset, get_registry])
+        .invoke_handler(tauri::generate_handler![download_dataset, get_registry, check_path_exists])
         .setup(|app| {
             let sobre_item = MenuItem::with_id(app, "sobre", "Sobre", true, None::<&str>)?;
             let ajuda_submenu = Submenu::with_items(app, "Ajuda", true, &[&sobre_item])?;

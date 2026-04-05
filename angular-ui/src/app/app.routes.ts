@@ -28,6 +28,13 @@ export const routes: Routes = [
             (m) => m.DatasetGetView
           ),
       },
+      {
+        path: 'datasets/list',
+        loadComponent: () =>
+          import('./components/views/desktop/datasets/list/dataset-list-view').then(
+            (m) => m.DatasetListView
+          ),
+      },
     ],
   },
 ];
