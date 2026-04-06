@@ -145,8 +145,12 @@ import { invoke } from '@tauri-apps/api/core';
                 <div class="analysis-actions">
                   <button mat-flat-button color="primary">Frequências</button>
                   <button mat-flat-button color="primary">Medidas de Tendência</button>
+                  <button mat-flat-button color="primary" (click)="goToBarChart()">
+                    <mat-icon>bar_chart</mat-icon> Gráficos de Barras
+                  </button>
                   <button mat-flat-button color="primary">Cruzamentos</button>
                 </div>
+
               </div>
             } @else {
               <div class="analysis-placeholder">
@@ -235,6 +239,10 @@ export class DescritivaView implements OnInit {
 
   editCurrent() {
     this.router.navigate(['/desktop/analysis/config']);
+  }
+
+  goToBarChart() {
+    this.router.navigate(['/desktop/analysis/descritiva/barchart']);
   }
 
   async startEtl() {

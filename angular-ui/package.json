@@ -44,6 +44,8 @@
     "@tauri-apps/plugin-dialog": "^2.6.0",
     "@tauri-apps/plugin-fs": "^2.4.4",
     "@tauri-apps/plugin-http": "^2.5.7",
+    "angular-plotly.js": "^20.0.0",
+    "plotly.js-dist-min": "^3.5.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
@@ -52,6 +54,7 @@
     "@angular/cli": "~20.3.22",
     "@angular/compiler-cli": "~20.3.18",
     "@types/jasmine": "~5.1.13",
+    "@types/plotly.js-dist-min": "^2.3.4",
     "baseline-browser-mapping": "^2.10.13",
     "concurrently": "^9.2.1",
     "jasmine-core": "~5.13.0",

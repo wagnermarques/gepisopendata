@@ -494,6 +494,12 @@ async fn parse_dictionary(app_handle: tauri::AppHandle, group_name: String, file
 }
 
 #[tauri::command]
+async fn get_app_data_dir(app_handle: tauri::AppHandle) -> Result<String, String> {
+    let path = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    Ok(path.to_string_lossy().into_owned())
+}
+
+#[tauri::command]
 async fn save_analysis(app_handle: tauri::AppHandle, mut config: serde_json::Value) -> Result<(), String> {
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
     let mut paths = vec![app_data_dir.join("analyses-history.json")];
@@ -681,7 +687,7 @@ async fn get_group_columns(app_handle: tauri::AppHandle, group_name: String) -> 
 }
 
 mod data_processing;
-use data_processing::run_etl;
+use data_processing::{run_etl, get_barchart_data};
 
 fn main() {
     tauri::Builder::default()
@@ -700,6 +706,8 @@ fn main() {
             get_excel_files, 
             parse_dictionary,
             run_etl,
+            get_barchart_data,
+            get_app_data_dir,
             save_analysis,
             get_analyses,
             delete_analysis

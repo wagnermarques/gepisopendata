@@ -56,6 +56,20 @@ export const routes: Routes = [
             (m) => m.DescritivaView
           ),
       },
+      {
+        path: 'analysis/descritiva/barchart',
+        loadComponent: () =>
+          import('./components/views/desktop/analysis/descritiva/bar-chart-view').then(
+            (m) => m.BarChartView
+          ),
+      },
+      {
+        path: 'analysis/published/:analysisId/:artifactId',
+        loadComponent: () =>
+          import('./components/views/desktop/analysis/descritiva/published-artifact-view').then(
+            (m) => m.PublishedArtifactView
+          ),
+      },
     ],
   },
 ];

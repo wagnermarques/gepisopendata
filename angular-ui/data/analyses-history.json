@@ -13,7 +13,20 @@
     "groupName": "censo_escolar_ed_basica_inep2",
     "id": "cc5c9842-84a2-4799-8e3c-ac6614fcb070",
     "name": "Matriculas 2018-2024",
-    "updatedAt": "2026-04-05T22:30:08.110774088+00:00",
+    "publishedArtifacts": [
+      {
+        "createdAt": "2026-04-05T23:59:12.711Z",
+        "id": "2bc25a6f-e1fe-4d1d-8c1e-4a1a3e3ec00c",
+        "label": "Censo Escolar - Matrículas",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "sum",
+          "valueVar": "QT_MAT_INF"
+        },
+        "type": "barchart"
+      }
+    ],
+    "updatedAt": "2026-04-05T23:59:12.715672118+00:00",
     "variables": [
       {
         "description": "Número de Matrículas do Ensino Fundamental - Anos Finais - Tempo Integral",

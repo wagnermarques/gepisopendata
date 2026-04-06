@@ -11,8 +11,9 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ConfigService } from './services/config.service';
 import { TauriConfigService } from './services/tauri-config.service';
+import { DatasetStateService } from './services/dataset-state.service';
 import { isTauri } from './services/environment';
-import { JsonPipe } from '@angular/common';
+import { JsonPipe, CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { FixedSearch } from './components/layout/fixed-search/fixed-search';
 import { SearchInPageService } from './services/search-in-page.service';
@@ -22,6 +23,7 @@ import { SearchInPageService } from './services/search-in-page.service';
   templateUrl: './app.html',
   styleUrl: './app.css',
   imports: [
+    CommonModule,
     RouterOutlet,
     RouterLink,
     MatSidenavModule,
@@ -41,6 +43,7 @@ export class App implements OnInit, OnDestroy {
 
   configService = inject(ConfigService);
   searchService = inject(SearchInPageService);
+  stateService = inject(DatasetStateService);
   router = inject(Router);
   config = signal<Record<string, unknown> | null>(null);
   lastMenuEvent = signal<string | null>(null);
@@ -141,6 +144,13 @@ export class App implements OnInit, OnDestroy {
 
   toggleDrawer() {
     this.drawer.toggle();
+  }
+
+  goToArtifact(analysisId: string, artifactId: string) {
+    this.router.navigate(['/desktop/analysis/published', analysisId, artifactId]);
+    if (this.isSmallScreen) {
+      this.drawer.close();
+    }
   }
 
   checkScreenSize() {

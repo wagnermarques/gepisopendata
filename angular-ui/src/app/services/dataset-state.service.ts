@@ -1,6 +1,14 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { invoke } from '@tauri-apps/api/core';
 
+export interface AnalysisArtifact {
+  id: string;
+  label: string;
+  type: 'barchart' | 'table' | 'statistics';
+  params: any;
+  createdAt: string;
+}
+
 export interface AnalysisConfig {
   id?: string;
   name: string;
@@ -12,6 +20,7 @@ export interface AnalysisConfig {
     type: string;
     description?: string;
   }[];
+  publishedArtifacts?: AnalysisArtifact[];
   updatedAt?: string;
 }
 
