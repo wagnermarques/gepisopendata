@@ -10,6 +10,10 @@ export interface AnalysisArtifact {
   label: string;
   type: 'barchart' | 'table' | 'statistics';
   params: any;
+  data?: {
+    x: any[];
+    y: any[];
+  };
   createdAt: string;
 }
 

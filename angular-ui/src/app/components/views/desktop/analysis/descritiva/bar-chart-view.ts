@@ -149,6 +149,9 @@ export class BarChartView implements OnInit {
   metric = signal<string>('count');
   isLoading = signal(false);
 
+  // Store last calculated data for publication
+  lastResultData: { categories: string[], values: number[] } | null = null;
+
   metricLabel = () => {
     switch(this.metric()) {
       case 'sum': return 'Soma';
@@ -158,9 +161,7 @@ export class BarChartView implements OnInit {
   }
 
   ngOnInit() {
-    console.log('BarChartView: Initializing...');
     if (!this.config()) {
-      console.warn('BarChartView: No config found, redirecting back.');
       this.router.navigate(['/desktop/analysis/descritiva']);
     }
   }
@@ -185,9 +186,10 @@ export class BarChartView implements OnInit {
         metric: met
       });
 
+      this.lastResultData = data;
       this.renderPlotly(data.categories, data.values, cat, met);
     } catch (err) {
-      console.error('BarChartView: Error in updateChart:', err);
+      console.error('Erro ao gerar gráfico:', err);
     } finally {
       this.isLoading.set(false);
     }
@@ -213,6 +215,8 @@ export class BarChartView implements OnInit {
   }
 
   async publishArtifact() {
+    if (!this.lastResultData) return;
+
     const label = prompt('Digite um rótulo para esta publicação:');
     if (!label) return;
 
@@ -228,6 +232,10 @@ export class BarChartView implements OnInit {
         valueVar: this.valueVar(),
         metric: this.metric()
       },
+      data: {
+        x: this.lastResultData.categories,
+        y: this.lastResultData.values
+      },
       createdAt: new Date().toISOString()
     };
 
@@ -237,7 +245,7 @@ export class BarChartView implements OnInit {
     analysis.publishedArtifacts.push(artifact);
 
     await this.stateService.saveAnalysis(analysis);
-    this.snackBar.open('Gráfico publicado com sucesso!', 'OK', { duration: 3000 });
+    this.snackBar.open('Gráfico publicado com sucesso e dados persistidos!', 'OK', { duration: 3000 });
   }
 
   goBack() {

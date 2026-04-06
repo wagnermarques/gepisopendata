@@ -1,15 +1,16 @@
-import { Component, inject, signal, OnInit, effect } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DatasetStateService, AnalysisArtifact, AnalysisConfig } from '../../../../../services/dataset-state.service';
-import { isTauri } from '../../../../../services/environment';
 import { ActivatedRoute, Router } from '@angular/router';
-import { invoke } from '@tauri-apps/api/core';
 
-import * as Plotly from 'plotly.js-dist-min';
+// Plotly Module Integration
+import { PlotlyModule } from 'angular-plotly.js';
+import * as PlotlyJS from 'plotly.js-dist-min';
+PlotlyModule.plotlyjs = PlotlyJS;
 
 @Component({
   selector: 'app-published-artifact-view',
@@ -20,6 +21,7 @@ import * as Plotly from 'plotly.js-dist-min';
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
+    PlotlyModule,
   ],
   template: `
     <div class="container">
@@ -35,18 +37,10 @@ import * as Plotly from 'plotly.js-dist-min';
           <mat-progress-bar mode="query"></mat-progress-bar>
           <p>Carregando dados da publicação...</p>
         </div>
-      } @else if (!isTauriMode()) {
-        <div class="info-state">
-          <mat-icon color="primary">desktop_windows</mat-icon>
-          <h2>Visualização Limitada</h2>
-          <p>Para processar os dados originais e gerar este gráfico, é necessário utilizar a versão <strong>Desktop (Tauri)</strong> do aplicativo.</p>
-          <p>Na versão Web, você pode consultar o histórico de publicações, mas o processamento Polars/Rust requer acesso local aos arquivos.</p>
-          <button mat-raised-button color="primary" (click)="goBack()">Voltar</button>
-        </div>
       } @else if (error()) {
         <div class="error-state">
           <mat-icon color="warn">error</mat-icon>
-          <h2>Erro ao carrerar publicação</h2>
+          <h2>Erro ao carregar publicação</h2>
           <p>{{ error() }}</p>
           <button mat-raised-button color="primary" (click)="goBack()">Voltar</button>
         </div>
@@ -59,7 +53,19 @@ import * as Plotly from 'plotly.js-dist-min';
             </mat-card-subtitle>
           </mat-card-header>
           <mat-card-content>
-            <div id="artifact-content" class="chart-container"></div>
+            @if (graphData) {
+              <plotly-plot 
+                [data]="graphData.data" 
+                [layout]="graphData.layout" 
+                [config]="graphData.config"
+                [useResizeHandler]="true"
+                class="chart-container">
+              </plotly-plot>
+            } @else {
+              <div class="empty-state">
+                <p>Nenhum dado encontrado para este artefato.</p>
+              </div>
+            }
           </mat-card-content>
         </mat-card>
       }
@@ -70,18 +76,16 @@ import * as Plotly from 'plotly.js-dist-min';
     .header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
     .header h1 { margin: 0; color: #3f51b5; }
 
-    .chart-container { width: 100%; height: 600px; margin-top: 16px; }
+    .chart-container { width: 100%; height: 600px; display: block; }
 
-    .loading-state, .error-state, .info-state { 
+    .loading-state, .error-state { 
       text-align: center; 
       padding: 100px; 
       background: #fff; 
       border-radius: 8px; 
       box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
     }
-    .error-state mat-icon, .info-state mat-icon { font-size: 48px; width: 48px; height: 48px; margin-bottom: 16px; }
-    .info-state h2 { color: #3f51b5; }
-    .info-state p { max-width: 600px; margin: 8px auto; color: #666; }
+    .error-state mat-icon { font-size: 48px; width: 48px; height: 48px; margin-bottom: 16px; }
   `]
 })
 export class PublishedArtifactView implements OnInit {
@@ -93,11 +97,10 @@ export class PublishedArtifactView implements OnInit {
   artifact = signal<AnalysisArtifact | null>(null);
   isLoading = signal(true);
   error = signal<string | null>(null);
-  isTauriMode = signal(isTauri());
+
+  graphData: any = null;
 
   ngOnInit() {
-    console.log('PublishedArtifactView: Initializing. isTauri:', isTauri());
-    this.isTauriMode.set(isTauri());
     this.route.params.subscribe(params => {
       this.loadArtifact(params['analysisId'], params['artifactId']);
     });
@@ -108,7 +111,7 @@ export class PublishedArtifactView implements OnInit {
     this.error.set(null);
 
     try {
-      // Find the analysis in history
+      // Find the analysis in history (loaded in public/data for web)
       const analyses = this.stateService.allAnalyses();
       const targetAnalysis = analyses.find(a => a.id === analysisId);
       
@@ -127,16 +130,11 @@ export class PublishedArtifactView implements OnInit {
       this.analysis.set(targetAnalysis);
       this.artifact.set(targetArtifact);
 
-      if (!this.isTauriMode()) {
-        this.isLoading.set(false);
-        return;
-      }
-
-      // Render based on type
-      if (targetArtifact.type === 'barchart') {
-        await this.loadBarChartData(targetAnalysis, targetArtifact);
+      // We use the PERSISTED data if available (works on both Web and Desktop)
+      if (targetArtifact.data && targetArtifact.type === 'barchart') {
+        this.preparePlotlyData(targetArtifact);
       } else {
-        this.error.set('Tipo de artefato não suportado.');
+        this.error.set('Este artefato não contém dados persistidos ou é de um tipo sem suporte web.');
       }
 
     } catch (err: any) {
@@ -147,43 +145,24 @@ export class PublishedArtifactView implements OnInit {
     }
   }
 
-  async loadBarChartData(analysis: AnalysisConfig, artifact: AnalysisArtifact) {
-    const { categoryVar, valueVar, metric } = artifact.params;
+  preparePlotlyData(artifact: AnalysisArtifact) {
+    const { categoryVar, metric } = artifact.params;
     
-    try {
-      const appDataDir = await invoke<string>('get_app_data_dir');
-      const filePath = `${appDataDir}/processed_data/${analysis.groupName}/analysis_ready.csv`;
-
-      const data = await invoke<any>('get_barchart_data', {
-        filePath,
-        categoryCol: categoryVar,
-        valueCol: valueVar || categoryVar,
-        metric: metric
-      });
-
-      // Wait for DOM to be ready
-      setTimeout(() => this.renderBarChart(data.categories, data.values, artifact.label, categoryVar, metric), 100);
-    } catch (err: any) {
-      throw new Error(`Erro ao processar dados Polars: ${err}`);
-    }
-  }
-
-  renderBarChart(x: string[], y: number[], label: string, categoryVar: string, metric: string) {
-    const trace: any = {
-      x: x,
-      y: y,
-      type: 'bar',
-      marker: { color: '#3f51b5' }
+    this.graphData = {
+      data: [{
+        x: artifact.data?.x,
+        y: artifact.data?.y,
+        type: 'bar',
+        marker: { color: '#3f51b5' }
+      }],
+      layout: {
+        title: artifact.label,
+        xaxis: { title: categoryVar, automargin: true },
+        yaxis: { title: this.getMetricLabel(metric), automargin: true },
+        margin: { t: 50, b: 100, l: 60, r: 20 }
+      },
+      config: { responsive: true, displayModeBar: false }
     };
-
-    const layout: any = {
-      title: label,
-      xaxis: { title: categoryVar, automargin: true },
-      yaxis: { title: this.getMetricLabel(metric), automargin: true },
-      margin: { t: 50, b: 100, l: 60, r: 20 }
-    };
-
-    Plotly.newPlot('artifact-content', [trace], layout, { responsive: true });
   }
 
   getMetricLabel(metric: string) {
