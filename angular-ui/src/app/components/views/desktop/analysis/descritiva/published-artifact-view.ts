@@ -10,7 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 // Plotly Module Integration
 import { PlotlyModule } from 'angular-plotly.js';
 import * as PlotlyJS from 'plotly.js-dist-min';
-PlotlyModule.plotlyjs = PlotlyJS;
+(PlotlyModule as any).plotlyjs = PlotlyJS;
 
 @Component({
   selector: 'app-published-artifact-view',
