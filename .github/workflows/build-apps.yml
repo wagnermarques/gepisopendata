@@ -1,0 +1,59 @@
+name: Build Installers
+
+on:
+  push:
+    tags:
+      - 'v*' # Trigger only on version tags (e.g., v0.1.0)
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'windows-latest'
+          - platform: 'ubuntu-22.04' # Fedora artifacts are built here via tauri's rpm bundler
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: 'angular-ui/package-lock.json'
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf rpm
+
+      - name: install root dependencies (Tauri CLI)
+        run: npm install
+
+      - name: install frontend dependencies
+        run: npm install
+        working-directory: ./angular-ui
+
+      - name: build frontend
+        run: npm run build -- --configuration production
+        working-directory: ./angular-ui
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__ # the action will replace this with the version from tauri.conf.json
+          releaseName: "Gepis Dados Abertos v__VERSION__"
+          releaseBody: "Novas versões para Windows e Fedora."
+          releaseDraft: true
+          prerelease: false
