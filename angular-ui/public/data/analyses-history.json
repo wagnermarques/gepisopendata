@@ -24,9 +24,40 @@
           "valueVar": "QT_MAT_INF"
         },
         "type": "barchart"
+      },
+      {
+        "createdAt": "2026-04-06T12:51:56.600Z",
+        "data": {
+          "x": [
+            "2024",
+            "2023",
+            "2022",
+            "2021",
+            "2020",
+            "2018",
+            "2019"
+          ],
+          "y": [
+            9491894,
+            9461155,
+            9028764,
+            8319399,
+            8829795,
+            8745184,
+            8972778
+          ]
+        },
+        "id": "8ee56869-0fe1-45b9-a84b-1cd768596788",
+        "label": "Matriculas 2028-2024",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "sum",
+          "valueVar": "QT_MAT_INF"
+        },
+        "type": "barchart"
       }
     ],
-    "updatedAt": "2026-04-05T23:59:12.715672118+00:00",
+    "updatedAt": "2026-04-06T12:51:56.604016041+00:00",
     "variables": [
       {
         "description": "Número de Matrículas do Ensino Fundamental - Anos Finais - Tempo Integral",

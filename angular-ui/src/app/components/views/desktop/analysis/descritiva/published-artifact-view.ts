@@ -8,7 +8,7 @@ import { DatasetStateService, AnalysisArtifact, AnalysisConfig } from '../../../
 import { ActivatedRoute, Router } from '@angular/router';
 
 // Plotly via Window Integration (requires script in index.html)
-import { PlotlyViaWindowModule } from 'angular-plotly.js';
+import { PlotlyModule } from 'angular-plotly.js';
 
 @Component({
   selector: 'app-published-artifact-view',
@@ -19,7 +19,7 @@ import { PlotlyViaWindowModule } from 'angular-plotly.js';
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
-    PlotlyViaWindowModule,
+    PlotlyModule,
   ],
   template: `
     <div class="container">

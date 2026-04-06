@@ -13,7 +13,7 @@ import { Router } from '@angular/router';
 import { invoke } from '@tauri-apps/api/core';
 
 // Plotly via Window Integration (requires script in index.html)
-import { PlotlyViaWindowModule } from 'angular-plotly.js';
+import { PlotlyModule } from 'angular-plotly.js';
 
 // Access global plotly for direct calls if needed, but the component handles most
 declare var Plotly: any;
@@ -31,7 +31,7 @@ declare var Plotly: any;
     MatProgressBarModule,
     MatSnackBarModule,
     FormsModule,
-    PlotlyViaWindowModule,
+    PlotlyModule,
   ],
   template: `
     <div class="container">

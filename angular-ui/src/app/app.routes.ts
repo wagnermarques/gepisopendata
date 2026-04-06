@@ -43,6 +43,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'datasets/manage',
+        loadComponent: () =>
+          import('./components/views/desktop/datasets/list/dataset-list-view').then(
+            (m) => m.DatasetListView
+          ),
+      },
+      {
         path: 'analysis/select',
         loadComponent: () =>
           import('./components/views/desktop/analysis/select/dataset-select-view').then(

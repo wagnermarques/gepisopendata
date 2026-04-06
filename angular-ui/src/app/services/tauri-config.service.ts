@@ -2,7 +2,8 @@ import { Injectable, inject, isDevMode } from '@angular/core';
 import { catchError, from, map, Observable, of, Subject } from 'rxjs';
 import { ConfigService } from './config.service';
 import { BaseDirectory, readTextFile } from '@tauri-apps/plugin-fs';
-import { listen } from '@tauri-apps/api/event';
+import { listen, Event } from '@tauri-apps/api/event';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 
 @Injectable({
   providedIn: 'root',
@@ -17,13 +18,30 @@ export class TauriConfigService extends ConfigService {
   }
 
   private async initMenuListener() {
+    if (isDevMode()) {
+      console.log('Initializing Menu Listener...');
+    }
     try {
-      await listen<string>('menu-navigation', (event) => {
+      // Listen to global events
+      await listen('menu-navigation', (event: Event<string>) => {
         if (isDevMode()) {
-          console.log('Menu navigation event received:', event.payload);
+          console.log('GLOBAL Menu navigation event received:', event.payload);
         }
         this.menuNavigationSubject.next(event.payload);
       });
+
+      // Also listen to webview-specific events as a fallback
+      const webview = getCurrentWebviewWindow();
+      await webview.listen('menu-navigation', (event: Event<string>) => {
+        if (isDevMode()) {
+          console.log('WEBVIEW Menu navigation event received:', event.payload);
+        }
+        this.menuNavigationSubject.next(event.payload);
+      });
+      
+      if (isDevMode()) {
+        console.log('Menu listeners attached successfully.');
+      }
     } catch (err) {
       console.error('Failed to listen to menu-navigation events:', err);
     }
