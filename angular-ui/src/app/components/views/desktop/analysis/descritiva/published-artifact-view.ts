@@ -96,6 +96,8 @@ export class PublishedArtifactView implements OnInit {
   isTauriMode = signal(isTauri());
 
   ngOnInit() {
+    console.log('PublishedArtifactView: Initializing. isTauri:', isTauri());
+    this.isTauriMode.set(isTauri());
     this.route.params.subscribe(params => {
       this.loadArtifact(params['analysisId'], params['artifactId']);
     });

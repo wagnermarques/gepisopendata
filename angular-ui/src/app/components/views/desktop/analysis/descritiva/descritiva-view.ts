@@ -115,6 +115,26 @@ import { invoke } from '@tauri-apps/api/core';
 
                 <mat-divider></mat-divider>
 
+                @if (analysisConfig.publishedArtifacts && analysisConfig.publishedArtifacts.length > 0) {
+                  <div class="artifacts-section">
+                    <h3>Publicações desta Análise ({{ analysisConfig.publishedArtifacts.length }}):</h3>
+                    <div class="artifact-grid">
+                      @for (art of analysisConfig.publishedArtifacts; track art.id) {
+                        <mat-card appearance="outlined" class="artifact-item-card" (click)="goToArtifact(analysisConfig.id!, art.id)">
+                          <mat-card-content>
+                            <mat-icon>{{ art.type === 'barchart' ? 'bar_chart' : 'description' }}</mat-icon>
+                            <div class="art-info">
+                              <span class="art-label">{{ art.label }}</span>
+                              <span class="art-date">{{ art.createdAt | date:'short' }}</span>
+                            </div>
+                          </mat-card-content>
+                        </mat-card>
+                      }
+                    </div>
+                  </div>
+                  <mat-divider></mat-divider>
+                }
+
                 <div class="variable-summary">
                   <h3>Variáveis Selecionadas ({{ analysisConfig.variables.length }}):</h3>
                   <table mat-table [dataSource]="analysisConfig.variables" class="compact-table">
@@ -150,7 +170,6 @@ import { invoke } from '@tauri-apps/api/core';
                   </button>
                   <button mat-flat-button color="primary">Cruzamentos</button>
                 </div>
-
               </div>
             } @else {
               <div class="analysis-placeholder">
@@ -200,6 +219,16 @@ import { invoke } from '@tauri-apps/api/core';
     .status-box.error { background: #ffebee; color: #c62828; }
     .success-info small { font-family: monospace; font-size: 0.75rem; }
 
+    .artifacts-section { padding: 8px 0 16px 0; }
+    .artifact-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 12px; }
+    .artifact-item-card { cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; background: #fff; }
+    .artifact-item-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-color: #3f51b5; }
+    .artifact-item-card mat-card-content { display: flex; align-items: center; gap: 12px; padding: 12px !important; }
+    .artifact-item-card mat-icon { color: #3f51b5; }
+    .art-info { display: flex; flex-direction: column; }
+    .art-label { font-weight: 500; font-size: 0.9rem; color: #333; }
+    .art-date { font-size: 0.7rem; color: #999; }
+
     .analysis-placeholder { text-align: center; padding: 40px; background: #fafafa; border-radius: 8px; border: 2px dashed #ddd; }
     .analysis-placeholder.active { opacity: 1; background: #fff; border-style: solid; border-color: #3f51b5; }
     .analysis-placeholder mat-icon { font-size: 48px; width: 48px; height: 48px; color: #ccc; margin-bottom: 8px; }
@@ -243,6 +272,10 @@ export class DescritivaView implements OnInit {
 
   goToBarChart() {
     this.router.navigate(['/desktop/analysis/descritiva/barchart']);
+  }
+
+  goToArtifact(analysisId: string, artifactId: string) {
+    this.router.navigate(['/published', analysisId, artifactId]);
   }
 
   async startEtl() {
