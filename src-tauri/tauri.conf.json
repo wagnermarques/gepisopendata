@@ -30,6 +30,10 @@
       "icons/128x128.png",
       "icons/icon.icns",
       "icons/icon.ico"
+    ],
+    "resources": [
+      "angular-ui/public/data/datasets-registry.json",
+      "angular-ui/public/data/analyses-history.json"
     ]
   },
   "plugins": {

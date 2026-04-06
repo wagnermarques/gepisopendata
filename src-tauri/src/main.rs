@@ -713,6 +713,30 @@ fn main() {
             delete_analysis
         ])
         .setup(|app| {
+            // Copy bundled data to AppData on first run
+            let app_data_dir = app.path().app_data_dir().unwrap();
+            if !app_data_dir.exists() {
+                fs::create_dir_all(&app_data_dir).unwrap();
+            }
+
+            let files_to_copy = [
+                "datasets-registry.json",
+                "analyses-history.json"
+            ];
+
+            for file_name in files_to_copy {
+                let dest_path = app_data_dir.join(file_name);
+                if !dest_path.exists() {
+                    // Try to load from resources
+                    let resource_path = format!("angular-ui/public/data/{}", file_name);
+                    if let Ok(content) = app.path().resolve(&resource_path, tauri::path::BaseDirectory::Resource) {
+                        if content.exists() {
+                             let _ = fs::copy(content, dest_path);
+                        }
+                    }
+                }
+            }
+
             let sobre_item = MenuItem::with_id(app, "sobre", "Sobre", true, None::<&str>)?;
             let ajuda_submenu = Submenu::with_items(app, "Ajuda", true, &[&sobre_item])?;
             let obter_item = MenuItem::with_id(app, "obter_dados", "Obter Conj. Dados", true, None::<&str>)?;
