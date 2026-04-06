@@ -147,7 +147,7 @@ export class App implements OnInit, OnDestroy {
   }
 
   goToArtifact(analysisId: string, artifactId: string) {
-    this.router.navigate(['/desktop/analysis/published', analysisId, artifactId]);
+    this.router.navigate(['/published', analysisId, artifactId]);
     if (this.isSmallScreen) {
       this.drawer.close();
     }

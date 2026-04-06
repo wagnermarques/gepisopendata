@@ -14,6 +14,13 @@ export const routes: Routes = [
     component: ViewAbout,
   },
   {
+    path: 'published/:analysisId/:artifactId',
+    loadComponent: () =>
+      import('./components/views/desktop/analysis/descritiva/published-artifact-view').then(
+        (m) => m.PublishedArtifactView
+      ),
+  },
+  {
     path: 'desktop',
     canActivate: [isTauriGuard],
     children: [
@@ -61,13 +68,6 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./components/views/desktop/analysis/descritiva/bar-chart-view').then(
             (m) => m.BarChartView
-          ),
-      },
-      {
-        path: 'analysis/published/:analysisId/:artifactId',
-        loadComponent: () =>
-          import('./components/views/desktop/analysis/descritiva/published-artifact-view').then(
-            (m) => m.PublishedArtifactView
           ),
       },
     ],

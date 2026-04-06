@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DatasetStateService, AnalysisArtifact, AnalysisConfig } from '../../../../../services/dataset-state.service';
+import { isTauri } from '../../../../../services/environment';
 import { ActivatedRoute, Router } from '@angular/router';
 import { invoke } from '@tauri-apps/api/core';
 
@@ -33,6 +34,14 @@ import * as Plotly from 'plotly.js-dist-min';
         <div class="loading-state">
           <mat-progress-bar mode="query"></mat-progress-bar>
           <p>Carregando dados da publicação...</p>
+        </div>
+      } @else if (!isTauriMode()) {
+        <div class="info-state">
+          <mat-icon color="primary">desktop_windows</mat-icon>
+          <h2>Visualização Limitada</h2>
+          <p>Para processar os dados originais e gerar este gráfico, é necessário utilizar a versão <strong>Desktop (Tauri)</strong> do aplicativo.</p>
+          <p>Na versão Web, você pode consultar o histórico de publicações, mas o processamento Polars/Rust requer acesso local aos arquivos.</p>
+          <button mat-raised-button color="primary" (click)="goBack()">Voltar</button>
         </div>
       } @else if (error()) {
         <div class="error-state">
@@ -63,14 +72,16 @@ import * as Plotly from 'plotly.js-dist-min';
 
     .chart-container { width: 100%; height: 600px; margin-top: 16px; }
 
-    .loading-state, .error-state { 
+    .loading-state, .error-state, .info-state { 
       text-align: center; 
       padding: 100px; 
       background: #fff; 
       border-radius: 8px; 
       box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
     }
-    .error-state mat-icon { font-size: 48px; width: 48px; height: 48px; }
+    .error-state mat-icon, .info-state mat-icon { font-size: 48px; width: 48px; height: 48px; margin-bottom: 16px; }
+    .info-state h2 { color: #3f51b5; }
+    .info-state p { max-width: 600px; margin: 8px auto; color: #666; }
   `]
 })
 export class PublishedArtifactView implements OnInit {
@@ -82,6 +93,7 @@ export class PublishedArtifactView implements OnInit {
   artifact = signal<AnalysisArtifact | null>(null);
   isLoading = signal(true);
   error = signal<string | null>(null);
+  isTauriMode = signal(isTauri());
 
   ngOnInit() {
     this.route.params.subscribe(params => {
@@ -112,6 +124,11 @@ export class PublishedArtifactView implements OnInit {
 
       this.analysis.set(targetAnalysis);
       this.artifact.set(targetArtifact);
+
+      if (!this.isTauriMode()) {
+        this.isLoading.set(false);
+        return;
+      }
 
       // Render based on type
       if (targetArtifact.type === 'barchart') {
