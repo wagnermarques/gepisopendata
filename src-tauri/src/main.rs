@@ -202,7 +202,7 @@ async fn analyze_group(app_handle: tauri::AppHandle, group_name: String) -> Resu
     #[cfg(debug_assertions)]
     {
         if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
-            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("data").join("datasets-registry.json");
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("datasets-registry.json");
             if dev_path.exists() { registry_path = dev_path; }
         }
     }
@@ -296,7 +296,7 @@ async fn get_columns_for_files(app_handle: tauri::AppHandle, group_name: String,
     #[cfg(debug_assertions)]
     {
         if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
-            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("data").join("datasets-registry.json");
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("datasets-registry.json");
             if dev_path.exists() { registry_path = dev_path; }
         }
     }
@@ -384,7 +384,7 @@ async fn get_excel_files(app_handle: tauri::AppHandle, group_name: String) -> Re
     #[cfg(debug_assertions)]
     {
         if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
-            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("data").join("datasets-registry.json");
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("datasets-registry.json");
             if dev_path.exists() { registry_path = dev_path; }
         }
     }
@@ -427,7 +427,7 @@ async fn parse_dictionary(app_handle: tauri::AppHandle, group_name: String, file
     #[cfg(debug_assertions)]
     {
         if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
-            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("data").join("datasets-registry.json");
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("datasets-registry.json");
             if dev_path.exists() { registry_path = dev_path; }
         }
     }
@@ -507,7 +507,7 @@ async fn save_analysis(app_handle: tauri::AppHandle, mut config: serde_json::Val
     #[cfg(debug_assertions)]
     {
         if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
-            paths.push(PathBuf::from(manifest_dir).join("angular-ui").join("data").join("analyses-history.json"));
+            paths.push(PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("analyses-history.json"));
         }
     }
 
@@ -547,7 +547,7 @@ async fn get_analyses(app_handle: tauri::AppHandle) -> Result<Vec<serde_json::Va
     #[cfg(debug_assertions)]
     {
         if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
-            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("data").join("analyses-history.json");
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("analyses-history.json");
             if dev_path.exists() { path = dev_path; }
         }
     }
@@ -569,7 +569,7 @@ async fn delete_analysis(app_handle: tauri::AppHandle, id: String) -> Result<(),
     #[cfg(debug_assertions)]
     {
         if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
-            paths.push(PathBuf::from(manifest_dir).join("angular-ui").join("data").join("analyses-history.json"));
+            paths.push(PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("analyses-history.json"));
         }
     }
 
@@ -595,7 +595,7 @@ async fn get_registry(app_handle: tauri::AppHandle) -> Result<Vec<serde_json::Va
     #[cfg(debug_assertions)]
     {
         if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
-            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("data").join("datasets-registry.json");
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("datasets-registry.json");
             if dev_path.exists() { registry_path = dev_path; }
         }
     }

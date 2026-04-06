@@ -12,4 +12,4 @@ www
 *.json.metadata.json
 downloads/
 /data/
-!/angular-ui/data/*.json
+!/angular-ui/public/data/*.json

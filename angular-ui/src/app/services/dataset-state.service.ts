@@ -1,5 +1,9 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import { invoke } from '@tauri-apps/api/core';
+import { isTauri } from './environment';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 export interface AnalysisArtifact {
   id: string;
@@ -28,6 +32,8 @@ export interface AnalysisConfig {
   providedIn: 'root'
 })
 export class DatasetStateService {
+  private http = inject(HttpClient);
+  
   selectedGroup = signal<string | null>(localStorage.getItem('selectedGroup'));
   
   // List of all saved analyses
@@ -42,7 +48,20 @@ export class DatasetStateService {
 
   async refreshHistory() {
     try {
-      const history = await invoke<AnalysisConfig[]>('get_analyses');
+      let history: AnalysisConfig[] = [];
+      
+      if (isTauri()) {
+        history = await invoke<AnalysisConfig[]>('get_analyses');
+      } else {
+        // Fallback for Web/GitHub Pages: Fetch from public assets
+        const result = await firstValueFrom(
+          this.http.get<AnalysisConfig[]>('data/analyses-history.json').pipe(
+            catchError(() => of([]))
+          )
+        );
+        history = result || [];
+      }
+
       this.allAnalyses.set(history.sort((a, b) => 
         new Date(b.updatedAt!).getTime() - new Date(a.updatedAt!).getTime()
       ));
@@ -66,6 +85,11 @@ export class DatasetStateService {
   }
 
   async saveAnalysis(config: AnalysisConfig) {
+    if (!isTauri()) {
+      console.warn('Salvamento de análise não disponível em modo Web.');
+      return;
+    }
+
     try {
       await invoke('save_analysis', { config });
       await this.refreshHistory();
@@ -78,6 +102,8 @@ export class DatasetStateService {
   }
 
   async deleteAnalysis(id: string) {
+    if (!isTauri()) return;
+
     try {
       await invoke('delete_analysis', { id });
       if (this.currentAnalysis()?.id === id) {
