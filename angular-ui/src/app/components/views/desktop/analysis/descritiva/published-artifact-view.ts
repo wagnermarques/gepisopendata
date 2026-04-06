@@ -7,10 +7,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { DatasetStateService, AnalysisArtifact, AnalysisConfig } from '../../../../../services/dataset-state.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
-// Plotly Module Integration
-import { PlotlyModule } from 'angular-plotly.js';
-import * as PlotlyJS from 'plotly.js-dist-min';
-(PlotlyModule as any).plotlyjs = PlotlyJS;
+// Plotly via Window Integration (requires script in index.html)
+import { PlotlyViaWindowModule } from 'angular-plotly.js';
 
 @Component({
   selector: 'app-published-artifact-view',
@@ -21,7 +19,7 @@ import * as PlotlyJS from 'plotly.js-dist-min';
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
-    PlotlyModule,
+    PlotlyViaWindowModule,
   ],
   template: `
     <div class="container">
@@ -111,7 +109,7 @@ export class PublishedArtifactView implements OnInit {
     this.error.set(null);
 
     try {
-      // Find the analysis in history (loaded in public/data for web)
+      // Find the analysis in history (loaded from public/data for web)
       const analyses = this.stateService.allAnalyses();
       const targetAnalysis = analyses.find(a => a.id === analysisId);
       

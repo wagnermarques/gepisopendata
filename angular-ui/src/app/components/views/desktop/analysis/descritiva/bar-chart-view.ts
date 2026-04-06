@@ -12,8 +12,11 @@ import { DatasetStateService } from '../../../../../services/dataset-state.servi
 import { Router } from '@angular/router';
 import { invoke } from '@tauri-apps/api/core';
 
-// Direct import to ensure bundling
-import * as Plotly from 'plotly.js-dist-min';
+// Plotly via Window Integration (requires script in index.html)
+import { PlotlyViaWindowModule } from 'angular-plotly.js';
+
+// Access global plotly for direct calls if needed, but the component handles most
+declare var Plotly: any;
 
 @Component({
   selector: 'app-bar-chart-view',
@@ -28,6 +31,7 @@ import * as Plotly from 'plotly.js-dist-min';
     MatProgressBarModule,
     MatSnackBarModule,
     FormsModule,
+    PlotlyViaWindowModule,
   ],
   template: `
     <div class="container">
@@ -95,8 +99,17 @@ import * as Plotly from 'plotly.js-dist-min';
                 <p>Calculando métricas via Polars...</p>
               </div>
             }
-            <div id="plotly-chart" class="chart-container" [class.hidden]="isLoading() || !categoryVar()"></div>
             
+            @if (graphData && !isLoading()) {
+              <plotly-plot 
+                [data]="graphData.data" 
+                [layout]="graphData.layout" 
+                [config]="graphData.config"
+                [useResizeHandler]="true"
+                class="chart-container">
+              </plotly-plot>
+            }
+
             @if (!categoryVar() && !isLoading()) {
               <div class="empty-preview">
                 <mat-icon>bar_chart</mat-icon>
@@ -120,8 +133,7 @@ import * as Plotly from 'plotly.js-dist-min';
     .info-box { margin-top: 24px; padding: 16px; background: #e8eaf6; border-radius: 4px; font-size: 0.9rem; color: #3f51b5; display: flex; flex-direction: column; gap: 12px; }
     .publish-btn { width: 100%; }
 
-    .chart-container { width: 100%; height: 500px; }
-    .chart-container.hidden { visibility: hidden; height: 0; }
+    .chart-container { width: 100%; height: 500px; display: block; }
 
     .loading-state, .empty-preview { 
       height: 400px; 
@@ -149,7 +161,7 @@ export class BarChartView implements OnInit {
   metric = signal<string>('count');
   isLoading = signal(false);
 
-  // Store last calculated data for publication
+  graphData: any = null;
   lastResultData: { categories: string[], values: number[] } | null = null;
 
   metricLabel = () => {
@@ -187,7 +199,7 @@ export class BarChartView implements OnInit {
       });
 
       this.lastResultData = data;
-      this.renderPlotly(data.categories, data.values, cat, met);
+      this.preparePlotlyData(data.categories, data.values, cat, met);
     } catch (err) {
       console.error('Erro ao gerar gráfico:', err);
     } finally {
@@ -195,23 +207,22 @@ export class BarChartView implements OnInit {
     }
   }
 
-  renderPlotly(x: string[], y: number[], title: string, metric: string) {
-    const trace: any = {
-      x: x,
-      y: y,
-      type: 'bar',
-      marker: { color: '#3f51b5' }
+  preparePlotlyData(x: string[], y: number[], title: string, metric: string) {
+    this.graphData = {
+      data: [{
+        x: x,
+        y: y,
+        type: 'bar',
+        marker: { color: '#3f51b5' }
+      }],
+      layout: {
+        title: `${this.metricLabel()} de ${this.valueVar() || title} por ${title}`,
+        xaxis: { title: title, automargin: true },
+        yaxis: { title: this.metricLabel(), automargin: true },
+        margin: { t: 50, b: 100, l: 60, r: 20 }
+      },
+      config: { responsive: true, displayModeBar: false }
     };
-
-    const layout: any = {
-      title: `${this.metricLabel()} de ${this.valueVar() || title} por ${title}`,
-      xaxis: { title: title, automargin: true },
-      yaxis: { title: this.metricLabel(), automargin: true },
-      margin: { t: 50, b: 100, l: 60, r: 20 }
-    };
-
-    const config = { responsive: true, displayModeBar: false };
-    Plotly.newPlot('plotly-chart', [trace], layout, config);
   }
 
   async publishArtifact() {
@@ -245,7 +256,7 @@ export class BarChartView implements OnInit {
     analysis.publishedArtifacts.push(artifact);
 
     await this.stateService.saveAnalysis(analysis);
-    this.snackBar.open('Gráfico publicado com sucesso e dados persistidos!', 'OK', { duration: 3000 });
+    this.snackBar.open('Gráfico publicado com sucesso!', 'OK', { duration: 3000 });
   }
 
   goBack() {
