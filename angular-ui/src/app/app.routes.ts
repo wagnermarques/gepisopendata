@@ -77,6 +77,13 @@ export const routes: Routes = [
             (m) => m.BarChartView
           ),
       },
+      {
+        path: 'settings/collaboration',
+        loadComponent: () =>
+          import('./components/views/desktop/settings/collaboration-settings-view').then(
+            (m) => m.CollaborationSettingsView
+          ),
+      },
     ],
   },
 ];

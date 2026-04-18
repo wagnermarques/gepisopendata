@@ -105,6 +105,9 @@ export class App implements OnInit, OnDestroy {
       case 'analises_descritivas':
         route = '/desktop/analysis/descritiva';
         break;
+      case 'config_colaboracao':
+        route = '/desktop/settings/collaboration';
+        break;
       default:
         console.warn(`Unrecognized menu ID: ${menuId}`);
         return;

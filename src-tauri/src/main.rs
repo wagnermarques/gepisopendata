@@ -758,6 +758,66 @@ async fn get_group_columns(app_handle: tauri::AppHandle, group_name: String) -> 
     Ok(result)
 }
 
+#[derive(serde::Serialize, serde::Deserialize, Clone)]
+struct GithubConfig {
+    username: String,
+    token: String,
+    owner: String,
+    repo: String,
+}
+
+#[tauri::command]
+async fn get_github_config(app_handle: tauri::AppHandle) -> Result<Option<GithubConfig>, String> {
+    let config_path = app_handle.path().app_config_dir().map_err(|e| e.to_string())?.join("github-config.json");
+    if config_path.exists() {
+        let file = File::open(config_path).map_err(|e| e.to_string())?;
+        let config: GithubConfig = serde_json::from_reader(file).map_err(|e| e.to_string())?;
+        Ok(Some(config))
+    } else {
+        Ok(None)
+    }
+}
+
+#[tauri::command]
+async fn save_github_config(app_handle: tauri::AppHandle, config: GithubConfig) -> Result<(), String> {
+    let config_dir = app_handle.path().app_config_dir().map_err(|e| e.to_string())?;
+    fs::create_dir_all(&config_dir).map_err(|e| e.to_string())?;
+    let config_path = config_dir.join("github-config.json");
+    let mut file = File::create(config_path).map_err(|e| e.to_string())?;
+    let json = serde_json::to_string_pretty(&config).map_err(|e| e.to_string())?;
+    file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[tauri::command]
+async fn test_github_connection(token: String, owner: String, repo: String) -> Result<String, String> {
+    let client = reqwest::Client::builder()
+        .user_agent("Gepis-OpenData-App")
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let url = format!("https://api.github.com/repos/{}/{}", owner, repo);
+    let response = client.get(&url)
+        .header("Authorization", format!("token {}", token))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if response.status().is_success() {
+        let json: serde_json::Value = response.json().await.map_err(|e| e.to_string())?;
+        let permissions = json["permissions"].as_object();
+        let can_push = permissions.and_then(|p| p.get("push")).and_then(|v| v.as_bool()).unwrap_or(false);
+        
+        if can_push {
+            Ok("Conexão bem-sucedida! Você tem permissão de escrita.".into())
+        } else {
+            Err("Conexão estabelecida, mas você NÃO tem permissão de escrita neste repositório.".into())
+        }
+    } else {
+        Err(format!("Falha na conexão: {} - Verifique o token e as informações do repositório.", response.status()))
+    }
+}
+
 mod data_processing;
 use data_processing::{run_etl, get_barchart_data};
 
@@ -782,7 +842,10 @@ fn main() {
             get_app_data_dir,
             save_analysis,
             get_analyses,
-            delete_analysis
+            delete_analysis,
+            get_github_config,
+            save_github_config,
+            test_github_connection
         ])
         .setup(|app| {
             // Copy bundled data to AppData on first run
@@ -819,7 +882,11 @@ fn main() {
             let configurar_item = MenuItem::with_id(app, "configurar_variaveis", "Configurar Variaveis", true, None::<&str>)?;
             let analises_item = MenuItem::with_id(app, "analises_descritivas", "Analises Descritivas", true, None::<&str>)?;
             let analisar_submenu = Submenu::with_items(app, "Analisar Dados", true, &[&selecionar_item, &configurar_item, &analises_item])?;
-            let menu = Menu::with_items(app, &[&conjuntos_submenu, &analisar_submenu, &ajuda_submenu])?;
+            
+            let colaboracao_item = MenuItem::with_id(app, "config_colaboracao", "Colaboração GitHub", true, None::<&str>)?;
+            let config_submenu = Submenu::with_items(app, "Configurações", true, &[&colaboracao_item])?;
+
+            let menu = Menu::with_items(app, &[&conjuntos_submenu, &analisar_submenu, &config_submenu, &ajuda_submenu])?;
             app.set_menu(menu)?;
             app.on_menu_event(move |app, event| {
                 if event.id == "sobre" {
