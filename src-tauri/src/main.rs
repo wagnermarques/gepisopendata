@@ -22,6 +22,18 @@ fn sanitize_filename(name: &str) -> String {
         .to_lowercase()
 }
 
+// Helper to get base downloads path portably
+fn get_base_downloads_path(app_handle: &tauri::AppHandle) -> Result<PathBuf, String> {
+    let mut path = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            path = PathBuf::from(manifest_dir).join("downloads");
+        }
+    }
+    Ok(path)
+}
+
 // Rust command to download a file and update the registry with organized folders
 #[tauri::command]
 async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: serde_json::Value) -> Result<String, String> {
@@ -36,14 +48,7 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
     let dataset_folder = sanitize_filename(titulo_curto);
 
     // 2. Resolve Base Downloads Directory
-    let mut base_downloads_path = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
-    #[cfg(debug_assertions)]
-    {
-        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
-            base_downloads_path = PathBuf::from(manifest_dir).join("downloads");
-        }
-    }
-
+    let base_downloads_path = get_base_downloads_path(&app_handle)?;
     let target_dir = base_downloads_path.join("datasets").join(&grupo_folder).join(&dataset_folder);
     fs::create_dir_all(&target_dir).map_err(|e| format!("Erro ao criar pastas: {}", e))?;
 
@@ -117,7 +122,7 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
     #[cfg(debug_assertions)]
     {
         if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
-            registry_paths.push(PathBuf::from(manifest_dir).join("angular-ui").join("data").join("datasets-registry.json"));
+            registry_paths.push(PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("datasets-registry.json"));
         }
     }
 
@@ -139,6 +144,9 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
                         if !files.contains(&serde_json::json!(f)) { files.push(serde_json::json!(f)); }
                     }
                 }
+                // Update localPath as well, as a relative path for portability
+                let relative_path = target_dir.strip_prefix(&base_downloads_path).unwrap_or(&target_dir);
+                item["localPath"] = serde_json::json!(relative_path.to_string_lossy());
                 entry_exists = true;
                 break;
             }
@@ -150,7 +158,9 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
                 obj.insert("id".to_string(), serde_json::json!(entry_id));
                 obj.insert("dateAdded".to_string(), serde_json::json!(chrono::Utc::now().to_rfc3339()));
                 obj.insert("files".to_string(), serde_json::json!(final_files));
-                obj.insert("localPath".to_string(), serde_json::json!(target_dir.to_string_lossy()));
+                
+                let relative_path = target_dir.strip_prefix(&base_downloads_path).unwrap_or(&target_dir);
+                obj.insert("localPath".to_string(), serde_json::json!(relative_path.to_string_lossy()));
             }
             registry.push(entry);
         }
@@ -223,10 +233,19 @@ async fn analyze_group(app_handle: tauri::AppHandle, group_name: String) -> Resu
     let mut all_files = Vec::new();
     let mut common_columns: Option<HashMap<String, String>> = None;
 
+    let base_downloads_path = get_base_downloads_path(&app_handle)?;
+
     for item in group_items {
         let local_path_str = item["localPath"].as_str().unwrap_or("");
         if local_path_str.is_empty() { continue; }
-        let local_path = PathBuf::from(local_path_str);
+        
+        let p = PathBuf::from(local_path_str);
+        let local_path = if p.is_relative() {
+            base_downloads_path.join(p)
+        } else {
+            p
+        };
+        
         if !local_path.exists() { continue; }
 
         let mut item_files = Vec::new();
@@ -314,8 +333,15 @@ async fn get_columns_for_files(app_handle: tauri::AppHandle, group_name: String,
 
     for rel_path in files {
         let mut found_full_path = None;
+        let base_downloads_path = get_base_downloads_path(&app_handle)?;
         for item in &group_items {
-            let local_path = PathBuf::from(item["localPath"].as_str().unwrap_or(""));
+            let local_path_str = item["localPath"].as_str().unwrap_or("");
+            let p = PathBuf::from(local_path_str);
+            let local_path = if p.is_relative() {
+                base_downloads_path.join(p)
+            } else {
+                p
+            };
             let full_path = local_path.join(&rel_path);
             if full_path.exists() {
                 found_full_path = Some(full_path);
@@ -400,10 +426,19 @@ async fn get_excel_files(app_handle: tauri::AppHandle, group_name: String) -> Re
 
     let mut excel_files = Vec::new();
 
+    let base_downloads_path = get_base_downloads_path(&app_handle)?;
+
     for item in group_items {
         let local_path_str = item["localPath"].as_str().unwrap_or("");
         if local_path_str.is_empty() { continue; }
-        let local_path = PathBuf::from(local_path_str);
+        
+        let p = PathBuf::from(local_path_str);
+        let local_path = if p.is_relative() {
+            base_downloads_path.join(p)
+        } else {
+            p
+        };
+        
         if !local_path.exists() { continue; }
 
         let mut item_files = Vec::new();
@@ -440,8 +475,15 @@ async fn parse_dictionary(app_handle: tauri::AppHandle, group_name: String, file
         .collect();
 
     let mut full_path = None;
+    let base_downloads_path = get_base_downloads_path(&app_handle)?;
     for item in &group_items {
-        let local_path = PathBuf::from(item["localPath"].as_str().unwrap_or(""));
+        let local_path_str = item["localPath"].as_str().unwrap_or("");
+        let p = PathBuf::from(local_path_str);
+        let local_path = if p.is_relative() {
+            base_downloads_path.join(p)
+        } else {
+            p
+        };
         let test_path = local_path.join(&file_name);
         if test_path.exists() {
             full_path = Some(test_path);
@@ -602,7 +644,22 @@ async fn get_registry(app_handle: tauri::AppHandle) -> Result<Vec<serde_json::Va
 
     if registry_path.exists() {
         let file = File::open(&registry_path).map_err(|e| e.to_string())?;
-        let registry: Vec<serde_json::Value> = serde_json::from_reader(file).map_err(|e| e.to_string())?;
+        let mut registry: Vec<serde_json::Value> = serde_json::from_reader(file).map_err(|e| e.to_string())?;
+        
+        let base_path = get_base_downloads_path(&app_handle)?;
+        
+        // Hydrate relative paths to absolute for the frontend
+        for item in registry.iter_mut() {
+            if let Some(local_path) = item["localPath"].as_str() {
+                // Only join if it's not already absolute (e.g. during transition)
+                let p = PathBuf::from(local_path);
+                if p.is_relative() {
+                    let abs_path = base_path.join(p);
+                    item["localPath"] = serde_json::json!(abs_path.to_string_lossy());
+                }
+            }
+        }
+        
         Ok(registry)
     } else {
         Ok(vec![])
@@ -617,7 +674,15 @@ async fn check_path_exists(path: String) -> bool {
 #[tauri::command]
 async fn get_group_columns(app_handle: tauri::AppHandle, group_name: String) -> Result<Vec<serde_json::Value>, String> {
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
-    let registry_path = app_data_dir.join("datasets-registry.json");
+    let mut registry_path = app_data_dir.join("datasets-registry.json");
+
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("datasets-registry.json");
+            if dev_path.exists() { registry_path = dev_path; }
+        }
+    }
     
     if !registry_path.exists() { return Err("Registro não encontrado".into()); }
     
@@ -632,8 +697,15 @@ async fn get_group_columns(app_handle: tauri::AppHandle, group_name: String) -> 
 
     let mut common_columns: Option<HashMap<String, String>> = None;
 
+    let base_downloads_path = get_base_downloads_path(&app_handle)?;
     for item in group_items {
-        let local_path = PathBuf::from(item["localPath"].as_str().unwrap_or(""));
+        let local_path_str = item["localPath"].as_str().unwrap_or("");
+        let p = PathBuf::from(local_path_str);
+        let local_path = if p.is_relative() {
+            base_downloads_path.join(p)
+        } else {
+            p
+        };
         let files = item["files"].as_array().ok_or("No files in item")?;
         
         // We only look at CSV files for column analysis

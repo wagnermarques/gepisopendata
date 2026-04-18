@@ -6,7 +6,7 @@
     "ng-build-homolog": "ng build --configuration homolog",
     "ng-build-prod": "ng build --configuration production",
     "tauri:build-dev": "npm run ng-build-dev && cd ../ && cargo tauri build",
-    "tauri:dev": "concurrently \"ng build --configuration development --watch\" \"cd ../ && source $HOME/.cargo/env && cargo tauri dev\"",
+    "tauri:dev": "concurrently \"ng build --configuration development --watch\" \"cd ../ && cargo tauri dev\"",
     "tauri:prod": "npm run ng-build-prod && cd ../ && cargo tauri build",
     "start:dev": "npm run tauri:dev",
     "start:prod": "npm run tauri:prod && ../target/release/gepis-dados-abertos",

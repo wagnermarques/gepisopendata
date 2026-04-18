@@ -12,7 +12,15 @@ pub async fn run_etl(
     columns: Vec<String>
 ) -> Result<String, String> {
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
-    let registry_path = app_data_dir.join("datasets-registry.json");
+    let mut registry_path = app_data_dir.join("datasets-registry.json");
+
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("datasets-registry.json");
+            if dev_path.exists() { registry_path = dev_path; }
+        }
+    }
 
     // 1. Resolve full paths for all selected files
     let registry_content = std::fs::read_to_string(&registry_path).map_err(|e| e.to_string())?;
@@ -22,10 +30,24 @@ pub async fn run_etl(
         .filter(|item| item["grupo"].as_str().unwrap_or("") == group_name)
         .collect();
 
+    let mut base_downloads_path = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            base_downloads_path = PathBuf::from(manifest_dir).join("downloads");
+        }
+    }
+
     let mut full_paths = Vec::new();
     for rel_path in &files {
         for item in &group_items {
-            let local_path = PathBuf::from(item["localPath"].as_str().unwrap_or(""));
+            let local_path_str = item["localPath"].as_str().unwrap_or("");
+            let p = PathBuf::from(local_path_str);
+            let local_path = if p.is_relative() {
+                base_downloads_path.join(p)
+            } else {
+                p
+            };
             let full_path = local_path.join(rel_path);
             if full_path.exists() {
                 full_paths.push(full_path);
