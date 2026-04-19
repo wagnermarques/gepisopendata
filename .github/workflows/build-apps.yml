@@ -49,7 +49,6 @@ jobs:
         working-directory: ./angular-ui
 
       - name: Build Tauri bundle
-        working-directory: ./src-tauri
         run: |
           npx tauri build
 
