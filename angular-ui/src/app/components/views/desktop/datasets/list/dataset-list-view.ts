@@ -8,6 +8,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 import { invoke } from '@tauri-apps/api/core';
 import { message } from '@tauri-apps/plugin-dialog';
@@ -24,7 +25,7 @@ interface Dataset {
   localPath: string;
   dateAdded: string;
   urls: string;
-  exists?: boolean; // New property
+  exists?: boolean;
 }
 
 @Component({
@@ -40,6 +41,7 @@ interface Dataset {
     MatChipsModule,
     MatTooltipModule,
     MatProgressBarModule,
+    MatSnackBarModule,
     RouterLink,
   ],
   template: `
@@ -110,9 +112,21 @@ interface Dataset {
                           <mat-progress-bar mode="indeterminate"></mat-progress-bar>
                         </div>
                       }
+
+                      @if (isCollaborating() === item.id) {
+                        <div class="collaboration-progress">
+                          <p>Enviando para GitHub...</p>
+                          <mat-progress-bar mode="indeterminate" color="accent"></mat-progress-bar>
+                        </div>
+                      }
                     </mat-card-content>
 
                     <mat-card-actions align="end">
+                      <button mat-icon-button color="accent" (click)="collaborate(item)" 
+                        [disabled]="isCollaborating() !== null" matTooltip="Colaborar: salvar para outros usuários">
+                        <mat-icon>hub</mat-icon>
+                      </button>
+                      
                       @if (item.exists !== false) {
                         <button mat-button color="primary" (click)="openFolder(item.localPath)">
                           <mat-icon>folder_open</mat-icon> Abrir Pasta
@@ -192,6 +206,9 @@ interface Dataset {
     .redownload-progress { margin-top: 16px; }
     .redownload-progress p { font-size: 0.8rem; color: #f44336; margin-bottom: 4px; }
 
+    .collaboration-progress { margin-top: 16px; }
+    .collaboration-progress p { font-size: 0.8rem; color: #3f51b5; margin-bottom: 4px; }
+
     mat-card-actions { border-top: 1px solid #eee; padding: 8px 16px; }
   `]
 })
@@ -199,6 +216,9 @@ export class DatasetListView implements OnInit {
   datasets = signal<Dataset[]>([]);
   groupedDatasets = signal<{ name: string, items: Dataset[] }[]>([]);
   isRedownloading = signal<string | null>(null);
+  isCollaborating = signal<string | null>(null);
+
+  private snackBar = inject(MatSnackBar);
 
   ngOnInit() {
     this.loadDatasets();
@@ -238,8 +258,6 @@ export class DatasetListView implements OnInit {
   async redownload(item: Dataset) {
     this.isRedownloading.set(item.id);
     try {
-      // Reuse the download_dataset command
-      // We pass the existing metadata so it extracts and organizes exactly as before
       await invoke('download_dataset', { 
         url: item.urls, 
         metadata: item 
@@ -250,7 +268,6 @@ export class DatasetListView implements OnInit {
         kind: 'info'
       });
 
-      // Refresh the list to update status icons
       await this.loadDatasets();
     } catch (err) {
       console.error('Redownload failed:', err);
@@ -265,6 +282,18 @@ export class DatasetListView implements OnInit {
       await invoke('plugin:shell|open', { path });
     } catch (err) {
       console.error('Error opening folder:', err);
+    }
+  }
+
+  async collaborate(item: Dataset) {
+    this.isCollaborating.set(item.id);
+    try {
+      const result = await invoke<string>('push_dataset_to_github', { datasetId: item.id });
+      this.snackBar.open(result, 'OK', { duration: 5000 });
+    } catch (err) {
+      this.snackBar.open(`Erro ao colaborar: ${err}`, 'Fechar', { duration: 8000 });
+    } finally {
+      this.isCollaborating.set(null);
     }
   }
 }

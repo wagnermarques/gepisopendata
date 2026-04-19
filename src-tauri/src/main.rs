@@ -818,6 +818,97 @@ async fn test_github_connection(token: String, owner: String, repo: String) -> R
     }
 }
 
+use base64::{Engine as _, engine::general_purpose};
+
+#[tauri::command]
+async fn push_dataset_to_github(app_handle: tauri::AppHandle, dataset_id: String) -> Result<String, String> {
+    // 1. Get Github Config
+    let config = get_github_config(app_handle.clone()).await?
+        .ok_or("Configuração do GitHub não encontrada. Vá em Configurações > Colaboração GitHub.")?;
+
+    // 2. Load Local Registry Entry
+    let registry = get_registry(app_handle.clone()).await?;
+    let local_entry = registry.iter()
+        .find(|item| item["id"].as_str() == Some(&dataset_id))
+        .ok_or(format!("Dataset {} não encontrado no registro local.", dataset_id))?
+        .clone();
+
+    // 3. Prepare Entry for Collaboration (Clean system-specific paths)
+    let mut entry_to_push = local_entry.clone();
+    if let Some(obj) = entry_to_push.as_object_mut() {
+        obj.insert("localPath".to_string(), serde_json::json!(""));
+        obj.insert("exists".to_string(), serde_json::json!(false));
+    }
+
+    // 4. Fetch Remote Registry from GitHub
+    let client = reqwest::Client::builder()
+        .user_agent("Gepis-OpenData-App")
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    let url = format!("https://api.github.com/repos/{}/{}/contents/angular-ui/public/data/datasets-registry.json", config.owner, config.repo);
+    let response = client.get(&url)
+        .header("Authorization", format!("token {}", config.token))
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    let mut remote_sha = String::new();
+    let mut remote_registry: Vec<serde_json::Value> = Vec::new();
+
+    if response.status().is_success() {
+        let json: serde_json::Value = response.json().await.map_err(|e| e.to_string())?;
+        remote_sha = json["sha"].as_str().unwrap_or("").to_string();
+        
+        let content_b64 = json["content"].as_str().unwrap_or("").replace("\n", "").replace("\r", "");
+        let content_bytes = general_purpose::STANDARD.decode(content_b64).map_err(|e| e.to_string())?;
+        remote_registry = serde_json::from_slice(&content_bytes).unwrap_or_else(|_| vec![]);
+    } else if response.status() == 404 {
+        // File doesn't exist yet, we'll create it
+        println!("Rust => Remote registry not found (404), creating new one.");
+    } else {
+        return Err(format!("Erro ao buscar registro remoto: {}", response.status()));
+    }
+
+    // 5. Merge Local Entry into Remote Registry
+    let mut entry_exists = false;
+    for item in remote_registry.iter_mut() {
+        if item["id"] == entry_to_push["id"] {
+            *item = entry_to_push.clone();
+            entry_exists = true;
+            break;
+        }
+    }
+    if !entry_exists {
+        remote_registry.push(entry_to_push);
+    }
+
+    // 6. Push Back to GitHub
+    let final_json = serde_json::to_string_pretty(&remote_registry).map_err(|e| e.to_string())?;
+    let final_b64 = general_purpose::STANDARD.encode(final_json);
+
+    let payload = serde_json::json!({
+        "message": format!("Colaboração: Adicionando/Atualizando dataset {}", dataset_id),
+        "content": final_b64,
+        "sha": if remote_sha.is_empty() { serde_json::Value::Null } else { serde_json::Value::String(remote_sha) }
+    });
+
+    let put_response = client.put(&url)
+        .header("Authorization", format!("token {}", config.token))
+        .json(&payload)
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    if put_response.status().is_success() {
+        Ok("Dataset compartilhado com sucesso no GitHub!".into())
+    } else {
+        let status = put_response.status();
+        let error_body = put_response.text().await.unwrap_or_default();
+        Err(format!("Erro ao enviar para GitHub: {} - {}", status, error_body))
+    }
+}
+
 mod data_processing;
 use data_processing::{run_etl, get_barchart_data};
 
@@ -845,7 +936,8 @@ fn main() {
             delete_analysis,
             get_github_config,
             save_github_config,
-            test_github_connection
+            test_github_connection,
+            push_dataset_to_github
         ])
         .setup(|app| {
             // Copy bundled data to AppData on first run
