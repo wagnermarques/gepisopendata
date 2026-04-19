@@ -48,12 +48,29 @@ jobs:
         run: npm run build -- --configuration production
         working-directory: ./angular-ui
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: Build Tauri bundle
+        working-directory: ./src-tauri
+        run: |
+          npx tauri build --release
+
+      - name: Upload Linux build artifacts
+        if: matrix.platform == 'ubuntu-22.04'
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-bundles
+          path: ./src-tauri/target/release/bundle/*
+
+      - name: Create GitHub Release and upload Windows installers
+        if: matrix.platform == 'windows-latest'
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v__VERSION__ # the action will replace this with the version from tauri.conf.json
-          releaseName: "Gepis Dados Abertos v__VERSION__"
-          releaseBody: "Novas versões para Windows e Fedora."
-          releaseDraft: true
+          files: |
+            ./src-tauri/target/release/bundle/*.exe
+            ./src-tauri/target/release/bundle/*.msi
+          tag_name: ${{ github.ref_name }}
+          name: "Gepis Dados Abertos ${{ github.ref_name }}"
+          body: "Novas versões para Windows e Fedora."
+          draft: true
           prerelease: false
