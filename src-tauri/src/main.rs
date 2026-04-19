@@ -13,6 +13,7 @@ use std::path::PathBuf;
 use std::collections::HashMap;
 use zip::ZipArchive;
 use calamine::{Reader, open_workbook_auto};
+use tracing_subscriber::fmt::time::SystemTime;
 
 // Helper to sanitize filenames
 fn sanitize_filename(name: &str) -> String {
@@ -37,6 +38,8 @@ fn get_base_downloads_path(app_handle: &tauri::AppHandle) -> Result<PathBuf, Str
 // Rust command to download a file and update the registry with organized folders
 #[tauri::command]
 async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: serde_json::Value) -> Result<String, String> {
+    tracing::info!("Starting download_dataset: url={}", url);
+    
     println!("Rust => Processing download for: {}", url);
     
     // 1. Extract info from metadata
@@ -64,8 +67,11 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
 
     let response = client.get(&url).send().await.map_err(|e| format!("Erro na requisição: {}", e))?;
     if !response.status().is_success() {
-        return Err(format!("Servidor retornou erro {}: {}", response.status(), url));
+        let error_msg = format!("Servidor retornou erro {}: {}", response.status(), url);
+        tracing::error!("{}", error_msg);
+        return Err(error_msg);
     }
+    tracing::debug!("HTTP request successful, downloading file: {}", file_name);
 
     let content = response.bytes().await.map_err(|e| format!("Erro ao ler bytes: {}", e))?;
     let mut file = File::create(&dest_path).map_err(|e| format!("Erro ao criar arquivo local: {}", e))?;
@@ -170,6 +176,7 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
         file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
     }
 
+    tracing::info!("Dataset downloaded and registered successfully: {}", file_name);
     Ok(file_name.to_string())
 }
 
@@ -912,6 +919,38 @@ async fn push_dataset_to_github(app_handle: tauri::AppHandle, dataset_id: String
 mod data_processing;
 use data_processing::{run_etl, get_barchart_data};
 
+// Initialize logging to file
+fn init_logging(app_data_dir: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
+    // Create logs directory if it doesn't exist
+    let logs_dir = app_data_dir.join("logs");
+    fs::create_dir_all(&logs_dir)?;
+
+    // Create a file appender for logging
+    let file_appender = tracing_appender::rolling::daily(&logs_dir, "gepis-dados-abertos.log");
+    let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
+
+    // Keep the guard alive for the application lifetime so logs are flushed correctly
+    let _guard = Box::leak(Box::new(guard));
+
+    // Create a subscriber with file output
+    tracing_subscriber::fmt()
+        .with_writer(non_blocking)
+        .with_ansi(false)
+        .with_timer(SystemTime::default())
+        .with_target(true)
+        .with_level(true)
+        .with_thread_ids(true)
+        .init();
+
+    // Also log to console in debug mode
+    #[cfg(debug_assertions)]
+    {
+        eprintln!("Logging initialized. Logs directory: {:?}", logs_dir);
+    }
+
+    Ok(())
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
@@ -940,8 +979,15 @@ fn main() {
             push_dataset_to_github
         ])
         .setup(|app| {
-            // Copy bundled data to AppData on first run
+            // Initialize logging
             let app_data_dir = app.path().app_data_dir().unwrap();
+            if let Err(e) = init_logging(&app_data_dir) {
+                eprintln!("Failed to initialize logging: {}", e);
+            } else {
+                tracing::info!("Application started - Gepis Dados Abertos v0.1.0");
+            }
+
+            // Copy bundled data to AppData on first run
             if !app_data_dir.exists() {
                 fs::create_dir_all(&app_data_dir).unwrap();
             }

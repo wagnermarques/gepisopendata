@@ -11,6 +11,7 @@ pub async fn run_etl(
     files: Vec<String>, 
     columns: Vec<String>
 ) -> Result<String, String> {
+    tracing::info!("Starting ETL process for group: {}, files: {:?}, columns: {:?}", group_name, files, columns);
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
     let mut registry_path = app_data_dir.join("datasets-registry.json");
 
@@ -94,7 +95,9 @@ pub async fn run_etl(
         .finish(&mut df)
         .map_err(|e| format!("Erro ao salvar arquivo final: {}", e))?;
 
-    Ok(output_path.to_string_lossy().into_owned())
+    let output_str = output_path.to_string_lossy().into_owned();
+    tracing::info!("ETL process completed successfully. Output file: {}", output_str);
+    Ok(output_str)
 }
 
 #[derive(serde::Serialize)]
@@ -110,6 +113,7 @@ pub async fn get_barchart_data(
     value_col: String,
     metric: String, // "count", "sum", "avg"
 ) -> Result<BarChartData, String> {
+    tracing::info!("Starting get_barchart_data: file={}, category={}, value={}, metric={}", file_path, category_col, value_col, metric);
     println!("Rust => get_barchart_data started for: {}", category_col);
     let path = PathBuf::from(file_path);
     if !path.exists() {
@@ -153,6 +157,7 @@ pub async fn get_barchart_data(
 
     println!("Rust => Returning {} categories and {} values", cats.len(), vals.len());
 
+    tracing::info!("Bar chart data generated successfully: {} categories, {} values", cats.len(), vals.len());
     Ok(BarChartData {
         categories: cats,
         values: vals,
