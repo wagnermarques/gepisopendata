@@ -51,7 +51,7 @@ jobs:
       - name: Build Tauri bundle
         working-directory: ./src-tauri
         run: |
-          npx tauri build --release
+          npx tauri build
 
       - name: Upload Linux build artifacts
         if: matrix.platform == 'ubuntu-22.04'
