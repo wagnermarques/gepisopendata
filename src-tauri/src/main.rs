@@ -123,6 +123,7 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
 
     // 5. Update Registry
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    #[allow(unused_mut)]
     let mut registry_paths = vec![app_data_dir.join("datasets-registry.json")];
     
     #[cfg(debug_assertions)]
@@ -214,6 +215,7 @@ fn find_files_recursive(dir: &PathBuf, extension: &str, files: &mut Vec<PathBuf>
 #[tauri::command]
 async fn analyze_group(app_handle: tauri::AppHandle, group_name: String) -> Result<GroupAnalysis, String> {
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    #[allow(unused_mut)]
     let mut registry_path = app_data_dir.join("datasets-registry.json");
 
     #[cfg(debug_assertions)]
@@ -317,6 +319,7 @@ async fn analyze_group(app_handle: tauri::AppHandle, group_name: String) -> Resu
 #[tauri::command]
 async fn get_columns_for_files(app_handle: tauri::AppHandle, group_name: String, files: Vec<String>) -> Result<Vec<ColumnInfo>, String> {
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    #[allow(unused_mut)]
     let mut registry_path = app_data_dir.join("datasets-registry.json");
 
     #[cfg(debug_assertions)]
@@ -412,6 +415,7 @@ struct DictionaryEntry {
 #[tauri::command]
 async fn get_excel_files(app_handle: tauri::AppHandle, group_name: String) -> Result<Vec<String>, String> {
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    #[allow(unused_mut)]
     let mut registry_path = app_data_dir.join("datasets-registry.json");
 
     #[cfg(debug_assertions)]
@@ -464,6 +468,7 @@ async fn get_excel_files(app_handle: tauri::AppHandle, group_name: String) -> Re
 #[tauri::command]
 async fn parse_dictionary(app_handle: tauri::AppHandle, group_name: String, file_name: String) -> Result<Vec<DictionaryEntry>, String> {
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    #[allow(unused_mut)]
     let mut registry_path = app_data_dir.join("datasets-registry.json");
 
     #[cfg(debug_assertions)]

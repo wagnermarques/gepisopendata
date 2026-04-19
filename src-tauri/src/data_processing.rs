@@ -13,6 +13,7 @@ pub async fn run_etl(
 ) -> Result<String, String> {
     tracing::info!("Starting ETL process for group: {}, files: {:?}, columns: {:?}", group_name, files, columns);
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    #[allow(unused_mut)]
     let mut registry_path = app_data_dir.join("datasets-registry.json");
 
     #[cfg(debug_assertions)]
@@ -31,6 +32,7 @@ pub async fn run_etl(
         .filter(|item| item["grupo"].as_str().unwrap_or("") == group_name)
         .collect();
 
+    #[allow(unused_mut)]
     let mut base_downloads_path = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
     #[cfg(debug_assertions)]
     {
