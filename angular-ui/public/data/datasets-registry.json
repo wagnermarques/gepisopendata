@@ -42,5 +42,39 @@
     "tituloCurto": "censo_escolar_2025",
     "tituloLongo": "censo_escolar_2025",
     "urls": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2025_.zip"
+  },
+  {
+    "autor": "",
+    "dataReferencia": "2024",
+    "dateAdded": "2026-04-18T22:27:17.433279100+00:00",
+    "descricao": "censo_escolar_2024",
+    "exists": false,
+    "files": [
+      "microdados_censo_escolar_2024.zip",
+      "dicionário_dados_educação_básica.xlsx",
+      "~$Dicionário de Dados da Educação Básica.xlsx",
+      "~$dicionário_dados_educação_básica.xlsx",
+      "Aluno 2024.pdf",
+      "Escola 2024.pdf",
+      "Escola Nova 2024.pdf",
+      "Gestor Escolar 2024.pdf",
+      "Profissional Escolar 2024.pdf",
+      "Turma 2024.pdf",
+      "md5_microdados_ed_basica_2024.txt",
+      "microdados_ed_basica_2024.csv",
+      "suplemento_cursos_tecnicos_2024.csv",
+      "Leia-me.pdf"
+    ],
+    "frequencia": "Anual",
+    "grupo": "censo_escolar_ed_basica_inep2",
+    "id": "censo_escolar_ed_basica_inep2-censo_escolar_2024",
+    "isSerieHistorica": false,
+    "licenca": "",
+    "localPath": "",
+    "orgaoEmissao": "inep",
+    "tags": "",
+    "tituloCurto": "censo_escolar_2024",
+    "tituloLongo": "censo_escolar_2024",
+    "urls": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2024.zip"
   }
 ]
