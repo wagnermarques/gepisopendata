@@ -105,6 +105,24 @@ export class DatasetStateService {
     }
   }
 
+  async publishAnalysis(id: string): Promise<string> {
+    if (!isTauri()) {
+      console.warn('Publicação não disponível em modo Web.');
+      throw new Error('Publicação não disponível em modo Web.');
+    }
+
+    try {
+      const result = await invoke<string>('publish_analysis', { id });
+      console.log('Publish result:', result);
+      // Refresh history in case anything changed
+      await this.refreshHistory();
+      return result;
+    } catch (err) {
+      console.error('Erro ao publicar análise:', err);
+      throw err;
+    }
+  }
+
   async deleteAnalysis(id: string) {
     if (!isTauri()) return;
 

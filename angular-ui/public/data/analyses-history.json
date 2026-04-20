@@ -825,5 +825,62 @@
         "type": "Num"
       }
     ]
+  },
+  {
+    "dictionary": "dicionário_dados_educação_básica.xlsx",
+    "files": [
+      "microdados_ed_basica_2024.csv",
+      "censo_escolar_2023.csv",
+      "censo1_escolar_2021.csv"
+    ],
+    "groupName": "censo_escolar_ed_basica_inep2",
+    "id": "210fcd69-bdb5-4353-a117-3e06e809731d",
+    "name": "Censo Escolar: Ed Profissional: Matriculas",
+    "updatedAt": "2026-04-20T15:35:59.818008+00:00",
+    "variables": [
+      {
+        "description": "Número de Matrículas da Educação Profissional Técnica",
+        "name": "QT_MAT_PROF_TEC",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Turmas da Educação Profissional Técnica",
+        "name": "QT_TUR_PROF_TEC",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Docentes da Educação Profissional Técnica",
+        "name": "QT_DOC_PROF_TEC",
+        "type": "Num"
+      }
+    ]
+  },
+  {
+    "dictionary": "dicionário_dados_educação_básica.xlsx",
+    "files": [
+      "microdados_ed_basica_2024.csv",
+      "censo_escolar_2023.csv",
+      "censo1_escolar_2021.csv"
+    ],
+    "groupName": "censo_escolar_ed_basica_inep2",
+    "id": "9e897b38-58bf-4945-b592-32e70b37af37",
+    "name": "Teste: Censo Escolar (2021-2024): Ed Infantil",
+    "updatedAt": "2026-04-20T15:42:21.769328900+00:00",
+    "variables": [
+      {
+        "description": "Número de Matrículas da Educação Infantil - Creche",
+        "name": "QT_MAT_INF_CRE",
+        "type": "Num"
+      },
+      {
+        "name": "IN_INF_CRE",
+        "type": "Texto"
+      },
+      {
+        "description": "Ano do Censo",
+        "name": "NU_ANO_CENSO",
+        "type": "Num"
+      }
+    ]
   }
 ]

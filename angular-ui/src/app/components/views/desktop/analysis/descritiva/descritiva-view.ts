@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,9 +8,33 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { firstValueFrom } from 'rxjs';
 import { DatasetStateService, AnalysisConfig } from '../../../../../services/dataset-state.service';
 import { Router } from '@angular/router';
 import { invoke } from '@tauri-apps/api/core';
+
+@Component({
+  selector: 'confirm-dialog',
+  standalone: true,
+  imports: [CommonModule, MatButtonModule, MatIconModule],
+  template: `
+    <div style="padding:24px; max-width:420px;">
+      <h3 style="margin-top:0">{{ data.title || 'Confirmar' }}</h3>
+      <p>{{ data.message }}</p>
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:16px;">
+        <button mat-button (click)="onCancel()">Cancelar</button>
+        <button mat-flat-button color="primary" (click)="onConfirm()">Confirmar</button>
+      </div>
+    </div>
+  `
+})
+export class ConfirmDialog {
+  constructor(public dialogRef: MatDialogRef<ConfirmDialog>, @Inject(MAT_DIALOG_DATA) public data: any) {}
+  onConfirm() { this.dialogRef.close(true); }
+  onCancel() { this.dialogRef.close(false); }
+}
 
 @Component({
   selector: 'app-descritiva-view',
@@ -25,6 +49,9 @@ import { invoke } from '@tauri-apps/api/core';
     MatDividerModule,
     MatListModule,
     MatTooltipModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    ConfirmDialog,
   ],
   template: `
     <div class="container">
@@ -52,6 +79,9 @@ import { invoke } from '@tauri-apps/api/core';
                     <span matListItemLine>{{ item.groupName }} • {{ item.variables.length }} variáveis</span>
                     <button mat-icon-button matListItemMeta (click)="deleteAnalysis($event, item.id!)" matTooltip="Excluir">
                       <mat-icon color="warn">delete</mat-icon>
+                    </button>
+                    <button mat-icon-button matListItemMeta (click)="publishAnalysis($event, item.id!)" matTooltip="Contribuir">
+                      <mat-icon>cloud_upload</mat-icon>
                     </button>
                   </mat-list-item>
                 }
@@ -243,6 +273,8 @@ import { invoke } from '@tauri-apps/api/core';
 export class DescritivaView implements OnInit {
   stateService = inject(DatasetStateService);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
 
   config = this.stateService.currentAnalysis;
   etlStatus = signal<'idle' | 'processing' | 'success' | 'error'>('idle');
@@ -261,8 +293,27 @@ export class DescritivaView implements OnInit {
 
   async deleteAnalysis(event: Event, id: string) {
     event.stopPropagation();
-    if (confirm('Tem certeza que deseja excluir esta configuração?')) {
+    const res = await firstValueFrom(this.dialog.open(ConfirmDialog, { data: { title: 'Confirmar exclusão', message: 'Tem certeza que deseja excluir esta configuração?' } }).afterClosed());
+    if (res) {
       await this.stateService.deleteAnalysis(id);
+      this.snackBar.open('Análise excluída', 'Fechar', { duration: 3000 });
+    }
+  }
+
+  async publishAnalysis(event: Event, id: string) {
+    event.stopPropagation();
+    const ok = await firstValueFrom(this.dialog.open(ConfirmDialog, { data: { title: 'Contribuir', message: 'Enviar esta análise para o repositório de produção?' } }).afterClosed());
+    if (!ok) return;
+    try {
+      const result = await this.stateService.publishAnalysis(id);
+      if (result && result.startsWith('http')) {
+        const snack = this.snackBar.open('Pull request criado', 'Abrir', { duration: 10000 });
+        snack.onAction().subscribe(() => window.open(result, '_blank'));
+      } else {
+        this.snackBar.open('Publicação enviada', 'Fechar', { duration: 4000 });
+      }
+    } catch (err: any) {
+      this.snackBar.open('Falha ao publicar: ' + (err?.toString() || err), 'Fechar', { duration: 6000 });
     }
   }
 

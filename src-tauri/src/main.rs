@@ -956,6 +956,124 @@ fn init_logging(app_data_dir: &PathBuf) -> Result<(), Box<dyn std::error::Error>
     Ok(())
 }
 
+#[tauri::command]
+async fn publish_analysis(app_handle: tauri::AppHandle, id: String) -> Result<String, String> {
+    // Publish by creating a branch and opening a Pull Request using the GitHub API.
+    let config = get_github_config(app_handle.clone()).await?
+        .ok_or("GitHub configuration not found. Configure it in Settings > Collaboration.")?;
+
+    // Load local analyses-history.json (prefer app data dir, fall back to bundled file)
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    let mut local_path = app_data_dir.join("analyses-history.json");
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            let dev_path = PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("analyses-history.json");
+            if dev_path.exists() { local_path = dev_path; }
+        }
+    }
+
+    if !local_path.exists() { return Err("Local analyses-history.json not found".into()); }
+    let file = File::open(&local_path).map_err(|e| e.to_string())?;
+    let history: Vec<serde_json::Value> = serde_json::from_reader(file).map_err(|e| e.to_string())?;
+    if !history.iter().any(|item| item["id"].as_str() == Some(&id)) {
+        return Err("Analysis id not found in local analyses-history.json".into());
+    }
+
+    let final_json = serde_json::to_string_pretty(&history).map_err(|e| e.to_string())?;
+    let final_b64 = general_purpose::STANDARD.encode(final_json.as_bytes());
+
+    let client = reqwest::Client::builder()
+        .user_agent("Gepis-OpenData-App")
+        .build()
+        .map_err(|e| e.to_string())?;
+
+    // 1) Get repository info to find default branch
+    let repo_url = format!("https://api.github.com/repos/{}/{}", config.owner, config.repo);
+    let repo_resp = client.get(&repo_url)
+        .header("Authorization", format!("token {}", config.token))
+        .send().await.map_err(|e| e.to_string())?;
+    if !repo_resp.status().is_success() {
+        return Err(format!("Failed to get repo info: {}", repo_resp.status()));
+    }
+    let repo_json: serde_json::Value = repo_resp.json().await.map_err(|e| e.to_string())?;
+    let default_branch = repo_json["default_branch"].as_str().unwrap_or("main");
+
+    // 2) Get base branch commit sha
+    let ref_url = format!("https://api.github.com/repos/{}/{}/git/ref/heads/{}", config.owner, config.repo, default_branch);
+    let ref_resp = client.get(&ref_url)
+        .header("Authorization", format!("token {}", config.token))
+        .send().await.map_err(|e| e.to_string())?;
+    if !ref_resp.status().is_success() {
+        return Err(format!("Failed to get base ref: {}", ref_resp.status()));
+    }
+    let ref_json: serde_json::Value = ref_resp.json().await.map_err(|e| e.to_string())?;
+    let base_sha = ref_json["object"]["sha"].as_str().ok_or("Cannot determine base sha")?;
+
+    // 3) Create a branch
+    let branch = format!("contrib/analysis-{}-{}", id, chrono::Utc::now().format("%Y%m%d%H%M%S"));
+    let create_ref_url = format!("https://api.github.com/repos/{}/{}/git/refs", config.owner, config.repo);
+    let create_ref_body = serde_json::json!({ "ref": format!("refs/heads/{}", branch), "sha": base_sha });
+    let create_ref_resp = client.post(&create_ref_url)
+        .header("Authorization", format!("token {}", config.token))
+        .json(&create_ref_body)
+        .send().await.map_err(|e| e.to_string())?;
+    if !create_ref_resp.status().is_success() {
+        // If branch exists, continue; otherwise return error
+        let status = create_ref_resp.status();
+        if status.as_u16() != 422 {
+            let text = create_ref_resp.text().await.unwrap_or_default();
+            return Err(format!("Failed to create branch: {} - {}", status, text));
+        }
+    }
+
+    // 4) Check existing remote file to get sha (if present)
+    let contents_url = format!("https://api.github.com/repos/{}/{}/contents/angular-ui/public/data/analyses-history.json", config.owner, config.repo);
+    let contents_resp = client.get(&contents_url)
+        .header("Authorization", format!("token {}", config.token))
+        .send().await.map_err(|e| e.to_string())?;
+
+    let mut remote_sha: Option<String> = None;
+    if contents_resp.status().is_success() {
+        let contents_json: serde_json::Value = contents_resp.json().await.map_err(|e| e.to_string())?;
+        if let Some(s) = contents_json["sha"].as_str() { remote_sha = Some(s.to_string()); }
+    }
+
+    // 5) Put file to new branch
+    let put_body = if let Some(sha) = remote_sha.clone() {
+        serde_json::json!({ "message": format!("Contribuição: adicionando/atualizando análise {}", id), "content": final_b64, "branch": branch, "sha": sha })
+    } else {
+        serde_json::json!({ "message": format!("Contribuição: adicionando análise {}", id), "content": final_b64, "branch": branch })
+    };
+
+    let put_resp = client.put(&contents_url)
+        .header("Authorization", format!("token {}", config.token))
+        .json(&put_body)
+        .send().await.map_err(|e| e.to_string())?;
+    if !put_resp.status().is_success() {
+        let status = put_resp.status();
+        let t = put_resp.text().await.unwrap_or_default();
+        return Err(format!("Failed to create/update file: {} - {}", status, t));
+    }
+
+    // 6) Create Pull Request
+    let pr_url = format!("https://api.github.com/repos/{}/{}/pulls", config.owner, config.repo);
+    let pr_body = serde_json::json!({ "title": format!("Contribuição: análise {}", id), "head": branch, "base": default_branch, "body": format!("Contribuição automática da análise {} via aplicação desktop.", id) });
+    let pr_resp = client.post(&pr_url)
+        .header("Authorization", format!("token {}", config.token))
+        .json(&pr_body)
+        .send().await.map_err(|e| e.to_string())?;
+    if !pr_resp.status().is_success() {
+        let status = pr_resp.status();
+        let t = pr_resp.text().await.unwrap_or_default();
+        return Err(format!("Failed to create PR: {} - {}", status, t));
+    }
+    let pr_json: serde_json::Value = pr_resp.json().await.map_err(|e| e.to_string())?;
+    let pr_html = pr_json["html_url"].as_str().unwrap_or("").to_string();
+
+    Ok(pr_html)
+}
+
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
@@ -981,7 +1099,8 @@ fn main() {
             get_github_config,
             save_github_config,
             test_github_connection,
-            push_dataset_to_github
+            push_dataset_to_github,
+            publish_analysis
         ])
         .setup(|app| {
             // Initialize logging
