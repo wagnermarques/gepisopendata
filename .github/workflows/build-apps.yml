@@ -56,12 +56,24 @@ jobs:
         run: |
           npx tauri build
 
+      - name: Show bundle contents (Windows)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          echo "Contents of src-tauri\target\release\bundle"
+          dir target\release\bundle\* -Recurse || echo "bundle folder not found"
+
+      - name: Show bundle contents (Linux)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          echo "Contents of target/release/bundle"
+          ls -la target/release/bundle || true
+
       - name: Upload Linux build artifacts
         if: matrix.platform == 'ubuntu-22.04'
         uses: actions/upload-artifact@v4
         with:
           name: linux-bundles
-          path: ./src-tauri/target/release/bundle/*
+          path: ./target/release/bundle/*
 
       - name: Create GitHub Release and upload Windows installers
         if: matrix.platform == 'windows-latest'
@@ -70,8 +82,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            ./src-tauri/target/release/bundle/*.exe
-            ./src-tauri/target/release/bundle/*.msi
+            ./target/release/bundle/**/*.exe
+            ./target/release/bundle/**/*.msi
           tag_name: ${{ github.ref_name }}
           name: "Gepis Dados Abertos ${{ github.ref_name }}"
           body: "Novas versões para Windows e Fedora."
