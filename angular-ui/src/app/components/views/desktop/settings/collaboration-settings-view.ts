@@ -15,6 +15,7 @@ interface GithubConfig {
   token: String;
   owner: String;
   repo: String;
+  pr_target_branch?: String;
 }
 
 @Component({
@@ -73,6 +74,13 @@ interface GithubConfig {
               <mat-form-field appearance="outline">
                 <mat-label>Nome do Repositório</mat-label>
                 <input matInput formControlName="repo" placeholder="ex: gepisopendata">
+              </mat-form-field>
+            </div>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Destino das Pull Requests</mat-label>
+                <input matInput formControlName="pr_target_branch" placeholder="production">
+                <mat-hint>Branch alvo para Pull Requests (padrão: production)</mat-hint>
               </mat-form-field>
             </div>
           </form>
@@ -146,7 +154,8 @@ export class CollaborationSettingsView implements OnInit {
     username: ['', Validators.required],
     token: ['', Validators.required],
     owner: ['', Validators.required],
-    repo: ['', Validators.required]
+    repo: ['', Validators.required],
+    pr_target_branch: ['production']
   });
 
   hideToken = true;

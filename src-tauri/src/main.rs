@@ -776,7 +776,11 @@ struct GithubConfig {
     token: String,
     owner: String,
     repo: String,
+    #[serde(default = "default_pr_branch")]
+    pr_target_branch: String,
 }
+
+fn default_pr_branch() -> String { "production".into() }
 
 #[tauri::command]
 async fn get_github_config(app_handle: tauri::AppHandle) -> Result<Option<GithubConfig>, String> {
@@ -996,8 +1000,10 @@ async fn publish_analysis(app_handle: tauri::AppHandle, id: String) -> Result<St
     if !repo_resp.status().is_success() {
         return Err(format!("Failed to get repo info: {}", repo_resp.status()));
     }
-    let repo_json: serde_json::Value = repo_resp.json().await.map_err(|e| e.to_string())?;
-    let default_branch = repo_json["default_branch"].as_str().unwrap_or("main");
+    // Force PRs to target the production branch instead of repository default
+    // to ensure contributions are opened against the production branch.
+    let _repo_json: serde_json::Value = repo_resp.json().await.map_err(|e| e.to_string())?;
+    let default_branch = "production";
 
     // 2) Get base branch commit sha
     let ref_url = format!("https://api.github.com/repos/{}/{}/git/ref/heads/{}", config.owner, config.repo, default_branch);
