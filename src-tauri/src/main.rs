@@ -1000,10 +1000,13 @@ async fn publish_analysis(app_handle: tauri::AppHandle, id: String) -> Result<St
     if !repo_resp.status().is_success() {
         return Err(format!("Failed to get repo info: {}", repo_resp.status()));
     }
-    // Force PRs to target the production branch instead of repository default
-    // to ensure contributions are opened against the production branch.
+    // Determine PR target branch from saved config (fall back to "production").
     let _repo_json: serde_json::Value = repo_resp.json().await.map_err(|e| e.to_string())?;
-    let default_branch = "production";
+    let default_branch = if config.pr_target_branch.trim().is_empty() {
+        "production".to_string()
+    } else {
+        config.pr_target_branch.clone()
+    };
 
     // 2) Get base branch commit sha
     let ref_url = format!("https://api.github.com/repos/{}/{}/git/ref/heads/{}", config.owner, config.repo, default_branch);
