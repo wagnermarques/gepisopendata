@@ -882,5 +882,29 @@
         "type": "Num"
       }
     ]
+  },
+  {
+    "dictionary": "dicionário_dados_educação_básica.xlsx",
+    "files": [
+      "microdados_ed_basica_2024.csv",
+      "censo_escolar_2023.csv",
+      "censo1_escolar_2021.csv"
+    ],
+    "groupName": "censo_escolar_ed_basica_inep2",
+    "id": "4a7738e0-ea33-4b2a-9fb9-072b05541731",
+    "name": "teste contribuicao",
+    "updatedAt": "2026-04-20T16:30:54.292744300+00:00",
+    "variables": [
+      {
+        "description": "Tratamento do lixo/resíduos que a escola realiza - Reaproveitamento/reutilização",
+        "name": "IN_TRATAMENTO_LIXO_REUTILIZA",
+        "type": "Num"
+      },
+      {
+        "description": "Mantenedora da escola privada - Instituições sem fins lucrativos",
+        "name": "IN_MANT_ESCOLA_PRIVADA_S_FINS",
+        "type": "Num"
+      }
+    ]
   }
 ]
