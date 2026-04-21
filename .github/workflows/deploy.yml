@@ -1,3 +1,49 @@
+name: Deploy to production
+
+on:
+  push:
+    branches: [ production ]
+
+permissions:
+  contents: read
+  id-token: write
+  deployments: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Build Angular frontend
+        working-directory: angular-ui
+        run: |
+          npm ci
+          npm run build --configuration production
+
+      - name: Build native app (Tauri)
+        env:
+          TAURI_DIR: .
+        run: |
+          npm ci --prefix angular-ui
+          # build the tauri app (adjust flags as needed)
+          npx --yes @tauri-apps/cli build
+
+      - name: Deploy
+        run: |
+          echo "Run your deployment steps here (upload artifacts, deploy to server, etc.)"
+          # Example: ./scripts/deploy.sh
+        env:
+          PROD_DEPLOY_KEY: ${{ secrets.PROD_DEPLOY_KEY }}
 name: Deploy Angular App to GitHub Pages
 
 on:
