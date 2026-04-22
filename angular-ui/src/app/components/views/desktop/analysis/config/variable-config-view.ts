@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -150,6 +150,16 @@ interface DictionaryEntry {
               <div class="selection-info">
                 <strong>{{ selectedCount() }}</strong> selecionadas
               </div>
+              
+              <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+                <mat-icon matPrefix>search</mat-icon>
+                <mat-label>Filtrar variáveis...</mat-label>
+                <input matInput [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Nome ou descrição" />
+                <button *ngIf="searchQuery()" matSuffix mat-icon-button (click)="searchQuery.set('')">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+
               <button mat-raised-button color="primary" [disabled]="selectedCount() === 0" (click)="saveConfig()">
                 Salvar e Ir para Análises
                 <mat-icon>assessment</mat-icon>
@@ -161,7 +171,7 @@ interface DictionaryEntry {
                 <mat-progress-bar mode="query"></mat-progress-bar>
               </div>
             } @else {
-              <table mat-table [dataSource]="columns()" class="full-width-table">
+              <table mat-table [dataSource]="filteredColumns()" class="full-width-table">
                 <ng-container matColumnDef="select">
                   <th mat-header-cell *matHeaderCellDef>
                     <mat-checkbox (change)="$event ? toggleAll() : null"
@@ -213,7 +223,9 @@ interface DictionaryEntry {
     .file-list { max-height: 300px; overflow-y: auto; margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
     .file-item { display: flex; align-items: center; gap: 4px; padding: 4px 8px; background: #f9f9f9; border-radius: 4px; font-size: 0.85rem; }
     .file-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-    .table-actions-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f8f9fa; border-bottom: 1px solid #eee; margin-bottom: 8px; }
+    .table-actions-top { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #f8f9fa; border-bottom: 1px solid #eee; margin-bottom: 8px; gap: 16px; }
+    .search-field { flex: 1; max-width: 400px; }
+    .search-field ::ng-deep .mat-mdc-text-field-wrapper { background-color: white !important; }
     .var-name-cell { display: flex; flex-direction: column; gap: 2px; padding: 4px 0; }
     .var-name { font-weight: 500; }
     .var-description { font-size: 0.75rem; color: #666; font-style: italic; }
@@ -234,6 +246,17 @@ export class VariableConfigView implements OnInit {
   groupName = signal<string | null>(this.stateService.getSelectedGroup());
   analysisName = '';
   columns = signal<ColumnInfo[]>([]);
+  searchQuery = signal('');
+  filteredColumns = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return this.columns();
+    
+    return this.columns().filter(c => 
+      c.name.toLowerCase().includes(query) || 
+      (c.description && c.description.toLowerCase().includes(query))
+    );
+  });
+  
   files = signal<FileInfo[]>([]);
   excelFiles = signal<string[]>([]);
   format = signal<string>('');

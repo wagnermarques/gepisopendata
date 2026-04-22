@@ -3,6 +3,7 @@ use polars::prelude::*;
 use tauri::AppHandle;
 use std::fs::File;
 use tauri::Manager;
+use crate::detect_delimiter_from_file;
 
 #[tauri::command]
 pub async fn run_etl(
@@ -68,9 +69,10 @@ pub async fn run_etl(
     let col_exprs: Vec<Expr> = columns.iter().map(|c| col(c)).collect();
 
     for path in full_paths {
+        let sep = detect_delimiter_from_file(&path);
         let lf = LazyCsvReader::new(path)
             .with_has_header(true)
-            .with_separator(b';')
+            .with_separator(sep)
             .finish()
             .map_err(|e| format!("Erro ao ler CSV: {}", e))?
             .select(col_exprs.clone());
@@ -122,9 +124,10 @@ pub async fn get_barchart_data(
         return Err("Arquivo não encontrado".into());
     }
 
+    let sep = detect_delimiter_from_file(&path);
     let lf = LazyCsvReader::new(path)
         .with_has_header(true)
-        .with_separator(b';')
+        .with_separator(sep)
         .finish()
         .map_err(|e| format!("Erro ao ler arquivo: {}", e))?;
 
