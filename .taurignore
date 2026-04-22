@@ -1,0 +1,17 @@
+# Ignore datasets and metadata reloads
+downloads/
+angular-ui/data/
+angular-ui/public/data/
+
+# Ignore Angular build artifacts and cache
+angular-ui/.angular/
+angular-ui/node_modules/
+www/
+
+# Ignore Rust build artifacts
+target/
+src-tauri/target/
+
+# Common ignores
+.git/
+.DS_Store

@@ -1,36 +1,15 @@
-name: Deploy Angular App to GitHub Pages
+name: Deploy to production
 
-# Run this workflow every time a new commit is pushed to the `main` branch
 on:
   push:
-    branches:
-      - production
+    branches: [ production ]
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
-  pages: write
   id-token: write
+  deployments: write
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
     
-    # These steps are executed as part of the job
-    steps:
-      # Step 1: Check out your repository code so the workflow can access it
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      # Step 2: Set up Node.js, which is needed to build your Angular app
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
@@ -42,10 +21,13 @@ jobs:
         working-directory: ./angular-ui
 
       # Step 4: Build the Angular application for production
-      # IMPORTANT: Replace 'gepisopendata' with your GitHub repository name if it's different.
       - name: Build application
         run: npm run build -- --base-href /gepisopendata/ --configuration production
         working-directory: ./angular-ui
+
+      # Step 4.1: Create 404.html from index.html for SPA routing
+      - name: Create 404.html
+        run: cp www/browser/index.html www/browser/404.html
 
       # Step 5: Prepare the deployment artifact
       - name: Setup Pages
@@ -56,7 +38,7 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           # This path should match the `outputPath` in your angular.json, which is ../www from the angular-ui dir
-          path: './www'
+          path: './www/browser'
 
       # Step 7: Deploy the artifact to GitHub Pages
       - name: Deploy to GitHub Pages

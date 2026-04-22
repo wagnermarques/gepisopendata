@@ -1,4 +1,5 @@
 <app-fixed-head [drawer]="drawer" />
+<app-fixed-search />
 
 <mat-drawer-container class="drawer-container">
     <mat-drawer #drawer [mode]="isSmallScreen ? 'over' : 'side'" 
@@ -8,51 +9,53 @@
         </div>
 
         <mat-nav-list>
+            <div mat-subheader>Ferramentas</div>
             <a mat-list-item routerLink="/" (click)="drawer.close()">
                 <mat-icon matListItemIcon>home</mat-icon>
-                <span matListItemTitle>Home</span>
-            </a>
-
-            <a mat-list-item routerLink="/appshomevew" (click)="drawer.close()">
-                <mat-icon matListItemIcon>Shelves</mat-icon>
-                <span matListItemTitle>aplicaÃ§Ãµes</span>
-            </a>
-
-            <a mat-list-item routerLink="/desktophomeview" (click)="drawer.close()">
-                <mat-icon matListItemIcon>workspaces</mat-icon>
-                <span matListItemTitle>desktopscripts</span>
-            </a>
-
-            <a mat-list-item routerLink="/aulas" (click)="drawer.close()">
-                <mat-icon matListItemIcon>developer_mode</mat-icon>
-                <span matListItemTitle>aulas</span>
-            </a>
-
-            <a mat-list-item routerLink="/baseview" (click)="drawer.close()">
-                <mat-icon matListItemIcon>developer_mode</mat-icon>
-                <span matListItemTitle>baseview</span>
+                <span matListItemTitle>Início</span>
             </a>
 
             <mat-divider></mat-divider>
 
-            <a mat-list-item routerLink="/baseview" (click)="drawer.close()">
-                <mat-icon matListItemIcon>help</mat-icon>
-                <span matListItemTitle>angular base view</span>
-            </a>
+            <div mat-subheader>Publicações</div>
+            <mat-accordion multi="true">
+                @for (analysis of stateService.allAnalyses(); track analysis.id) {
+                    @if (analysis.publishedArtifacts && analysis.publishedArtifacts.length > 0) {
+                        <mat-expansion-panel [expanded]="false" class="mat-elevation-z0">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    <mat-icon class="analysis-icon">folder_shared</mat-icon>
+                                    {{ analysis.name }}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            
+                            <mat-nav-list class="artifact-list">
+                                @for (artifact of analysis.publishedArtifacts; track artifact.id) {
+                                    <a mat-list-item (click)="goToArtifact(analysis.id!, artifact.id)">
+                                        <mat-icon matListItemIcon>{{ artifact.type === 'barchart' ? 'bar_chart' : 'description' }}</mat-icon>
+                                        <span matListItemTitle>{{ artifact.label }}</span>
+                                    </a>
+                                }
+                            </mat-nav-list>
+                        </mat-expansion-panel>
+                    }
+                }
+                @if (stateService.allAnalyses().length === 0) {
+                    <div class="empty-nav-state">Nenhuma publicação encontrada</div>
+                }
+            </mat-accordion>
+
+            <mat-divider></mat-divider>
 
             <a mat-list-item routerLink="/about" (click)="drawer.close()">
                 <mat-icon matListItemIcon>info</mat-icon>
-                <span matListItemTitle>About</span>
+                <span matListItemTitle>Sobre</span>
             </a>
         </mat-nav-list>
     </mat-drawer>
 
     <mat-drawer-content>
         <div class="content-wrapper">
-            <div style="padding: 20px;">
-              <h2>Loaded Configuration:</h2>
-              <pre>{{ config() | json }}</pre>
-            </div>
             <router-outlet />
         </div>
     </mat-drawer-content>

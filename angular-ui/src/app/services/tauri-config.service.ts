@@ -1,14 +1,56 @@
-import { Injectable } from '@angular/core';
-import { catchError, from, map, Observable, of } from 'rxjs';
+import { Injectable, inject, isDevMode } from '@angular/core';
+import { catchError, from, map, Observable, of, Subject } from 'rxjs';
 import { ConfigService } from './config.service';
 import { BaseDirectory, readTextFile } from '@tauri-apps/plugin-fs';
+import { listen, Event } from '@tauri-apps/api/event';
+import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TauriConfigService extends ConfigService {
+  private menuNavigationSubject = new Subject<string>();
+  menuNavigation$ = this.menuNavigationSubject.asObservable();
+
+  constructor() {
+    super();
+    this.initMenuListener();
+  }
+
+  private async initMenuListener() {
+    if (isDevMode()) {
+      console.log('Initializing Menu Listener...');
+    }
+    try {
+      // Listen to global events
+      await listen('menu-navigation', (event: Event<string>) => {
+        if (isDevMode()) {
+          console.log('GLOBAL Menu navigation event received:', event.payload);
+        }
+        this.menuNavigationSubject.next(event.payload);
+      });
+
+      // Also listen to webview-specific events as a fallback
+      const webview = getCurrentWebviewWindow();
+      await webview.listen('menu-navigation', (event: Event<string>) => {
+        if (isDevMode()) {
+          console.log('WEBVIEW Menu navigation event received:', event.payload);
+        }
+        this.menuNavigationSubject.next(event.payload);
+      });
+      
+      if (isDevMode()) {
+        console.log('Menu listeners attached successfully.');
+      }
+    } catch (err) {
+      console.error('Failed to listen to menu-navigation events:', err);
+    }
+  }
+
   loadConfig(): Observable<Record<string, unknown>> {
-    console.log('Loading configuration from TauriConfigService');
+    if (isDevMode()) {
+      console.log('Loading configuration from TauriConfigService');
+    }
 
     const defaultConfig = {
       source: 'tauri-default',

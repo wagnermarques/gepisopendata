@@ -1,31 +1,39 @@
 {
-  "productName": "gepisopendata",
-  "version": "0.1.0",
-  "identifier": "com.gepisopendata.gepisopendata",
+  "productName": "Gepis Dados Abertos",
+  "version": "0.1.2",
+  "identifier": "com.gepis.dadosabertos",
   "build": {
     "frontendDist": "www/browser"
   },
   "app": {
     "windows": [
       {
-        "title": "Gepis OpenData",
+        "label": "main",
+        "title": "Gepis Dados Abertos",
         "width": 1200,
         "height": 800
       }
     ],
     "withGlobalTauri": true,
     "security": {
+      "capabilities": [
+        "default"
+      ],
       "csp": null
     }
   },
   "bundle": {
     "active": true,
-    "targets": ["rpm", "deb"],
+    "targets": ["rpm", "deb", "nsis", "msi"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/icon.icns",
       "icons/icon.ico"
+    ],
+    "resources": [
+      "angular-ui/public/data/datasets-registry.json",
+      "angular-ui/public/data/analyses-history.json"
     ]
   },
   "plugins": {

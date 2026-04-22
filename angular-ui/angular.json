@@ -10,24 +10,24 @@
       "sourceRoot": "src",
       "prefix": "app",
       "architect": {
-        "build": {
-          "builder": "@angular/build:application",
-          "options": {
-            "outputPath": "../www",
-            "browser": "src/main.ts",
-            "tsConfig": "tsconfig.app.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
-              "src/custom-theme.scss",
-              "src/styles.css"
-            ]
-          },
-          "configurations": {
+      "build": {
+      "builder": "@angular/build:application",
+      "options": {
+        "outputPath": "../www",
+        "index": "src/index.html",
+        "browser": "src/main.ts",
+        "tsConfig": "tsconfig.app.json",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "public"
+          }
+        ],
+        "styles": [
+          "src/custom-theme.scss",
+          "src/styles.css"
+        ]
+      },          "configurations": {
             "production": {
               "budgets": [
                 {
@@ -41,7 +41,8 @@
                   "maximumError": "10kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "optimization": false,
