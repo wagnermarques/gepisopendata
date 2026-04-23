@@ -305,12 +305,6 @@ async fn analyze_group(app_handle: tauri::AppHandle, group_name: String) -> Resu
                     if let Ok(headers) = rdr.headers().map(|h| h.clone()) {
                         let mut current_file_cols = HashMap::new();
                         
-                        // Skip if we only found 1 column but line looks like it should have more
-                        if headers.len() <= 1 && sep == b';' {
-                             // Try one more time with comma just in case
-                             // (This handles cases where detector might fail on very small/strange files)
-                        }
-
                         let types = if let Some(Ok(record)) = rdr.records().next() {
                             let mut t = Vec::new();
                             for val in record.iter() {
