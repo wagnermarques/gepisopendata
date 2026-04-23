@@ -102,13 +102,8 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
                     }
                 }
                 
-                // If it's the expected format, rename it to the short title
-                let extension = outpath.extension().and_then(|s| s.to_str()).unwrap_or("");
-                let mut final_name = outpath.file_name().unwrap().to_string_lossy().into_owned();
-                
-                if extension.to_lowercase() == formato_esperado {
-                    final_name = format!("{}.{}", sanitize_filename(titulo_curto), extension);
-                }
+                // If it's the expected format, we can still use the original name to avoid overwrites
+                let final_name = outpath.file_name().unwrap().to_string_lossy().into_owned();
 
                 let extract_dest = target_dir.join(&final_name);
                 let mut outfile = fs::File::create(&extract_dest).map_err(|e| e.to_string())?;
@@ -212,6 +207,23 @@ fn find_files_recursive(dir: &PathBuf, extension: &str, files: &mut Vec<PathBuf>
     Ok(())
 }
 
+fn detect_delimiter(path: &PathBuf) -> u8 {
+    if let Ok(file) = File::open(path) {
+        use std::io::{BufRead, BufReader};
+        let reader = BufReader::new(file);
+        if let Some(Ok(line)) = reader.lines().next() {
+            let semi = line.chars().filter(|&c| c == ';').count();
+            let comma = line.chars().filter(|&c| c == ',').count();
+            if semi >= comma && semi > 0 {
+                return b';';
+            } else if comma > 0 {
+                return b',';
+            }
+        }
+    }
+    b';'
+}
+
 #[tauri::command]
 async fn analyze_group(app_handle: tauri::AppHandle, group_name: String) -> Result<GroupAnalysis, String> {
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
@@ -266,9 +278,10 @@ async fn analyze_group(app_handle: tauri::AppHandle, group_name: String) -> Resu
 
             if format == "csv" {
                 if let Ok(file) = File::open(&file_path) {
+                    let delimiter = detect_delimiter(&file_path);
                     let mut rdr = csv::ReaderBuilder::new()
                         .has_headers(true)
-                        .delimiter(b';')
+                        .delimiter(delimiter)
                         .from_reader(file);
 
                     if let Ok(headers) = rdr.headers().map(|h| h.clone()) {
@@ -285,7 +298,7 @@ async fn analyze_group(app_handle: tauri::AppHandle, group_name: String) -> Resu
                         };
 
                         for (i, h) in headers.iter().enumerate() {
-                            current_file_cols.insert(h.to_string(), types.get(i).unwrap_or(&"Texto").to_string());
+                            current_file_cols.insert(h.trim().to_string(), types.get(i).unwrap_or(&"Texto").to_string());
                         }
 
                         if let Some(common) = common_columns {
@@ -361,9 +374,10 @@ async fn get_columns_for_files(app_handle: tauri::AppHandle, group_name: String,
 
         if let Some(full_path) = found_full_path {
             if let Ok(file) = File::open(&full_path) {
+                let delimiter = detect_delimiter(&full_path);
                 let mut rdr = csv::ReaderBuilder::new()
                     .has_headers(true)
-                    .delimiter(b';')
+                    .delimiter(delimiter)
                     .from_reader(file);
 
                 if let Ok(headers) = rdr.headers().map(|h| h.clone()) {
@@ -379,7 +393,7 @@ async fn get_columns_for_files(app_handle: tauri::AppHandle, group_name: String,
                     };
 
                     for (i, h) in headers.iter().enumerate() {
-                        current_file_cols.insert(h.to_string(), types.get(i).unwrap_or(&"Texto").to_string());
+                        current_file_cols.insert(h.trim().to_string(), types.get(i).unwrap_or(&"Texto").to_string());
                     }
 
                     if let Some(common) = common_columns {
@@ -729,10 +743,11 @@ async fn get_group_columns(app_handle: tauri::AppHandle, group_name: String) -> 
             let full_path = local_path.join(file_name);
             if !full_path.exists() { continue; }
 
-            let file = File::open(full_path).map_err(|e| e.to_string())?;
+            let file = File::open(&full_path).map_err(|e| e.to_string())?;
+            let delimiter = detect_delimiter(&full_path);
             let mut rdr = csv::ReaderBuilder::new()
                 .has_headers(true)
-                .delimiter(b';') // common in brazilian gov datasets, we might need auto-detect
+                .delimiter(delimiter)
                 .from_reader(file);
 
             let headers = rdr.headers().map_err(|e| e.to_string())?.clone();
@@ -744,7 +759,7 @@ async fn get_group_columns(app_handle: tauri::AppHandle, group_name: String) -> 
                 for (i, header) in headers.iter().enumerate() {
                     let val = record.get(i).unwrap_or("");
                     let col_type = if val.parse::<f64>().is_ok() { "Número" } else { "Texto" };
-                    current_file_cols.insert(header.to_string(), col_type.to_string());
+                    current_file_cols.insert(header.trim().to_string(), col_type.to_string());
                 }
             }
 
