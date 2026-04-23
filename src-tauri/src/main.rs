@@ -23,6 +23,24 @@ fn sanitize_filename(name: &str) -> String {
         .to_lowercase()
 }
 
+// Helper to detect CSV delimiter from bytes (robust for large files)
+pub fn detect_delimiter_from_file(path: &PathBuf) -> u8 {
+    use std::io::Read;
+    if let Ok(mut file) = File::open(path) {
+        let mut buffer = [0; 4096];
+        if let Ok(n) = file.read(&mut buffer) {
+            let first_line = buffer[..n].split(|&b| b == b'\n' || b == b'\r').next().unwrap_or(&buffer[..n]);
+            let semi = first_line.iter().filter(|&&b| b == b';').count();
+            let comma = first_line.iter().filter(|&&b| b == b',').count();
+            let tab = first_line.iter().filter(|&&b| b == b'\t').count();
+
+            if tab > semi && tab > comma { return b'\t'; }
+            if comma > semi && comma > tab { return b','; }
+        }
+    }
+    b';' // Default to Brazilian Gov standard
+}
+
 // Helper to get base downloads path portably
 fn get_base_downloads_path(app_handle: &tauri::AppHandle) -> Result<PathBuf, String> {
     let mut path = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
@@ -287,6 +305,12 @@ async fn analyze_group(app_handle: tauri::AppHandle, group_name: String) -> Resu
                     if let Ok(headers) = rdr.headers().map(|h| h.clone()) {
                         let mut current_file_cols = HashMap::new();
                         
+                        // Skip if we only found 1 column but line looks like it should have more
+                        if headers.len() <= 1 && sep == b';' {
+                             // Try one more time with comma just in case
+                             // (This handles cases where detector might fail on very small/strange files)
+                        }
+
                         let types = if let Some(Ok(record)) = rdr.records().next() {
                             let mut t = Vec::new();
                             for val in record.iter() {
@@ -302,14 +326,19 @@ async fn analyze_group(app_handle: tauri::AppHandle, group_name: String) -> Resu
                         }
 
                         if let Some(common) = common_columns {
-                            let mut new_common = HashMap::new();
-                            for (name, col_type) in common {
-                                if current_file_cols.contains_key(&name) {
-                                    new_common.insert(name, col_type);
+                            // Only intersect if the current file seems valid (> 1 column)
+                            if current_file_cols.len() > 1 {
+                                let mut new_common = HashMap::new();
+                                for (name, col_type) in common {
+                                    if current_file_cols.contains_key(&name) {
+                                        new_common.insert(name, col_type);
+                                    }
                                 }
+                                common_columns = Some(new_common);
+                            } else {
+                                common_columns = Some(common);
                             }
-                            common_columns = Some(new_common);
-                        } else {
+                        } else if current_file_cols.len() > 1 {
                             common_columns = Some(current_file_cols);
                         }
                     }
@@ -374,10 +403,10 @@ async fn get_columns_for_files(app_handle: tauri::AppHandle, group_name: String,
 
         if let Some(full_path) = found_full_path {
             if let Ok(file) = File::open(&full_path) {
-                let delimiter = detect_delimiter(&full_path);
+                let sep = detect_delimiter_from_file(&full_path);
                 let mut rdr = csv::ReaderBuilder::new()
                     .has_headers(true)
-                    .delimiter(delimiter)
+                    .delimiter(sep)
                     .from_reader(file);
 
                 if let Ok(headers) = rdr.headers().map(|h| h.clone()) {
@@ -397,14 +426,19 @@ async fn get_columns_for_files(app_handle: tauri::AppHandle, group_name: String,
                     }
 
                     if let Some(common) = common_columns {
-                        let mut new_common = HashMap::new();
-                        for (name, col_type) in common {
-                            if current_file_cols.contains_key(&name) {
-                                new_common.insert(name, col_type);
+                        // Only intersect if the current file seems valid (> 1 column)
+                        if current_file_cols.len() > 1 {
+                            let mut new_common = HashMap::new();
+                            for (name, col_type) in common {
+                                if current_file_cols.contains_key(&name) {
+                                    new_common.insert(name, col_type);
+                                }
                             }
+                            common_columns = Some(new_common);
+                        } else {
+                            common_columns = Some(common);
                         }
-                        common_columns = Some(new_common);
-                    } else {
+                    } else if current_file_cols.len() > 1 {
                         common_columns = Some(current_file_cols);
                     }
                 }
