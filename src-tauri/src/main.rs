@@ -658,6 +658,94 @@ async fn get_analyses(app_handle: tauri::AppHandle) -> Result<Vec<serde_json::Va
 }
 
 #[tauri::command]
+async fn delete_dataset(app_handle: tauri::AppHandle, id: String) -> Result<(), String> {
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    let mut registry_paths = vec![app_data_dir.join("datasets-registry.json")];
+
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            registry_paths.push(PathBuf::from(manifest_dir.clone()).join("angular-ui").join("data").join("datasets-registry.json"));
+            registry_paths.push(PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("datasets-registry.json"));
+        }
+    }
+
+    let mut path_to_delete = None;
+
+    for path in &registry_paths {
+        if path.exists() {
+            let file = File::open(&path).map_err(|e| e.to_string())?;
+            let mut registry: Vec<serde_json::Value> = serde_json::from_reader(file).unwrap_or_else(|_| vec![]);
+
+            if let Some(item) = registry.iter().find(|i| i["id"].as_str() == Some(&id)) {
+                if let Some(local_path) = item["localPath"].as_str() {
+                    path_to_delete = Some(PathBuf::from(local_path));
+                }
+            }
+
+            registry.retain(|item| item["id"].as_str() != Some(&id));
+
+            let mut file = File::create(&path).map_err(|e| e.to_string())?;
+            let json = serde_json::to_string_pretty(&registry).map_err(|e| e.to_string())?;
+            file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+        }
+    }
+
+    if let Some(p) = path_to_delete {
+        if p.exists() {
+            let _ = fs::remove_dir_all(p);
+        }
+    }
+
+    Ok(())
+}
+
+#[tauri::command]
+async fn delete_group(app_handle: tauri::AppHandle, group_name: String) -> Result<(), String> {
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    let mut registry_paths = vec![app_data_dir.join("datasets-registry.json")];
+
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            registry_paths.push(PathBuf::from(manifest_dir.clone()).join("angular-ui").join("data").join("datasets-registry.json"));
+            registry_paths.push(PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("datasets-registry.json"));
+        }
+    }
+
+    let mut paths_to_delete = Vec::new();
+
+    for path in &registry_paths {
+        if path.exists() {
+            let file = File::open(&path).map_err(|e| e.to_string())?;
+            let mut registry: Vec<serde_json::Value> = serde_json::from_reader(file).unwrap_or_else(|_| vec![]);
+
+            for item in registry.iter() {
+                if item["grupo"].as_str() == Some(&group_name) {
+                    if let Some(local_path) = item["localPath"].as_str() {
+                        paths_to_delete.push(PathBuf::from(local_path));
+                    }
+                }
+            }
+
+            registry.retain(|item| item["grupo"].as_str() != Some(&group_name));
+
+            let mut file = File::create(&path).map_err(|e| e.to_string())?;
+            let json = serde_json::to_string_pretty(&registry).map_err(|e| e.to_string())?;
+            file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+        }
+    }
+
+    for p in paths_to_delete {
+        if p.exists() {
+            let _ = fs::remove_dir_all(p);
+        }
+    }
+
+    Ok(())
+}
+
+#[tauri::command]
 async fn delete_analysis(app_handle: tauri::AppHandle, id: String) -> Result<(), String> {
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
     let mut paths = vec![app_data_dir.join("analyses-history.json")];
@@ -1148,11 +1236,8 @@ fn main() {
             save_analysis,
             get_analyses,
             delete_analysis,
-            get_github_config,
-            save_github_config,
-            test_github_connection,
-            push_dataset_to_github,
-            publish_analysis
+            delete_dataset,
+            delete_group
         ])
         .setup(|app| {
             // Initialize logging

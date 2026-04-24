@@ -88,6 +88,13 @@ export class DatasetStateService {
     return this.selectedGroup();
   }
 
+  clearSelectedGroupIfMatches(name: string) {
+    if (this.selectedGroup() === name) {
+      this.selectedGroup.set(null);
+      localStorage.removeItem('selectedGroup');
+    }
+  }
+
   async saveAnalysis(config: AnalysisConfig) {
     if (!isTauri()) {
       console.warn('Salvamento de análise não disponível em modo Web.');

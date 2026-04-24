@@ -11,7 +11,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 import { invoke } from '@tauri-apps/api/core';
-import { message } from '@tauri-apps/plugin-dialog';
+import { message, ask } from '@tauri-apps/plugin-dialog';
+import { DatasetStateService } from '../../../../../services/dataset-state.service';
 
 interface Dataset {
   id: string;
@@ -72,6 +73,9 @@ interface Dataset {
                 </mat-panel-title>
                 <mat-panel-description>
                   {{ group.items.length }} dataset(s) nesta coleção
+                  <button mat-icon-button color="warn" matTooltip="Excluir todo o grupo" (click)="deleteGroup($event, group.name)">
+                    <mat-icon>delete_sweep</mat-icon>
+                  </button>
                 </mat-panel-description>
               </mat-expansion-panel-header>
 
@@ -122,11 +126,10 @@ interface Dataset {
                     </mat-card-content>
 
                     <mat-card-actions align="end">
-                      <button mat-icon-button color="accent" (click)="collaborate(item)" 
-                        [disabled]="isCollaborating() !== null" matTooltip="Colaborar: salvar para outros usuários">
-                        <mat-icon>hub</mat-icon>
+                      <button mat-icon-button color="warn" matTooltip="Excluir dataset" (click)="deleteDataset(item)">
+                        <mat-icon>delete</mat-icon>
                       </button>
-                      
+                      <span class="spacer"></span>
                       @if (item.exists !== false) {
                         <button mat-button color="primary" (click)="openFolder(item.localPath)">
                           <mat-icon>folder_open</mat-icon> Abrir Pasta
@@ -205,14 +208,12 @@ interface Dataset {
     
     .redownload-progress { margin-top: 16px; }
     .redownload-progress p { font-size: 0.8rem; color: #f44336; margin-bottom: 4px; }
-
-    .collaboration-progress { margin-top: 16px; }
-    .collaboration-progress p { font-size: 0.8rem; color: #3f51b5; margin-bottom: 4px; }
-
-    mat-card-actions { border-top: 1px solid #eee; padding: 8px 16px; }
+    .spacer { flex: 1 1 auto; }
+    mat-card-actions { border-top: 1px solid #eee; padding: 8px 16px; display: flex; align-items: center; }
   `]
 })
 export class DatasetListView implements OnInit {
+  private datasetState = inject(DatasetStateService);
   datasets = signal<Dataset[]>([]);
   groupedDatasets = signal<{ name: string, items: Dataset[] }[]>([]);
   isRedownloading = signal<string | null>(null);
@@ -222,6 +223,47 @@ export class DatasetListView implements OnInit {
 
   ngOnInit() {
     this.loadDatasets();
+  }
+
+  async deleteDataset(item: Dataset) {
+    const confirmed = await ask(`Tem certeza que deseja excluir o dataset "${item.tituloCurto}"? Todos os arquivos locais serão removidos.`, {
+      title: 'Confirmar Exclusão',
+      kind: 'warning',
+      okLabel: 'Excluir',
+      cancelLabel: 'Cancelar'
+    });
+
+    if (confirmed) {
+      try {
+        await invoke('delete_dataset', { id: item.id });
+        await message('Dataset excluído com sucesso.', { title: 'Sucesso', kind: 'info' });
+        await this.loadDatasets();
+      } catch (err) {
+        console.error('Error deleting dataset:', err);
+        await message(`Falha ao excluir: ${err}`, { title: 'Erro', kind: 'error' });
+      }
+    }
+  }
+
+  async deleteGroup(event: Event, groupName: string) {
+    event.stopPropagation();
+    const confirmed = await ask(`Tem certeza que deseja excluir TODO o grupo "${groupName}"? Isso removerá todos os datasets e arquivos desta coleção.`, {
+      title: 'Confirmar Exclusão de Grupo',
+      kind: 'warning',
+      okLabel: 'Excluir Tudo',
+      cancelLabel: 'Cancelar'
+    });
+
+    if (confirmed) {
+      try {
+        await invoke('delete_group', { groupName });
+        await message('Grupo excluído com sucesso.', { title: 'Sucesso', kind: 'info' });
+        await this.loadDatasets();
+      } catch (err) {
+        console.error('Error deleting group:', err);
+        await message(`Falha ao excluir grupo: ${err}`, { title: 'Erro', kind: 'error' });
+      }
+    }
   }
 
   async loadDatasets() {
@@ -250,6 +292,12 @@ export class DatasetListView implements OnInit {
       }));
       
       this.groupedDatasets.set(groupArray);
+
+      // Limpar o estado do grupo selecionado se ele não existir mais
+      const selected = this.datasetState.getSelectedGroup();
+      if (selected && !groups[selected]) {
+        this.datasetState.clearSelectedGroupIfMatches(selected);
+      }
     } catch (err) {
       console.error('Error loading datasets:', err);
     }
