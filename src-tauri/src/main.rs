@@ -142,6 +142,7 @@ async fn download_dataset(app_handle: tauri::AppHandle, url: String, metadata: s
     #[cfg(debug_assertions)]
     {
         if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            registry_paths.push(PathBuf::from(manifest_dir.clone()).join("angular-ui").join("data").join("datasets-registry.json"));
             registry_paths.push(PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("datasets-registry.json"));
         }
     }
