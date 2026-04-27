@@ -8,6 +8,7 @@
     "core:event:allow-emit",
     "core:webview:allow-internal-toggle-devtools",
     "shell:default",
+    "shell:allow-open",
     "fs:allow-appdata-read",
     "fs:allow-appdata-write",
     "fs:allow-appdata-read-recursive",

@@ -98,6 +98,18 @@ interface Dataset {
                     <mat-card-content>
                       <p class="description">{{ item.tituloLongo }}</p>
                       
+                      <div class="url-info">
+                        <div class="small-label">URL de Origem:</div>
+                        @for (url of item.urls.split('\n'); track url) {
+                          @if (url.trim()) {
+                            <div class="url-item">
+                              <mat-icon class="url-icon">link</mat-icon>
+                              <a (click)="openUrl(url)" class="dataset-url">{{ url }}</a>
+                            </div>
+                          }
+                        }
+                      </div>
+
                       <div class="file-list">
                         <div class="small-label">Arquivos esperados:</div>
                         <mat-chip-set>
@@ -200,6 +212,40 @@ interface Dataset {
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+    }
+
+    .url-info {
+      margin-bottom: 12px;
+      padding: 8px;
+      background: #f9f9f9;
+      border-radius: 4px;
+      border-left: 3px solid #3f51b5;
+    }
+
+    .url-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .url-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: #3f51b5;
+    }
+
+    .dataset-url {
+      font-size: 0.8rem;
+      color: #3f51b5;
+      text-decoration: none;
+      word-break: break-all;
+      cursor: pointer;
+    }
+
+    .dataset-url:hover {
+      text-decoration: underline;
     }
 
     .file-list { margin-top: auto; }
@@ -330,6 +376,14 @@ export class DatasetListView implements OnInit {
       await invoke('plugin:shell|open', { path });
     } catch (err) {
       console.error('Error opening folder:', err);
+    }
+  }
+
+  async openUrl(url: string) {
+    try {
+      await invoke('plugin:shell|open', { path: url });
+    } catch (err) {
+      console.error('Error opening URL:', err);
     }
   }
 
