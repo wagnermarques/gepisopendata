@@ -293,7 +293,12 @@ export class DatasetListView implements OnInit {
 
   async deleteGroup(event: Event, groupName: string) {
     event.stopPropagation();
-    const confirmed = await ask(`Tem certeza que deseja excluir TODO o grupo "${groupName}"? Isso removerá todos os datasets e arquivos desta coleção.`, {
+    // Normalize groupName for deletion: 'Sem Grupo' is the display label for empty group
+    const targetGroup = groupName === 'Sem Grupo' ? '' : groupName;
+    
+    console.log('DEBUG: Frontend deleteGroup called for:', groupName, 'Target:', targetGroup);
+    
+    const confirmed = await ask(`Tem certeza que deseja excluir TODO o grupo "${groupName || 'Sem Grupo'}"? Isso removerá todos os datasets e arquivos desta coleção.`, {
       title: 'Confirmar Exclusão de Grupo',
       kind: 'warning',
       okLabel: 'Excluir Tudo',
@@ -302,11 +307,12 @@ export class DatasetListView implements OnInit {
 
     if (confirmed) {
       try {
-        await invoke('delete_group', { groupName });
+        console.log('DEBUG: Invoking delete_group with:', targetGroup);
+        await invoke('delete_group', { groupName: targetGroup });
         await message('Grupo excluído com sucesso.', { title: 'Sucesso', kind: 'info' });
         await this.loadDatasets();
       } catch (err) {
-        console.error('Error deleting group:', err);
+        console.error('DEBUG: Error deleting group:', err);
         await message(`Falha ao excluir grupo: ${err}`, { title: 'Erro', kind: 'error' });
       }
     }

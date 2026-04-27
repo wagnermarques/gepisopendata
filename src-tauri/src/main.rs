@@ -702,7 +702,13 @@ async fn delete_dataset(app_handle: tauri::AppHandle, id: String) -> Result<(), 
 }
 
 #[tauri::command]
-async fn delete_group(app_handle: tauri::AppHandle, group_name: String) -> Result<(), String> {
+async fn delete_group(app_handle: tauri::AppHandle, mut group_name: String) -> Result<(), String> {
+    // Treat 'Sem Grupo' as empty string for matching purposes
+    if group_name == "Sem Grupo" {
+        group_name = "".to_string();
+    }
+    
+    println!("DEBUG: delete_group called with group_name: '{}'", group_name);
     let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
     let mut registry_paths = vec![app_data_dir.join("datasets-registry.json")];
 
@@ -717,29 +723,43 @@ async fn delete_group(app_handle: tauri::AppHandle, group_name: String) -> Resul
     let mut paths_to_delete = Vec::new();
 
     for path in &registry_paths {
+        println!("DEBUG: Checking registry path: {:?}", path);
         if path.exists() {
             let file = File::open(&path).map_err(|e| e.to_string())?;
             let mut registry: Vec<serde_json::Value> = serde_json::from_reader(file).unwrap_or_else(|_| vec![]);
 
+            let initial_count = registry.len();
             for item in registry.iter() {
-                if item["grupo"].as_str() == Some(&group_name) {
+                let item_group = item["grupo"].as_str().unwrap_or("");
+                if item_group == group_name {
                     if let Some(local_path) = item["localPath"].as_str() {
                         paths_to_delete.push(PathBuf::from(local_path));
                     }
                 }
             }
 
-            registry.retain(|item| item["grupo"].as_str() != Some(&group_name));
+            registry.retain(|item| {
+                let item_group = item["grupo"].as_str().unwrap_or("");
+                item_group != group_name
+            });
+            let final_count = registry.len();
+            println!("DEBUG: Registry count changed from {} to {} for group: '{}'", initial_count, final_count, group_name);
 
             let mut file = File::create(&path).map_err(|e| e.to_string())?;
             let json = serde_json::to_string_pretty(&registry).map_err(|e| e.to_string())?;
             file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+        } else {
+            println!("DEBUG: Registry path does not exist: {:?}", path);
         }
     }
 
+    println!("DEBUG: Found {} paths to delete locally.", paths_to_delete.len());
     for p in paths_to_delete {
         if p.exists() {
+            println!("DEBUG: Removing directory: {:?}", p);
             let _ = fs::remove_dir_all(p);
+        } else {
+            println!("DEBUG: Directory to delete does not exist: {:?}", p);
         }
     }
 

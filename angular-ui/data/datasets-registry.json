@@ -217,5 +217,37 @@
     "tituloCurto": "Censo Escolar 2023",
     "tituloLongo": "Microdados do Censo Escolar 2023",
     "urls": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2023.zip"
+  },
+  {
+    "autor": "",
+    "dataReferencia": "2022",
+    "dateAdded": "2026-04-27T02:09:17.713438440+00:00",
+    "descricao": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2022.zip",
+    "files": [
+      "microdados_censo_escolar_2022.zip",
+      "dicionário_dados_educaç╞o_básica.xlsx",
+      "~$Dicionário de Dados da Educaç╞o Básica.xlsx",
+      "~$dicionário_dados_educaç╞o_básica.xlsx",
+      "Aluno.pdf",
+      "Escola.pdf",
+      "Gestor Escolar.pdf",
+      "Profissional Escolar.pdf",
+      "Turma.pdf",
+      "md5_microdados_ed_basica_2022.txt",
+      "microdados_ed_basica_2022.csv",
+      "Leia-me.pdf"
+    ],
+    "formato": "csv",
+    "frequencia": "Anual",
+    "grupo": "Censo Escolar INEP",
+    "id": "censo_escolar_inep-censo_escolar_2022",
+    "isSerieHistorica": true,
+    "licenca": "",
+    "localPath": "datasets/censo_escolar_inep/censo_escolar_2022",
+    "orgaoEmissao": "INEP",
+    "tags": "",
+    "tituloCurto": "Censo Escolar 2022",
+    "tituloLongo": "Censo Escolar 2022",
+    "urls": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2022.zip"
   }
 ]
