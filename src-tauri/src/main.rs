@@ -1093,7 +1093,7 @@ fn init_logging(app_data_dir: &PathBuf) -> Result<(), Box<dyn std::error::Error>
 }
 
 #[tauri::command]
-async fn publish_analysis(app_handle: tauri::AppHandle, id: String) -> Result<String, String> {
+async fn publish_analysis(app_handle: tauri::AppHandle, id: Option<String>) -> Result<String, String> {
     // Publish by creating a branch and opening a Pull Request using the GitHub API.
     let config = get_github_config(app_handle.clone()).await?
         .ok_or("GitHub configuration not found. Configure it in Settings > Collaboration.")?;
@@ -1112,8 +1112,11 @@ async fn publish_analysis(app_handle: tauri::AppHandle, id: String) -> Result<St
     if !local_path.exists() { return Err("Local analyses-history.json not found".into()); }
     let file = File::open(&local_path).map_err(|e| e.to_string())?;
     let history: Vec<serde_json::Value> = serde_json::from_reader(file).map_err(|e| e.to_string())?;
-    if !history.iter().any(|item| item["id"].as_str() == Some(&id)) {
-        return Err("Analysis id not found in local analyses-history.json".into());
+    
+    if let Some(ref aid) = id {
+        if !history.iter().any(|item| item["id"].as_str() == Some(aid)) {
+            return Err("Analysis id not found in local analyses-history.json".into());
+        }
     }
 
     let final_json = serde_json::to_string_pretty(&history).map_err(|e| e.to_string())?;
@@ -1152,7 +1155,12 @@ async fn publish_analysis(app_handle: tauri::AppHandle, id: String) -> Result<St
     let base_sha = ref_json["object"]["sha"].as_str().ok_or("Cannot determine base sha")?;
 
     // 3) Create a branch
-    let branch = format!("contrib/analysis-{}-{}", id, chrono::Utc::now().format("%Y%m%d%H%M%S"));
+    let branch = if let Some(ref aid) = id {
+        format!("contrib/analysis-{}-{}", aid, chrono::Utc::now().format("%Y%m%d%H%M%S"))
+    } else {
+        format!("contrib/sync-all-{}", chrono::Utc::now().format("%Y%m%d%H%M%S"))
+    };
+
     let create_ref_url = format!("https://api.github.com/repos/{}/{}/git/refs", config.owner, config.repo);
     let create_ref_body = serde_json::json!({ "ref": format!("refs/heads/{}", branch), "sha": base_sha });
     let create_ref_resp = client.post(&create_ref_url)
@@ -1181,10 +1189,16 @@ async fn publish_analysis(app_handle: tauri::AppHandle, id: String) -> Result<St
     }
 
     // 5) Put file to new branch
-    let put_body = if let Some(sha) = remote_sha.clone() {
-        serde_json::json!({ "message": format!("Contribuição: adicionando/atualizando análise {}", id), "content": final_b64, "branch": branch, "sha": sha })
+    let message = if let Some(ref aid) = id {
+        format!("Contribuição: adicionando/atualizando análise {}", aid)
     } else {
-        serde_json::json!({ "message": format!("Contribuição: adicionando análise {}", id), "content": final_b64, "branch": branch })
+        "Contribuição: sincronização total das análises".to_string()
+    };
+
+    let put_body = if let Some(sha) = remote_sha.clone() {
+        serde_json::json!({ "message": message, "content": final_b64, "branch": branch, "sha": sha })
+    } else {
+        serde_json::json!({ "message": message, "content": final_b64, "branch": branch })
     };
 
     let put_resp = client.put(&contents_url)
@@ -1198,8 +1212,20 @@ async fn publish_analysis(app_handle: tauri::AppHandle, id: String) -> Result<St
     }
 
     // 6) Create Pull Request
+    let title = if let Some(ref aid) = id {
+        format!("Contribuição: análise {}", aid)
+    } else {
+        "Contribuição: Sincronização de Análises".to_string()
+    };
+
+    let body = if let Some(ref aid) = id {
+        format!("Contribuição automática da análise {} via aplicação desktop.", aid)
+    } else {
+        "Sincronização automática de todas as análises locais via aplicação desktop.".to_string()
+    };
+
     let pr_url = format!("https://api.github.com/repos/{}/{}/pulls", config.owner, config.repo);
-    let pr_body = serde_json::json!({ "title": format!("Contribuição: análise {}", id), "head": branch, "base": default_branch, "body": format!("Contribuição automática da análise {} via aplicação desktop.", id) });
+    let pr_body = serde_json::json!({ "title": title, "head": branch, "base": default_branch, "body": body });
     let pr_resp = client.post(&pr_url)
         .header("Authorization", format!("token {}", config.token))
         .json(&pr_body)
@@ -1238,7 +1264,12 @@ fn main() {
             get_analyses,
             delete_analysis,
             delete_dataset,
-            delete_group
+            delete_group,
+            get_github_config,
+            save_github_config,
+            test_github_connection,
+            push_dataset_to_github,
+            publish_analysis
         ])
         .setup(|app| {
             // Initialize logging

@@ -130,6 +130,21 @@ export class DatasetStateService {
     }
   }
 
+  async syncAnalysesWithSite(): Promise<string> {
+    if (!isTauri()) {
+      throw new Error('Sincronização não disponível em modo Web.');
+    }
+
+    try {
+      const result = await invoke<string>('publish_analysis', { id: null });
+      console.log('Sync result:', result);
+      return result;
+    } catch (err) {
+      console.error('Erro ao sincronizar análises:', err);
+      throw err;
+    }
+  }
+
   async deleteAnalysis(id: string) {
     if (!isTauri()) return;
 

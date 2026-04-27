@@ -60,6 +60,10 @@ export class ConfirmDialog {
           <mat-icon>arrow_back</mat-icon>
         </button>
         <h1>Análises Descritivas</h1>
+        <span class="spacer"></span>
+        <button mat-stroked-button color="primary" (click)="syncWithSite()" matTooltip="Sincronizar todas as análises com o repositório GitHub">
+          <mat-icon>sync</mat-icon> Sincronizar com Site
+        </button>
       </div>
 
       <div class="content-grid">
@@ -226,6 +230,7 @@ export class ConfirmDialog {
     .container { padding: 24px; max-width: 1400px; margin: 0 auto; }
     .header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
     .header h1 { margin: 0; color: #3f51b5; }
+    .spacer { flex: 1 1 auto; }
 
     .content-grid { display: grid; grid-template-columns: 350px 1fr; gap: 24px; align-items: start; }
     
@@ -314,6 +319,29 @@ export class DescritivaView implements OnInit {
       }
     } catch (err: any) {
       this.snackBar.open('Falha ao publicar: ' + (err?.toString() || err), 'Fechar', { duration: 6000 });
+    }
+  }
+
+  async syncWithSite() {
+    const ok = await firstValueFrom(this.dialog.open(ConfirmDialog, { 
+      data: { 
+        title: 'Sincronizar com Site', 
+        message: 'Deseja sincronizar todas as suas análises locais com o repositório do site? Isso criará um Pull Request com o histórico completo.' 
+      } 
+    }).afterClosed());
+    
+    if (!ok) return;
+    
+    try {
+      const result = await this.stateService.syncAnalysesWithSite();
+      if (result && result.startsWith('http')) {
+        const snack = this.snackBar.open('Pull request de sincronização criado', 'Abrir', { duration: 10000 });
+        snack.onAction().subscribe(() => window.open(result, '_blank'));
+      } else {
+        this.snackBar.open('Sincronização enviada', 'Fechar', { duration: 4000 });
+      }
+    } catch (err: any) {
+      this.snackBar.open('Falha na sincronização: ' + (err?.toString() || err), 'Fechar', { duration: 6000 });
     }
   }
 
