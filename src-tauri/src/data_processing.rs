@@ -73,6 +73,9 @@ pub async fn run_etl(
         let lf = LazyCsvReader::new(path)
             .with_has_header(true)
             .with_separator(sep)
+            .with_encoding(CsvEncoding::LossyUtf8)
+            .with_infer_schema_length(Some(10000))
+            .with_ignore_errors(true)
             .finish()
             .map_err(|e| format!("Erro ao ler CSV: {}", e))?
             .select(col_exprs.clone());
@@ -128,6 +131,9 @@ pub async fn get_barchart_data(
     let lf = LazyCsvReader::new(path)
         .with_has_header(true)
         .with_separator(sep)
+        .with_encoding(CsvEncoding::LossyUtf8)
+        .with_infer_schema_length(Some(10000))
+        .with_ignore_errors(true)
         .finish()
         .map_err(|e| format!("Erro ao ler arquivo: {}", e))?;
 

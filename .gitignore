@@ -13,3 +13,4 @@ www
 downloads/
 /data/
 !/angular-ui/public/data/*.json
+/home/wgn/WORKING/Projects-Srcs/Projects-Srcs-FzlSoft/AnsibleArtifacts/vars/vault.yml
