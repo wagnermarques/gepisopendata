@@ -66,7 +66,7 @@ pub async fn run_etl(
 
     // 2. Build LazyFrame for each file and concatenate
     let mut lazy_frames = Vec::new();
-    let col_exprs: Vec<Expr> = columns.iter().map(|c| col(c)).collect();
+    let col_exprs: Vec<Expr> = columns.iter().map(|c| col(c).cast(DataType::String)).collect();
 
     for path in full_paths {
         let sep = detect_delimiter_from_file(&path);
@@ -138,13 +138,13 @@ pub async fn get_barchart_data(
         .map_err(|e| format!("Erro ao ler arquivo: {}", e))?;
 
     let agg_expr = match metric.as_str() {
-        "sum" => col(&value_col).sum(),
-        "avg" => col(&value_col).mean(),
+        "sum" => col(&value_col).cast(DataType::Float64).sum(),
+        "avg" => col(&value_col).cast(DataType::Float64).mean(),
         _ => col(&value_col).count(),
     };
 
     let df = lf
-        .group_by([col(&category_col)])
+        .group_by([col(&category_col).cast(DataType::String)])
         .agg([agg_expr.alias("result")])
         .collect()
         .map_err(|e| format!("Erro na agregação: {}", e))?;
@@ -152,6 +152,7 @@ pub async fn get_barchart_data(
     println!("Rust => Aggregation complete. Rows: {}", df.height());
 
     let cats: Vec<String> = df.column(&category_col)
+        .or_else(|_| df.column(&category_col)) // This is a bit redundant but safe if name changes
         .map_err(|e| e.to_string())?
         .iter()
         .map(|v| v.to_string().replace("\"", ""))
