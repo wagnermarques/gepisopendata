@@ -90,7 +90,34 @@
     "groupName": "Censo Escolar INEP",
     "id": "8eb70b79-996f-4d56-94a1-08e934ed781c",
     "name": "Analise Geral",
-    "updatedAt": "2026-05-20T03:41:57.846660295+00:00",
+    "publishedArtifacts": [
+      {
+        "createdAt": "2026-05-21T18:53:29.409Z",
+        "data": {
+          "x": [
+            "2023",
+            "2024",
+            "2022",
+            "2021"
+          ],
+          "y": [
+            1896947,
+            2017297,
+            1775616,
+            1635559
+          ]
+        },
+        "id": "c723088b-798c-4770-922e-7cad4169e482",
+        "label": "Soma Qt Doc Esp CC por Ano",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "sum",
+          "valueVar": "QT_DOC_ESP_CC"
+        },
+        "type": "barchart"
+      }
+    ],
+    "updatedAt": "2026-05-21T18:53:29.425585920+00:00",
     "variables": [
       {
         "description": "Equipamentos existentes na escola para uso técnico e administrativo - Impressora Multifuncional",
