@@ -175,3 +175,39 @@ pub async fn get_barchart_data(
         values: vals,
     })
 }
+
+#[tauri::command]
+pub async fn get_variable_sample(
+    file_path: String,
+    column_name: String,
+    limit: usize
+) -> Result<Vec<String>, String> {
+    tracing::info!("Starting get_variable_sample: file={}, column={}, limit={}", file_path, column_name, limit);
+    let path = PathBuf::from(file_path);
+    if !path.exists() {
+        return Err("Arquivo não encontrado".into());
+    }
+
+    let sep = detect_delimiter_from_file(&path);
+    let df = LazyCsvReader::new(path)
+        .with_has_header(true)
+        .with_separator(sep)
+        .with_encoding(CsvEncoding::LossyUtf8)
+        .with_infer_schema_length(Some(10000))
+        .with_ignore_errors(true)
+        .finish()
+        .map_err(|e| format!("Erro ao ler arquivo: {}", e))?
+        .select([col(&column_name).cast(DataType::String)])
+        .limit(limit as u32)
+        .collect()
+        .map_err(|e| format!("Erro ao processar amostra: {}", e))?;
+
+    let values: Vec<String> = df.column(&column_name)
+        .map_err(|e| format!("Coluna não encontrada: {}", e))?
+        .iter()
+        .map(|v| v.to_string().replace("\"", ""))
+        .collect();
+
+    tracing::info!("Variable sample retrieved successfully: {} values", values.len());
+    Ok(values)
+}

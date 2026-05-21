@@ -37,6 +37,41 @@ export class ConfirmDialog {
 }
 
 @Component({
+  selector: 'sample-dialog',
+  standalone: true,
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatListModule, MatDividerModule],
+  template: `
+    <div style="padding:24px; min-width:350px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="margin:0">Amostra: {{ data.columnName }}</h3>
+        <button mat-icon-button (click)="dialogRef.close()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <p style="font-size: 0.9rem; color: #666;">Exibindo as primeiras {{ data.sample.length }} linhas do arquivo consolidado.</p>
+      <mat-divider></mat-divider>
+      <div style="max-height: 400px; overflow-y: auto; margin: 16px 0;">
+        <mat-list dense>
+          @for (item of data.sample; track $index) {
+            <mat-list-item>
+              <mat-icon matListItemIcon>data_object</mat-icon>
+              <span matListItemTitle>{{ item }}</span>
+            </mat-list-item>
+            <mat-divider></mat-divider>
+          }
+        </mat-list>
+      </div>
+      <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+        <button mat-flat-button color="primary" (click)="dialogRef.close()">Fechar</button>
+      </div>
+    </div>
+  `
+})
+export class SampleDialog {
+  constructor(public dialogRef: MatDialogRef<SampleDialog>, @Inject(MAT_DIALOG_DATA) public data: { columnName: string, sample: string[] }) {}
+}
+
+@Component({
   selector: 'app-descritiva-view',
   standalone: true,
   imports: [
@@ -52,6 +87,7 @@ export class ConfirmDialog {
     MatDialogModule,
     MatSnackBarModule,
     ConfirmDialog,
+    SampleDialog,
   ],
   template: `
     <div class="container">
@@ -134,8 +170,11 @@ export class ConfirmDialog {
                     <div class="status-box success">
                       <mat-icon>check_circle</mat-icon>
                       <div class="success-info">
-                        <p>Base consolidada com sucesso!</p>
-                        <small>{{ processedFilePath() }}</small>
+                        <p><strong>Base consolidada com sucesso!</strong></p>
+                        <div class="path-display">
+                          <mat-icon>folder_open</mat-icon>
+                          <span>Local do arquivo: <code>{{ processedFilePath() }}</code></span>
+                        </div>
                       </div>
                     </div>
                   } @else if (etlStatus() === 'error') {
@@ -185,8 +224,18 @@ export class ConfirmDialog {
                         <span class="type-badge" [class.number]="variable.type === 'Número'">{{ variable.type }}</span>
                       </td>
                     </ng-container>
-                    <tr mat-header-row *matHeaderRowDef="['name', 'type']"></tr>
-                    <tr mat-row *matRowDef="let row; columns: ['name', 'type'];"></tr>
+                    <ng-container matColumnDef="actions">
+                      <th mat-header-cell *matHeaderCellDef></th>
+                      <td mat-cell *matCellDef="let variable">
+                        @if (etlStatus() === 'success') {
+                          <button mat-button color="primary" (click)="viewSample(variable.name)">
+                            <mat-icon>visibility</mat-icon> ver amostra
+                          </button>
+                        }
+                      </td>
+                    </ng-container>
+                    <tr mat-header-row *matHeaderRowDef="['name', 'type', 'actions']"></tr>
+                    <tr mat-row *matRowDef="let row; columns: ['name', 'type', 'actions'];"></tr>
                   </table>
                 </div>
               </mat-card-content>
@@ -252,7 +301,9 @@ export class ConfirmDialog {
     .status-box.processing { background: #e3f2fd; }
     .status-box.success { background: #e8f5e9; color: #2e7d32; }
     .status-box.error { background: #ffebee; color: #c62828; }
-    .success-info small { font-family: monospace; font-size: 0.75rem; }
+    .success-info p { margin: 0; }
+    .path-display { display: flex; align-items: center; gap: 8px; margin-top: 4px; font-size: 0.85rem; color: #555; }
+    .path-display code { background: rgba(0,0,0,0.05); padding: 2px 4px; border-radius: 4px; word-break: break-all; }
 
     .artifacts-section { padding: 8px 0 16px 0; }
     .artifact-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-top: 12px; }
@@ -376,6 +427,28 @@ export class DescritivaView implements OnInit {
     } catch (err: any) {
       this.etlStatus.set('error');
       this.etlError.set(err.toString());
+    }
+  }
+
+  async viewSample(variableName: string) {
+    const path = this.processedFilePath();
+    if (!path) {
+      this.snackBar.open('Consolide os dados primeiro', 'Fechar', { duration: 3000 });
+      return;
+    }
+
+    try {
+      const sample = await invoke<string[]>('get_variable_sample', {
+        filePath: path,
+        columnName: variableName,
+        limit: 10
+      });
+      
+      this.dialog.open(SampleDialog, {
+        data: { columnName: variableName, sample }
+      });
+    } catch (err: any) {
+      this.snackBar.open('Erro ao carregar amostra: ' + err, 'Fechar', { duration: 5000 });
     }
   }
 

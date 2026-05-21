@@ -1078,7 +1078,7 @@ async fn push_dataset_to_github(app_handle: tauri::AppHandle, dataset_id: String
 }
 
 mod data_processing;
-use data_processing::{run_etl, get_barchart_data};
+use data_processing::{run_etl, get_barchart_data, get_variable_sample};
 
 // Initialize logging to file
 fn init_logging(app_data_dir: &PathBuf) -> Result<(), Box<dyn std::error::Error>> {
@@ -1279,6 +1279,7 @@ fn main() {
             parse_dictionary,
             run_etl,
             get_barchart_data,
+            get_variable_sample,
             get_app_data_dir,
             save_analysis,
             get_analyses,
