@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, Inject } from '@angular/core';
+import { Component, inject, signal, OnInit, Inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,10 +10,13 @@ import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { firstValueFrom } from 'rxjs';
 import { DatasetStateService, AnalysisConfig } from '../../../../../services/dataset-state.service';
 import { Router } from '@angular/router';
 import { invoke } from '@tauri-apps/api/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'confirm-dialog',
@@ -86,6 +89,9 @@ export class SampleDialog {
     MatTooltipModule,
     MatDialogModule,
     MatSnackBarModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
     ConfirmDialog,
     SampleDialog,
   ],
@@ -209,8 +215,19 @@ export class SampleDialog {
                 }
 
                 <div class="variable-summary">
-                  <h3>Variáveis Selecionadas ({{ analysisConfig.variables.length }}):</h3>
-                  <table mat-table [dataSource]="analysisConfig.variables" class="compact-table">
+                  <div class="variable-header">
+                    <h3>Variáveis Selecionadas ({{ analysisConfig.variables.length }}):</h3>
+                    <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+                      <mat-icon matPrefix>search</mat-icon>
+                      <mat-label>Filtrar variáveis...</mat-label>
+                      <input matInput [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Nome ou descrição" />
+                      <button *ngIf="searchQuery()" matSuffix mat-icon-button (click)="searchQuery.set('')">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </mat-form-field>
+                  </div>
+
+                  <table mat-table [dataSource]="filteredVariables()" class="compact-table">
                     <ng-container matColumnDef="name">
                       <th mat-header-cell *matHeaderCellDef>Nome</th>
                       <td mat-cell *matCellDef="let variable">
@@ -290,6 +307,8 @@ export class SampleDialog {
     .card-header-with-actions { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
 
     .info-card { margin-bottom: 24px; }
+    .variable-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 16px; }
+    .search-field { flex: 1; max-width: 350px; }
     .compact-table { width: 100%; margin-top: 8px; }
     .var-name { font-weight: 500; }
     .var-desc { font-size: 0.75rem; color: #777; font-style: italic; }
@@ -333,6 +352,17 @@ export class DescritivaView implements OnInit {
   private snackBar = inject(MatSnackBar);
 
   config = this.stateService.currentAnalysis;
+  searchQuery = signal('');
+  filteredVariables = computed(() => {
+    const vars = this.config()?.variables || [];
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return vars;
+    return vars.filter(v => 
+      v.name.toLowerCase().includes(query) || 
+      (v.description && v.description.toLowerCase().includes(query))
+    );
+  });
+  
   etlStatus = signal<'idle' | 'processing' | 'success' | 'error'>('idle');
   etlError = signal<string | null>(null);
   processedFilePath = signal<string | null>(null);
