@@ -100,15 +100,51 @@ import { PlotlyModule } from 'angular-plotly.js';
             </mat-card-header>
             <mat-card-content>
               <div class="edit-form">
-                <mat-form-field appearance="outline">
-                  <mat-label>Título do Eixo X</mat-label>
-                  <input matInput [(ngModel)]="tempXTitle" placeholder="Ex: Categorias">
-                </mat-form-field>
+                <div class="section-group">
+                  <h4>Títulos dos Eixos</h4>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Título do Eixo X</mat-label>
+                    <input matInput [(ngModel)]="tempXTitle" placeholder="Ex: Categorias">
+                  </mat-form-field>
 
-                <mat-form-field appearance="outline">
-                  <mat-label>Título do Eixo Y</mat-label>
-                  <input matInput [(ngModel)]="tempYTitle" placeholder="Ex: Valores">
-                </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Título do Eixo Y</mat-label>
+                    <input matInput [(ngModel)]="tempYTitle" placeholder="Ex: Valores">
+                  </mat-form-field>
+                </div>
+
+                <mat-divider></mat-divider>
+
+                <div class="section-group">
+                  <h4>Formatação do Eixo Y (Rótulos)</h4>
+                  <div class="row-fields">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Prefixo (ex: $)</mat-label>
+                      <input matInput [(ngModel)]="tempYPrefix">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                      <mat-label>Sufixo (ex: %)</mat-label>
+                      <input matInput [(ngModel)]="tempYSuffix">
+                    </mat-form-field>
+                  </div>
+                </div>
+
+                <mat-divider></mat-divider>
+
+                <div class="section-group">
+                  <h4>Renomear Categorias (Eixo X)</h4>
+                  <div class="category-edit-list">
+                    @for (cat of artifact()?.data?.x; track cat) {
+                      <div class="category-edit-row">
+                        <span class="orig-cat" [title]="cat">{{ cat }}</span>
+                        <mat-icon>arrow_forward</mat-icon>
+                        <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                          <input matInput [placeholder]="cat" [(ngModel)]="tempXLabelMap[cat]">
+                        </mat-form-field>
+                      </div>
+                    }
+                  </div>
+                </div>
                 
                 <p class="edit-hint">As alterações serão aplicadas ao salvar no cabeçalho.</p>
               </div>
@@ -127,12 +163,22 @@ import { PlotlyModule } from 'angular-plotly.js';
     .edit-actions { display: flex; gap: 8px; }
 
     .view-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
-    .view-grid.editing-active { grid-template-columns: 1fr 300px; }
+    .view-grid.editing-active { grid-template-columns: 1fr 380px; }
 
     .chart-container { width: 100%; height: 600px; display: block; }
 
-    .edit-panel { background: #f8f9fa; }
+    .edit-panel { background: #f8f9fa; max-height: 800px; overflow-y: auto; }
     .edit-form { display: flex; flex-direction: column; gap: 16px; padding-top: 16px; }
+    .section-group { display: flex; flex-direction: column; gap: 12px; }
+    .section-group h4 { margin: 0 0 4px 0; color: #555; font-size: 0.9rem; }
+    .row-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    
+    .category-edit-list { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; padding-right: 8px; }
+    .category-edit-row { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+    .orig-cat { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #666; font-weight: 500; }
+    .category-edit-row mat-icon { font-size: 16px; width: 16px; height: 16px; color: #999; }
+    .category-edit-row mat-form-field { flex: 2; }
+
     .edit-hint { font-size: 0.75rem; color: #666; font-style: italic; }
 
     .loading-state, .error-state { 
@@ -144,8 +190,9 @@ import { PlotlyModule } from 'angular-plotly.js';
     }
     .error-state mat-icon { font-size: 48px; width: 48px; height: 48px; margin-bottom: 16px; }
 
-    @media (max-width: 900px) { 
+    @media (max-width: 1100px) { 
       .view-grid.editing-active { grid-template-columns: 1fr; }
+      .edit-panel { max-height: none; }
     }
   `]
 })
@@ -166,6 +213,9 @@ export class PublishedArtifactView implements OnInit {
   tempLabel = '';
   tempXTitle = '';
   tempYTitle = '';
+  tempYPrefix = '';
+  tempYSuffix = '';
+  tempXLabelMap: Record<string, string> = {};
 
   graphData: any = null;
 
@@ -215,9 +265,13 @@ export class PublishedArtifactView implements OnInit {
   preparePlotlyData(artifact: AnalysisArtifact) {
     const { categoryVar, metric } = artifact.params;
     
+    const xValues = artifact.data?.x.map(val => 
+      (artifact.xLabelMap && artifact.xLabelMap[val]) ? artifact.xLabelMap[val] : val
+    );
+
     this.graphData = {
       data: [{
-        x: artifact.data?.x,
+        x: xValues,
         y: artifact.data?.y,
         type: 'bar',
         marker: { color: '#3f51b5' }
@@ -230,6 +284,8 @@ export class PublishedArtifactView implements OnInit {
         },
         yaxis: { 
           title: artifact.yTitle || this.getMetricLabel(metric), 
+          tickprefix: artifact.yPrefix || '',
+          ticksuffix: artifact.ySuffix || '',
           automargin: true 
         },
         margin: { t: 50, b: 100, l: 60, r: 20 }
@@ -253,6 +309,12 @@ export class PublishedArtifactView implements OnInit {
     this.tempLabel = art.label;
     this.tempXTitle = art.xTitle || art.params.categoryVar || '';
     this.tempYTitle = art.yTitle || this.getMetricLabel(art.params.metric) || '';
+    this.tempYPrefix = art.yPrefix || '';
+    this.tempYSuffix = art.ySuffix || '';
+    
+    // Clone label map or initialize
+    this.tempXLabelMap = art.xLabelMap ? { ...art.xLabelMap } : {};
+    
     this.isEditing.set(true);
   }
 
@@ -270,6 +332,9 @@ export class PublishedArtifactView implements OnInit {
     art.label = this.tempLabel;
     art.xTitle = this.tempXTitle;
     art.yTitle = this.tempYTitle;
+    art.yPrefix = this.tempYPrefix;
+    art.ySuffix = this.tempYSuffix;
+    art.xLabelMap = { ...this.tempXLabelMap };
 
     // Update analysis config
     const artifactIndex = config.publishedArtifacts?.findIndex(a => a.id === art.id);

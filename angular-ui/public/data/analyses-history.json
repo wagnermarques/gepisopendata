@@ -108,18 +108,48 @@
           ]
         },
         "id": "c723088b-798c-4770-922e-7cad4169e482",
-        "label": "Titulo do gráfico editado",
+        "label": "Titu gráfico editado2",
         "params": {
           "categoryVar": "NU_ANO_CENSO",
           "metric": "sum",
           "valueVar": "QT_DOC_ESP_CC"
         },
         "type": "barchart",
-        "xTitle": "NU_ANO_CENSO",
-        "yTitle": "Soma"
+        "xLabelMap": {
+          "2023": "2023"
+        },
+        "xTitle": "Ano do Censo",
+        "yPrefix": "!",
+        "ySuffix": "",
+        "yTitle": "Num Matrículas"
+      },
+      {
+        "createdAt": "2026-05-22T16:48:46.691Z",
+        "data": {
+          "x": [
+            "2022",
+            "2023",
+            "2024",
+            "2021"
+          ],
+          "y": [
+            3089,
+            3067,
+            3033,
+            3119
+          ]
+        },
+        "id": "0f89a80b-ced6-4ea5-86e5-630c80ea153a",
+        "label": "teste",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "sum",
+          "valueVar": "IN_ESP_CE"
+        },
+        "type": "barchart"
       }
     ],
-    "updatedAt": "2026-05-22T15:10:44.218168857+00:00",
+    "updatedAt": "2026-05-22T16:48:46.694167250+00:00",
     "variables": [
       {
         "description": "Equipamentos existentes na escola para uso técnico e administrativo - Impressora Multifuncional",
@@ -1744,6 +1774,100 @@
       {
         "description": "Divisão Intramunicipal - Código do Distrito",
         "name": "CO_DISTRITO",
+        "type": "Num"
+      }
+    ]
+  },
+  {
+    "dictionary": "dicionário_dados_educação_básica.xlsx",
+    "files": [
+      "microdados_ed_basica_2024.csv",
+      "microdados_ed_basica_2023.csv",
+      "microdados_ed_basica_2022.csv",
+      "microdados_ed_basica_2021.csv"
+    ],
+    "groupName": "Censo Escolar INEP",
+    "id": "9d8642b0-e877-4443-a80f-95d623af7ed1",
+    "name": "Matr Alun Esp",
+    "publishedArtifacts": [
+      {
+        "createdAt": "2026-05-22T16:55:08.009Z",
+        "data": {
+          "x": [
+            "0",
+            "null",
+            "1"
+          ],
+          "y": [
+            222015,
+            121711,
+            535233
+          ]
+        },
+        "id": "8b603c88-7f95-40ee-9034-0aa33ba6d014",
+        "label": "Qtde Matr Esp Exclusiva",
+        "params": {
+          "categoryVar": "IN_ESP_CC",
+          "metric": "count",
+          "valueVar": "NU_ANO_CENSO"
+        },
+        "type": "barchart"
+      }
+    ],
+    "updatedAt": "2026-05-22T16:55:08.010677851+00:00",
+    "variables": [
+      {
+        "description": "Número de Matrículas da Educação Especial Exclusiva",
+        "name": "QT_MAT_ESP_CE",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Ano do Censo",
+        "name": "NU_ANO_CENSO",
+        "statisticalType": "qualitativa_ordinal",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Docentes da Educação Especial Exclusiva",
+        "name": "QT_DOC_ESP_CE",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Educação Especial Inclusiva (em Classes Comuns) - Escola possui um ou mais alunos com deficiência, transtorno global do desenvolvimento ou altas habilidades/superdotação estudando em classes comuns do Ensino Regular e/ou Educação de Jovens e Adultos (Possui uma ou mais matrículas)",
+        "name": "IN_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Turmas de Educação Especial Exclusiva",
+        "name": "QT_TUR_ESP_CE",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Educação Especial Exclusiva - Escola exclusivamente especializada e/ou que possui classe especial exclusiva para o atendimento de alunos com deficiência, transtorno global do desenvolvimento ou altas habilidades/superdotação (Possui uma ou mais matrículas)",
+        "name": "IN_ESP_CE",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Docentes da Educação Especial Inclusiva",
+        "name": "QT_DOC_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Turmas de Educação Especial Inclusiva",
+        "name": "QT_TUR_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Matrículas da Educação Especial Inclusiva",
+        "name": "QT_MAT_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
         "type": "Num"
       }
     ]

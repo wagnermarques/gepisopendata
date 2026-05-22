@@ -20,6 +20,7 @@ interface ColumnInfo {
   type: string;
   included?: boolean;
   description?: string;
+  statisticalType?: string;
 }
 
 interface FileInfo {
@@ -198,9 +199,23 @@ interface DictionaryEntry {
                 </ng-container>
 
                 <ng-container matColumnDef="type">
-                  <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                  <th mat-header-cell *matHeaderCellDef>Tipo Primitivo</th>
                   <td mat-cell *matCellDef="let row">
                     <span class="type-badge" [class.number]="row.type === 'Número'">{{ row.type }}</span>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="statisticalType">
+                  <th mat-header-cell *matHeaderCellDef>Classificação Estatística</th>
+                  <td mat-cell *matCellDef="let row">
+                    <mat-form-field appearance="outline" subscriptSizing="dynamic" class="stat-type-select" *ngIf="row.included">
+                      <mat-select [(ngModel)]="row.statisticalType">
+                        @for (type of statisticalTypes; track type.value) {
+                          <mat-option [value]="type.value">{{ type.label }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+                    <span class="type-placeholder" *ngIf="!row.included">-</span>
                   </td>
                 </ng-container>
 
@@ -232,6 +247,8 @@ interface DictionaryEntry {
     .full-width-table { width: 100%; }
     .type-badge { font-size: 0.75rem; padding: 2px 8px; background: #f0f0f0; border-radius: 4px; color: #666; }
     .type-badge.number { background: #e3f2fd; color: #1976d2; }
+    .stat-type-select { width: 100%; min-width: 200px; font-size: 0.85rem; }
+    .type-placeholder { color: #ccc; margin-left: 12px; }
     .row-excluded { opacity: 0.5; }
     .header-info { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 0.75rem; color: #888; }
     .header-info mat-icon { font-size: 14px; width: 14px; height: 14px; }
@@ -246,6 +263,16 @@ export class VariableConfigView implements OnInit {
   groupName = signal<string | null>(this.stateService.getSelectedGroup());
   analysisName = '';
   columns = signal<ColumnInfo[]>([]);
+
+  statisticalTypes = [
+    { value: 'qualitativa_nominal', label: 'Qualitativa Nominal' },
+    { value: 'qualitativa_ordinal', label: 'Qualitativa Ordinal' },
+    { value: 'quantitativa_discreta', label: 'Quantitativa Discreta' },
+    { value: 'quantitativa_continua', label: 'Quantitativa Contínua' },
+    { value: 'categorica_temporal_ano', label: 'Temporal (Ano)' },
+    { value: 'categorica_temporal_timestamp', label: 'Temporal (Timestamp)' },
+  ];
+
   searchQuery = signal('');
   filteredColumns = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
@@ -268,7 +295,7 @@ export class VariableConfigView implements OnInit {
   isLoadingColumns = signal(false);
   isLoadingDictionary = signal(false);
   
-  displayedColumns = ['select', 'name', 'type'];
+  displayedColumns = ['select', 'name', 'type', 'statisticalType'];
 
   ngOnInit() {
     this.initialLoad();
@@ -285,7 +312,11 @@ export class VariableConfigView implements OnInit {
       const result = await invoke<any>('analyze_group', { groupName: name });
       this.format.set(result.format);
       this.files.set(result.files.map((f: string) => ({ name: f, selected: true })));
-      this.columns.set(result.common_columns.map((c: any) => ({ ...c, included: false })));
+      this.columns.set(result.common_columns.map((c: any) => ({ 
+        ...c, 
+        included: false,
+        statisticalType: c.type === 'Número' ? 'quantitativa_discreta' : 'qualitativa_nominal'
+      })));
     } catch (err) {
       console.error('Falha ao carregar grupo:', err);
     } finally {
@@ -369,7 +400,8 @@ export class VariableConfigView implements OnInit {
           ...c,
           included: prev?.included ?? false,
           description: dictEntry ? dictEntry.description : prev?.description,
-          type: dictEntry ? dictEntry.var_type : c.type
+          type: dictEntry ? dictEntry.var_type : c.type,
+          statisticalType: prev?.statisticalType || (c.type === 'Número' ? 'quantitativa_discreta' : 'qualitativa_nominal')
         };
       });
 
@@ -429,7 +461,8 @@ export class VariableConfigView implements OnInit {
       variables: this.columns().filter(c => c.included).map(v => ({
         name: v.name,
         type: v.type,
-        description: v.description
+        description: v.description,
+        statisticalType: v.statisticalType
       }))
     };
     

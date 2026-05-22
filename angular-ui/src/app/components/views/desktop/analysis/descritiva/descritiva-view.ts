@@ -236,9 +236,14 @@ export class SampleDialog {
                       </td>
                     </ng-container>
                     <ng-container matColumnDef="type">
-                      <th mat-header-cell *matHeaderCellDef>Tipo</th>
+                      <th mat-header-cell *matHeaderCellDef>Classificação</th>
                       <td mat-cell *matCellDef="let variable">
-                        <span class="type-badge" [class.number]="variable.type === 'Número'">{{ variable.type }}</span>
+                        <div class="type-container">
+                          <span class="type-badge" [class.number]="variable.type === 'Número'">{{ variable.type }}</span>
+                          <span class="stat-type-label" *ngIf="variable.statisticalType">
+                            {{ getStatisticalTypeLabel(variable.statisticalType) }}
+                          </span>
+                        </div>
                       </td>
                     </ng-container>
                     <ng-container matColumnDef="actions">
@@ -314,6 +319,8 @@ export class SampleDialog {
     .var-desc { font-size: 0.75rem; color: #777; font-style: italic; }
     .type-badge { font-size: 0.7rem; padding: 2px 6px; background: #f0f0f0; border-radius: 4px; }
     .type-badge.number { background: #e3f2fd; color: #1976d2; }
+    .type-container { display: flex; flex-direction: column; gap: 4px; }
+    .stat-type-label { font-size: 0.75rem; color: #3f51b5; font-weight: 500; }
 
     .etl-section { padding: 8px 0 16px 0; }
     .status-box { display: flex; align-items: center; gap: 16px; padding: 12px; border-radius: 8px; margin-top: 8px; }
@@ -484,5 +491,17 @@ export class DescritivaView implements OnInit {
 
   goBack() {
     this.router.navigate(['/desktop/analysis/config']);
+  }
+
+  getStatisticalTypeLabel(typeValue: string): string {
+    const types: Record<string, string> = {
+      'qualitativa_nominal': 'Qualitativa Nominal',
+      'qualitativa_ordinal': 'Qualitativa Ordinal',
+      'quantitativa_discreta': 'Quantitativa Discreta',
+      'quantitativa_continua': 'Quantitativa Contínua',
+      'categorica_temporal_ano': 'Temporal (Ano)',
+      'categorica_temporal_timestamp': 'Temporal (Timestamp)',
+    };
+    return types[typeValue] || typeValue;
   }
 }

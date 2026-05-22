@@ -16,6 +16,9 @@ export interface AnalysisArtifact {
   };
   xTitle?: string;
   yTitle?: string;
+  xLabelMap?: Record<string, string>;
+  yPrefix?: string;
+  ySuffix?: string;
   createdAt: string;
 }
 
@@ -29,6 +32,7 @@ export interface AnalysisConfig {
     name: string;
     type: string;
     description?: string;
+    statisticalType?: string; // New field for richer types
   }[];
   publishedArtifacts?: AnalysisArtifact[];
   updatedAt?: string;
