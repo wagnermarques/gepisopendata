@@ -2069,7 +2069,35 @@
     "groupName": "Censo Escolar INEP",
     "id": "6b45b519-501e-4f1c-8245-4560ecd76876",
     "name": "Matriculas Alun Especiais",
-    "updatedAt": "2026-05-22T18:10:02.635365236+00:00",
+    "publishedArtifacts": [
+      {
+        "createdAt": "2026-05-22T18:21:17.562Z",
+        "data": {
+          "x": [
+            "2023",
+            "2022",
+            "2021",
+            "2024"
+          ],
+          "y": [
+            138382,
+            130901,
+            122261,
+            143689
+          ]
+        },
+        "id": "b848cc44-f50f-4531-aed9-abe3e4ed176f",
+        "label": "Matr Ed Esp Inclusiva",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "sum",
+          "statisticalType": "categorica_temporal_ano",
+          "valueVar": "IN_ESP_CC"
+        },
+        "type": "barchart"
+      }
+    ],
+    "updatedAt": "2026-05-22T18:21:17.566161860+00:00",
     "variables": [
       {
         "description": "Número de Turmas de Educação Especial Inclusiva",
