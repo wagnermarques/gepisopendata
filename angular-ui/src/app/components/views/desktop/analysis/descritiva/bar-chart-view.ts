@@ -311,21 +311,62 @@ export class BarChartView implements OnInit {
   }
 
   preparePlotlyData(x: string[], y: number[], title: string, metric: string) {
+    const analysis = this.config();
+    const xVarInfo = analysis?.variables.find(v => v.name === title);
+    const statType = xVarInfo?.statisticalType;
+    const plotlyType = this.mapToPlotlyType(statType);
+
+    // Create pairs and sort based on statistical type
+    let paired = x.map((val, i) => ({ x: val, y: y[i] }));
+    
+    if (statType === 'qualitativa_ordinal' || statType === 'categorica_temporal_ano') {
+      paired.sort((a, b) => {
+        const na = parseFloat(a.x);
+        const nb = parseFloat(b.x);
+        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        return a.x.localeCompare(b.x, undefined, { numeric: true, sensitivity: 'base' });
+      });
+    }
+
+    const sortedX = paired.map(p => p.x);
+    const sortedY = paired.map(p => p.y);
+
     this.graphData = {
       data: [{
-        x: x,
-        y: y,
+        x: sortedX,
+        y: sortedY,
         type: 'bar',
         marker: { color: '#3f51b5' }
       }],
       layout: {
         title: `${this.metricLabel()} de ${this.valueVar() || title} por ${title}`,
-        xaxis: { title: title, automargin: true },
+        xaxis: { 
+          title: title, 
+          type: plotlyType,
+          categoryorder: (statType === 'qualitativa_ordinal' || statType === 'categorica_temporal_ano') ? 'category ascending' : 'trace',
+          automargin: true 
+        },
         yaxis: { title: this.metricLabel(), automargin: true },
         margin: { t: 50, b: 100, l: 60, r: 20 }
       },
       config: { responsive: true, displayModeBar: false }
     };
+  }
+
+  mapToPlotlyType(statType?: string): string {
+    switch (statType) {
+      case 'qualitativa_nominal':
+      case 'qualitativa_ordinal':
+      case 'categorica_temporal_ano':
+        return 'category';
+      case 'categorica_temporal_timestamp':
+        return 'date';
+      case 'quantitativa_continua':
+      case 'quantitativa_discreta':
+        return 'linear';
+      default:
+        return '-'; // Plotly auto-detect
+    }
   }
 
   async publishArtifact() {
@@ -337,14 +378,18 @@ export class BarChartView implements OnInit {
     const analysis = this.config();
     if (!analysis) return;
 
+    const cat = this.categoryVar();
+    const xVarInfo = analysis.variables.find(v => v.name === cat);
+
     const artifact = {
       id: crypto.randomUUID(),
       label: label,
       type: 'barchart' as const,
       params: {
-        categoryVar: this.categoryVar(),
+        categoryVar: cat,
         valueVar: this.valueVar(),
-        metric: this.metric()
+        metric: this.metric(),
+        statisticalType: xVarInfo?.statisticalType // Persist for rendering
       },
       data: {
         x: this.lastResultData.categories,

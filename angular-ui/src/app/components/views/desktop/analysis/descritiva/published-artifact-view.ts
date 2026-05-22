@@ -263,16 +263,37 @@ export class PublishedArtifactView implements OnInit {
   }
 
   preparePlotlyData(artifact: AnalysisArtifact) {
-    const { categoryVar, metric } = artifact.params;
+    const { categoryVar, metric, statisticalType } = artifact.params;
     
+    // Initial mapping of labels (renaming)
     const xValues = artifact.data?.x.map(val => 
       (artifact.xLabelMap && artifact.xLabelMap[val]) ? artifact.xLabelMap[val] : val
-    );
+    ) || [];
+    
+    const yValues = artifact.data?.y || [];
+
+    // Create pairs for sorting
+    let paired = xValues.map((val, i) => ({ x: val, y: yValues[i] }));
+    
+    // Sort if it's ordinal or temporal
+    if (statisticalType === 'qualitativa_ordinal' || statisticalType === 'categorica_temporal_ano') {
+      paired.sort((a, b) => {
+        const na = parseFloat(a.x);
+        const nb = parseFloat(b.x);
+        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        return a.x.localeCompare(b.x, undefined, { numeric: true, sensitivity: 'base' });
+      });
+    }
+
+    const sortedX = paired.map(p => p.x);
+    const sortedY = paired.map(p => p.y);
+
+    const plotlyType = this.mapToPlotlyType(statisticalType);
 
     this.graphData = {
       data: [{
-        x: xValues,
-        y: artifact.data?.y,
+        x: sortedX,
+        y: sortedY,
         type: 'bar',
         marker: { color: '#3f51b5' }
       }],
@@ -280,6 +301,8 @@ export class PublishedArtifactView implements OnInit {
         title: artifact.label,
         xaxis: { 
           title: artifact.xTitle || categoryVar, 
+          type: plotlyType,
+          categoryorder: (statisticalType === 'qualitativa_ordinal' || statisticalType === 'categorica_temporal_ano') ? 'category ascending' : 'trace',
           automargin: true 
         },
         yaxis: { 
@@ -292,6 +315,22 @@ export class PublishedArtifactView implements OnInit {
       },
       config: { responsive: true, displayModeBar: false }
     };
+  }
+
+  mapToPlotlyType(statType?: string): string {
+    switch (statType) {
+      case 'qualitativa_nominal':
+      case 'qualitativa_ordinal':
+      case 'categorica_temporal_ano':
+        return 'category';
+      case 'categorica_temporal_timestamp':
+        return 'date';
+      case 'quantitativa_continua':
+      case 'quantitativa_discreta':
+        return 'linear';
+      default:
+        return '-'; // Plotly auto-detect
+    }
   }
 
   getMetricLabel(metric: string) {
