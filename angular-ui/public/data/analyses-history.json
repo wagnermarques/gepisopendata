@@ -108,16 +108,18 @@
           ]
         },
         "id": "c723088b-798c-4770-922e-7cad4169e482",
-        "label": "Soma Qt Doc Esp CC por Ano",
+        "label": "Titulo do gráfico editado",
         "params": {
           "categoryVar": "NU_ANO_CENSO",
           "metric": "sum",
           "valueVar": "QT_DOC_ESP_CC"
         },
-        "type": "barchart"
+        "type": "barchart",
+        "xTitle": "NU_ANO_CENSO",
+        "yTitle": "Soma"
       }
     ],
-    "updatedAt": "2026-05-21T18:53:29.425585920+00:00",
+    "updatedAt": "2026-05-22T15:10:44.218168857+00:00",
     "variables": [
       {
         "description": "Equipamentos existentes na escola para uso técnico e administrativo - Impressora Multifuncional",

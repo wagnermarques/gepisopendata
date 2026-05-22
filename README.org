@@ -76,6 +76,10 @@ gepis-dados-abertos/
 
 * Build e Desenvolvimento
 
+** pre requisitos para o build
+*** no fedora
+sudo dnf install libxdo-devel libxdo
+
 ** Comandos de Build
 
 #+END_SRC

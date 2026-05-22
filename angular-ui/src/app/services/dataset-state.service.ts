@@ -14,6 +14,8 @@ export interface AnalysisArtifact {
     x: any[];
     y: any[];
   };
+  xTitle?: string;
+  yTitle?: string;
   createdAt: string;
 }
 
