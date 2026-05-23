@@ -128,5 +128,26 @@
     "tituloCurto": "Censo Escolar 2021",
     "tituloLongo": "Dados do Censo Escolar 2021",
     "urls": "https://download.inep.gov.br/dados_abertos/microdados_censo_escolar_2021.zip"
+  },
+  {
+    "autor": "",
+    "dataReferencia": "2000",
+    "dateAdded": "2026-05-23T20:39:40.044323950+00:00",
+    "descricao": "Csv de dados sobreviventes do titanic",
+    "files": [
+      "titanic.csv"
+    ],
+    "formato": "csv",
+    "frequencia": "Anual",
+    "grupo": "Titanic Data",
+    "id": "titanic_data-titanicdatasample",
+    "isSerieHistorica": false,
+    "licenca": "",
+    "localPath": "datasets/titanic_data/titanicdatasample",
+    "orgaoEmissao": "my",
+    "tags": "",
+    "tituloCurto": "titanicdatasample",
+    "tituloLongo": "Exemplo dados titanic",
+    "urls": ""
   }
 ]
