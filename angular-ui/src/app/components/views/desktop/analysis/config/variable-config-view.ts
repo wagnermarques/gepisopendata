@@ -445,10 +445,6 @@ export class VariableConfigView implements OnInit {
   isAllSelected() { return this.columns().length > 0 && this.columns().every(c => c.included); }
 
   toggleAll() {
-    if (!this.selectedDictionary && this.columns().length > 0) {
-      this.snackBar.open('Por favor, selecione primeiro um Dicionário de Dados.', 'OK', { duration: 5000 });
-      return;
-    }
     const target = !this.isAllSelected();
     console.log(`[VariableConfig] Toggling ALL variables to included: ${target}`);
     this.columns.update(cols => cols.map(c => {
@@ -462,10 +458,6 @@ export class VariableConfigView implements OnInit {
   }
 
   toggleRow(row: ColumnInfo) {
-    if (!this.selectedDictionary && !row.included) {
-      this.snackBar.open('Por favor, selecione primeiro um Dicionário de Dados.', 'OK', { duration: 5000 });
-      return;
-    }
     this.columns.update(cols => cols.map(c => {
       if (c.name === row.name) {
         const included = !c.included;

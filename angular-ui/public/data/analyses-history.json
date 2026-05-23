@@ -364,5 +364,104 @@
         "type": "Num"
       }
     ]
+  },
+  {
+    "dictionary": null,
+    "files": [
+      "titanic.csv"
+    ],
+    "groupName": "Titanic Data",
+    "id": "1847900e-fa26-4a49-95c0-5cd9e89ad576",
+    "name": "Titanic_Alives_Study",
+    "publishedArtifacts": [
+      {
+        "createdAt": "2026-05-23T23:07:53.097Z",
+        "data": {
+          "x": [
+            "no",
+            "yes"
+          ],
+          "y": [
+            549,
+            342
+          ]
+        },
+        "id": "e4b6cbef-2967-4560-84e5-2bca6283397b",
+        "label": "Qtde Sobreviventes",
+        "params": {
+          "categoryVar": "alive",
+          "metric": "count",
+          "statisticalType": "qualitativa_nominal",
+          "valueVar": null
+        },
+        "type": "barchart",
+        "xLabelMap": {
+          "no": "Não",
+          "yes": "Sim"
+        },
+        "xTitle": "alive",
+        "yPrefix": "",
+        "ySuffix": "",
+        "yTitle": "Num Sobreviventes"
+      }
+    ],
+    "updatedAt": "2026-05-23T23:09:22.758636094+00:00",
+    "variables": [
+      {
+        "name": "class",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "age",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Número"
+      },
+      {
+        "name": "embark_town",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "alone",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "survived",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Número"
+      },
+      {
+        "name": "sibsp",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Número"
+      },
+      {
+        "name": "fare",
+        "statisticalType": "quantitativa_continua",
+        "type": "Número"
+      },
+      {
+        "name": "parch",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Número"
+      },
+      {
+        "name": "alive",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "sex",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "embarked",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      }
+    ]
   }
 ]
