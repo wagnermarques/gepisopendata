@@ -391,6 +391,7 @@
         "params": {
           "categoryVar": "alive",
           "metric": "count",
+          "showBarValues": true,
           "statisticalType": "qualitativa_nominal",
           "valueVar": null
         },
@@ -405,7 +406,7 @@
         "yTitle": "Num Sobreviventes"
       }
     ],
-    "updatedAt": "2026-05-23T23:09:22.758636094+00:00",
+    "updatedAt": "2026-05-23T23:27:39.217150675+00:00",
     "variables": [
       {
         "name": "class",
