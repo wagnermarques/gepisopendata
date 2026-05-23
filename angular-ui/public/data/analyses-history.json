@@ -189,5 +189,180 @@
         "type": "Num"
       }
     ]
+  },
+  {
+    "dictionary": "dicionário_dados_educação_básica.xlsx",
+    "files": [
+      "microdados_ed_basica_2024.csv",
+      "microdados_ed_basica_2023.csv",
+      "microdados_ed_basica_2022.csv",
+      "microdados_ed_basica_2021.csv"
+    ],
+    "groupName": "Censo Escolar INEP",
+    "id": "14524b94-3f79-4213-94e5-20eba7488f6b",
+    "name": "Evolução Matrículas Ed Esp",
+    "publishedArtifacts": [
+      {
+        "createdAt": "2026-05-23T03:34:35.332Z",
+        "data": {
+          "x": [
+            "2022",
+            "2024",
+            "2023",
+            "2021"
+          ],
+          "y": [
+            178346,
+            179286,
+            178476,
+            221140
+          ]
+        },
+        "id": "4d2427c2-f317-4a8a-bdd2-6b45914e699b",
+        "label": "Num Registros In_ESP_CC",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "count",
+          "statisticalType": "qualitativa_ordinal",
+          "valueVar": "IN_ESP_CC"
+        },
+        "type": "barchart"
+      },
+      {
+        "createdAt": "2026-05-23T03:35:34.285Z",
+        "data": {
+          "x": [
+            "2022",
+            "2024",
+            "2023",
+            "2021"
+          ],
+          "y": [
+            224649,
+            215545,
+            217625,
+            221140
+          ]
+        },
+        "id": "51c930ab-e286-4754-a1f3-726135ec700d",
+        "label": "Num Registros NU_ANO_CENSO por NU_ANO_CENSO",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "count",
+          "statisticalType": "qualitativa_ordinal",
+          "valueVar": null
+        },
+        "type": "barchart"
+      },
+      {
+        "createdAt": "2026-05-23T03:36:16.424Z",
+        "data": {
+          "x": [
+            "2022",
+            "2021",
+            "2024",
+            "2023"
+          ],
+          "y": [
+            178346,
+            221140,
+            179286,
+            178476
+          ]
+        },
+        "id": "464d21c8-d45a-4d51-99a4-3b7885c0643c",
+        "label": "Num Registros IN_ESP_CE por Ano Censo",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "count",
+          "statisticalType": "qualitativa_ordinal",
+          "valueVar": "IN_ESP_CE"
+        },
+        "type": "barchart"
+      },
+      {
+        "createdAt": "2026-05-23T03:37:00.841Z",
+        "data": {
+          "x": [
+            "2022",
+            "2021",
+            "2024",
+            "2023"
+          ],
+          "y": [
+            178346,
+            221140,
+            179286,
+            178476
+          ]
+        },
+        "id": "be9f7737-79f6-4a7e-b25e-d29401ddb572",
+        "label": "Num registros QT_MAT_ESP por Ano Censo",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "count",
+          "statisticalType": "qualitativa_ordinal",
+          "valueVar": "QT_MAT_ESP_CC"
+        },
+        "type": "barchart"
+      }
+    ],
+    "updatedAt": "2026-05-23T03:37:00.846715123+00:00",
+    "variables": [
+      {
+        "description": "Número de Docentes da Educação Especial Exclusiva",
+        "name": "QT_DOC_ESP_CE",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Ano do Censo",
+        "name": "NU_ANO_CENSO",
+        "statisticalType": "qualitativa_ordinal",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Turmas de Educação Especial Inclusiva",
+        "name": "QT_TUR_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Educação Especial Exclusiva - Escola exclusivamente especializada e/ou que possui classe especial exclusiva para o atendimento de alunos com deficiência, transtorno global do desenvolvimento ou altas habilidades/superdotação (Possui uma ou mais matrículas)",
+        "name": "IN_ESP_CE",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Turmas de Educação Especial Exclusiva",
+        "name": "QT_TUR_ESP_CE",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Docentes da Educação Especial Inclusiva",
+        "name": "QT_DOC_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Educação Especial Inclusiva (em Classes Comuns) - Escola possui um ou mais alunos com deficiência, transtorno global do desenvolvimento ou altas habilidades/superdotação estudando em classes comuns do Ensino Regular e/ou Educação de Jovens e Adultos (Possui uma ou mais matrículas)",
+        "name": "IN_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Matrículas da Educação Especial Inclusiva",
+        "name": "QT_MAT_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Matrículas da Educação Especial Exclusiva",
+        "name": "QT_MAT_ESP_CE",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      }
+    ]
   }
 ]

@@ -478,7 +478,7 @@ async fn get_excel_files(app_handle: tauri::AppHandle, group_name: String) -> Re
         
     if group_items.is_empty() { return Err("Grupo não encontrado".into()); }
 
-    let mut excel_files = Vec::new();
+    let mut excel_files = std::collections::HashSet::new();
 
     let base_downloads_path = get_base_downloads_path(&app_handle)?;
 
@@ -501,11 +501,16 @@ async fn get_excel_files(app_handle: tauri::AppHandle, group_name: String) -> Re
         
         for file_path in item_files {
             let rel_path = file_path.strip_prefix(&local_path).unwrap_or(&file_path).to_string_lossy().into_owned();
-            excel_files.push(rel_path);
+            // Filter out Excel temporary files
+            if !rel_path.starts_with("~$") {
+                excel_files.insert(rel_path);
+            }
         }
     }
 
-    Ok(excel_files)
+    let mut result: Vec<String> = excel_files.into_iter().collect();
+    result.sort();
+    Ok(result)
 }
 
 #[tauri::command]

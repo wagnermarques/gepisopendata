@@ -118,7 +118,7 @@ interface DictionaryEntry {
                 <mat-label>Arquivo de Dicionário</mat-label>
                 <mat-select [(ngModel)]="selectedDictionary" (selectionChange)="onDictionaryChange()">
                   <mat-option [value]="null">Nenhum</mat-option>
-                  @for (dict of excelFiles(); track dict) {
+                  @for (dict of excelFiles(); track $index) {
                     <mat-option [value]="dict">{{ dict }}</mat-option>
                   }
                 </mat-select>
@@ -297,6 +297,17 @@ export class VariableConfigView implements OnInit {
   
   displayedColumns = ['select', 'name', 'type', 'statisticalType'];
 
+  private getDefaultStatisticalType(primitiveType: string): string {
+    const type = (primitiveType || '').toLowerCase();
+    // Broaden the check to include 'num' and other numeric indicators
+    if (type.includes('número') || type.includes('numero') || type.includes('num') || 
+        type.includes('decimal') || type.includes('inteiro') || type.includes('float') || 
+        type.includes('int') || type.includes('double')) {
+      return 'quantitativa_discreta';
+    }
+    return 'qualitativa_nominal';
+  }
+
   ngOnInit() {
     this.initialLoad();
     this.loadExcelFiles();
@@ -315,7 +326,7 @@ export class VariableConfigView implements OnInit {
       this.columns.set(result.common_columns.map((c: any) => ({ 
         ...c, 
         included: false,
-        statisticalType: c.type === 'Número' ? 'quantitativa_discreta' : 'qualitativa_nominal'
+        statisticalType: this.getDefaultStatisticalType(c.type)
       })));
     } catch (err) {
       console.error('Falha ao carregar grupo:', err);
@@ -365,10 +376,14 @@ export class VariableConfigView implements OnInit {
       const entry = this.dictionaryEntries.find(e => 
         e.name.toLowerCase().trim() === col.name.toLowerCase().trim()
       );
+      const newType = entry ? entry.var_type : col.type;
       return {
         ...col,
         description: entry ? entry.description : col.description,
-        type: entry ? entry.var_type : col.type
+        type: newType,
+        statisticalType: (entry && col.statisticalType === 'qualitativa_nominal') 
+          ? this.getDefaultStatisticalType(newType)
+          : col.statisticalType
       };
     }));
   }
@@ -396,12 +411,13 @@ export class VariableConfigView implements OnInit {
           e.name.toLowerCase().trim() === c.name.toLowerCase().trim()
         );
 
+        const newType = dictEntry ? dictEntry.var_type : c.type;
         return {
           ...c,
           included: prev?.included ?? false,
           description: dictEntry ? dictEntry.description : prev?.description,
-          type: dictEntry ? dictEntry.var_type : c.type,
-          statisticalType: prev?.statisticalType || (c.type === 'Número' ? 'quantitativa_discreta' : 'qualitativa_nominal')
+          type: newType,
+          statisticalType: prev?.statisticalType || this.getDefaultStatisticalType(newType)
         };
       });
 
@@ -434,7 +450,15 @@ export class VariableConfigView implements OnInit {
       return;
     }
     const target = !this.isAllSelected();
-    this.columns.update(cols => cols.map(c => ({ ...c, included: target })));
+    console.log(`[VariableConfig] Toggling ALL variables to included: ${target}`);
+    this.columns.update(cols => cols.map(c => {
+      let statType = c.statisticalType;
+      if (target && (!statType || statType === 'qualitativa_nominal')) {
+        statType = this.getDefaultStatisticalType(c.type);
+        console.log(`[VariableConfig] Auto-assigned type for '${c.name}': Primitive='${c.type}' -> Statistical='${statType}'`);
+      }
+      return { ...c, included: target, statisticalType: statType };
+    }));
   }
 
   toggleRow(row: ColumnInfo) {
@@ -442,7 +466,20 @@ export class VariableConfigView implements OnInit {
       this.snackBar.open('Por favor, selecione primeiro um Dicionário de Dados.', 'OK', { duration: 5000 });
       return;
     }
-    this.columns.update(cols => cols.map(c => c.name === row.name ? { ...c, included: !c.included } : c));
+    this.columns.update(cols => cols.map(c => {
+      if (c.name === row.name) {
+        const included = !c.included;
+        let statType = c.statisticalType;
+        if (included && (!statType || statType === 'qualitativa_nominal')) {
+          statType = this.getDefaultStatisticalType(c.type);
+          console.log(`[VariableConfig] Toggled '${c.name}'. Auto-assigned: Primitive='${c.type}' -> Statistical='${statType}'`);
+        } else {
+           console.log(`[VariableConfig] Toggled '${c.name}'. Included: ${included}, Current Statistical Type: '${statType}'`);
+        }
+        return { ...c, included, statisticalType: statType };
+      }
+      return c;
+    }));
   }
 
   selectedCount() { return this.columns().filter(c => c.included).length; }
