@@ -387,7 +387,7 @@
           ]
         },
         "id": "e4b6cbef-2967-4560-84e5-2bca6283397b",
-        "label": "Qtde Sobreviventes",
+        "label": "Qtde Sobreviventes2",
         "params": {
           "categoryVar": "alive",
           "metric": "count",
@@ -418,7 +418,7 @@
           ]
         },
         "id": "181761e0-75f6-45cb-ae08-39eeb8154adc",
-        "label": "Idade media",
+        "label": "Idade media2",
         "params": {
           "categoryVar": "survived",
           "metric": "avg",
@@ -431,13 +431,13 @@
           "0": "Não",
           "1": "Sim"
         },
-        "xTitle": "Sobreviventes",
+        "xTitle": "Idade média de sobreviventes s não sobreviventes",
         "yPrefix": "",
         "ySuffix": "",
-        "yTitle": "Média"
+        "yTitle": "Idade Média"
       }
     ],
-    "updatedAt": "2026-05-24T19:30:21.321364646+00:00",
+    "updatedAt": "2026-05-24T20:18:41.321902216+00:00",
     "variables": [
       {
         "name": "class",
