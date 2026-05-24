@@ -404,9 +404,32 @@
         "yPrefix": "",
         "ySuffix": "",
         "yTitle": "Num Sobreviventes"
+      },
+      {
+        "createdAt": "2026-05-24T14:28:35.919Z",
+        "data": {
+          "x": [
+            "1",
+            "0"
+          ],
+          "y": [
+            28.343689655172415,
+            30.62617924528302
+          ]
+        },
+        "id": "181761e0-75f6-45cb-ae08-39eeb8154adc",
+        "label": "Idade media",
+        "params": {
+          "categoryVar": "survived",
+          "metric": "avg",
+          "showBarValues": true,
+          "statisticalType": "qualitativa_nominal",
+          "valueVar": "age"
+        },
+        "type": "barchart"
       }
     ],
-    "updatedAt": "2026-05-23T23:27:39.217150675+00:00",
+    "updatedAt": "2026-05-24T14:28:35.924108387+00:00",
     "variables": [
       {
         "name": "class",
