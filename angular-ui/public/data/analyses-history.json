@@ -426,10 +426,18 @@
           "statisticalType": "qualitativa_nominal",
           "valueVar": "age"
         },
-        "type": "barchart"
+        "type": "barchart",
+        "xLabelMap": {
+          "0": "Não",
+          "1": "Sim"
+        },
+        "xTitle": "Sobreviventes",
+        "yPrefix": "",
+        "ySuffix": "",
+        "yTitle": "Média"
       }
     ],
-    "updatedAt": "2026-05-24T14:28:35.924108387+00:00",
+    "updatedAt": "2026-05-24T19:30:21.321364646+00:00",
     "variables": [
       {
         "name": "class",
