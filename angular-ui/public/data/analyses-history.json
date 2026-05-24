@@ -102,1971 +102,6 @@
       "microdados_ed_basica_2021.csv"
     ],
     "groupName": "Censo Escolar INEP",
-    "id": "7258500f-2e70-4ccb-a729-21715f2d51d9",
-    "name": "Matr Esp por Ano do Censo",
-    "updatedAt": "2026-05-22T17:50:11.927085877+00:00",
-    "variables": [
-      {
-        "description": "Código da Microrregião",
-        "name": "CO_MICRORREGIAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola - Auxiliares de secretaria ou auxiliares administrativos, atendentes",
-        "name": "QT_PROF_ADMINISTRATIVOS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes do Ensino Fundamental - Anos Iniciais",
-        "name": "QT_DOC_FUND_AI",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes da Educação Infantil - Creche",
-        "name": "QT_DOC_INF_CRE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Término (previsão) do ano letivo",
-        "name": "DT_ANO_LETIVO_TERMINO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Data"
-      },
-      {
-        "description": "Número de Docentes da Educação de Jovens e Adultos (EJA)",
-        "name": "QT_DOC_EJA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Quadra de esportes descoberta",
-        "name": "IN_QUADRA_ESPORTES_DESCOBERTA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Feminino",
-        "name": "QT_MAT_BAS_FEM",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Instrumentos e materiais socioculturais e/ou pedagógicos em uso na escola para o desenvolvimento de atividades de ensino e aprendizagem - Instrumentos musicais para conjunto, banda/fanfarra e/ou aulas de música",
-        "name": "IN_MATERIAL_PED_MUSICAL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Sala/ateliê de artes",
-        "name": "IN_SALA_ATELIE_ARTES",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Turno - Diurno - Maior parte das atividades da turma são realizadas no período entre 6h e 17:59h",
-        "name": "IN_DIURNO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Fornece água potável para o consumo humano",
-        "name": "IN_AGUA_POTAVEL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes da Educação Especial",
-        "name": "QT_DOC_ESP",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Instrumentos e materiais socioculturais e/ou pedagógicos em uso na escola para o desenvolvimento de atividades de ensino e aprendizagem - Acervo multimídia",
-        "name": "IN_MATERIAL_PED_MULTIMIDIA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Laboratório de ciências",
-        "name": "IN_LABORATORIO_CIENCIAS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Tratamento do lixo/resíduos que a escola realiza - Reciclagem",
-        "name": "IN_TRATAMENTO_LIXO_RECICLAGEM",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número",
-        "name": "NU_ENDERECO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Número de Matrículas do Ensino Fundamental - Anos Iniciais",
-        "name": "QT_MAT_FUND_AI",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Até 3 anos de idade",
-        "name": "QT_MAT_BAS_0_3",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Situação de funcionamento",
-        "name": "TP_SITUACAO_FUNCIONAMENTO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de Aparelhos de som",
-        "name": "QT_EQUIP_SOM",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Com 18 ou mais anos de idade",
-        "name": "QT_MAT_BAS_18_MAIS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação de Jovens e Adultos (EJA) - Ensino Médio",
-        "name": "QT_MAT_EJA_MED",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Local de funcionamento da escola - Unidade de Atendimento socioeducativo",
-        "name": "IN_LOCAL_FUNC_SOCIOEDUCATIVO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Local de funcionamento da escola - Salas em outra escola",
-        "name": "IN_LOCAL_FUNC_SALAS_OUTRA_ESC",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Esgoto sanitário - Fossa",
-        "name": "IN_ESGOTO_FOSSA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Cor/Raça Amarela",
-        "name": "QT_MAT_BAS_AMARELA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Acesso à Internet - Para uso administrativo",
-        "name": "IN_INTERNET_ADMINISTRATIVO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número do CNPJ da escola privada",
-        "name": "NU_CNPJ_ESCOLA_PRIVADA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Recursos de acessibilidade para pessoas com deficiência ou mobilidade reduzida nas vias de circulação interna na escola - Elevador",
-        "name": "IN_ACESSIBILIDADE_ELEVADOR",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Cozinha",
-        "name": "IN_COZINHA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação de Jovens e Adultos (EJA)",
-        "name": "QT_MAT_EJA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Instrumentos e materiais socioculturais e/ou pedagógicos em uso na escola para o desenvolvimento de atividades de ensino e aprendizagem - Equipamento para amplificação e difusão de som/áudio",
-        "name": "IN_MATERIAL_PED_DIFUSAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Divisão Intramunicipal - Código do Distrito",
-        "name": "CO_DISTRITO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Quadra de esportes coberta ou descoberta",
-        "name": "IN_QUADRA_ESPORTES",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Educação de Jovens e Adultos (EJA) - Ensino Fundamental",
-        "name": "QT_TUR_EJA_FUND",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Condições das salas de aula utilizadas na escola (dentro e fora do prédio escolar) - Número de salas de aula climatizadas",
-        "name": "QT_SALAS_UTILIZA_CLIMATIZADAS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Coordenador(a) de turno/disciplina",
-        "name": "IN_PROF_COORDENADOR",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Início do ano letivo",
-        "name": "DT_ANO_LETIVO_INICIO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Data"
-      },
-      {
-        "description": "Número de Turmas de Educação Especial Exclusiva",
-        "name": "QT_TUR_ESP_CE",
-        "statisticalType": "quantitativa_discreta",
-        "type": "Num"
-      },
-      {
-        "description": "Recursos de acessibilidade para pessoas com deficiência ou mobilidade reduzida nas vias de circulação interna na escola - Rampas",
-        "name": "IN_ACESSIBILIDADE_RAMPAS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Especial Exclusiva",
-        "name": "QT_MAT_ESP_CE",
-        "statisticalType": "quantitativa_discreta",
-        "type": "Num"
-      },
-      {
-        "description": "Mantenedora da escola privada - Organização da Sociedade Civil de Interesse Público (Oscip)",
-        "name": "IN_MANT_ESCOLA_PRIVADA_OSCIP",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Piscina",
-        "name": "IN_PISCINA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Refeitório",
-        "name": "IN_REFEITORIO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Educação Especial Inclusiva",
-        "name": "QT_TUR_ESP_CC",
-        "statisticalType": "quantitativa_discreta",
-        "type": "Num"
-      },
-      {
-        "description": "Escola Indígena - Língua em que o ensino é ministrado (apenas para escola indígena) - Língua Indígena - Código da língua Indígena 1",
-        "name": "CO_LINGUA_INDIGENA_1",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Nutricionista",
-        "name": "IN_PROF_NUTRICIONISTA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes da Educação Especial Inclusiva",
-        "name": "QT_DOC_ESP_CC",
-        "statisticalType": "quantitativa_discreta",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Sala de Secretaria",
-        "name": "IN_SECRETARIA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes da Educação de Jovens e Adultos (EJA) - Ensino Fundamental",
-        "name": "QT_DOC_EJA_FUND",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Profissionais de preparação e segurança alimentar, cozinheiro(a), merendeiro(a) e auxiliar de cozinha",
-        "name": "IN_PROF_ALIMENTACAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Código da Escola",
-        "name": "CO_ENTIDADE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Abastecimento de energia elétrica - Gerador movido a combustível fóssil",
-        "name": "IN_ENERGIA_GERADOR_FOSSIL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Área de vegetação ou gramado",
-        "name": "IN_AREA_VERDE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "",
-        "name": "QT_MAT_PROF_TEC",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Reserva de vagas por sistema de cotas para grupos específicos de alunos - Condição de Renda",
-        "name": "IN_RESERVA_RENDA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola - Nutricionista",
-        "name": "QT_PROF_NUTRICIONISTA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Ensino Médio",
-        "name": "QT_TUR_MED",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Código do Município",
-        "name": "CO_MUNICIPIO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Localização",
-        "name": "TP_LOCALIZACAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Educação Infantil - Creche",
-        "name": "QT_TUR_INF_CRE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Acesso à Internet - Para uso nos processos de ensino e aprendizagem",
-        "name": "IN_INTERNET_APRENDIZAGEM",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependência Administrativa",
-        "name": "TP_DEPENDENCIA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Bombeiro(a) brigadista, profissionais de assistência à saúde (urgência e emergência), Enfermeiro(a), Técnico(a) de enfermagem e socorrista",
-        "name": "IN_PROF_SAUDE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Equipamentos existentes na escola para uso técnico e administrativo - Antena parabólica",
-        "name": "IN_EQUIP_PARABOLICA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Turno Diurno",
-        "name": "QT_MAT_BAS_D",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Banheiro acessível, adequado ao uso de pessoas com deficiência ou mobilidade reduzida",
-        "name": "IN_BANHEIRO_PNE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Código da Mesorregião",
-        "name": "CO_MESORREGIAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Instrumentos e materiais socioculturais e/ou pedagógicos em uso na escola para o desenvolvimento de atividades de ensino e aprendizagem - Brinquedos para Educação Infantil",
-        "name": "IN_MATERIAL_PED_INFANTIL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Recursos de acessibilidade para pessoas com deficiência ou mobilidade reduzida nas vias de circulação interna na escola - Sinalização tátil (piso/paredes)",
-        "name": "IN_ACESSIBILIDADE_SINAL_TATIL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Reserva de vagas por sistema de cotas para grupos específicos de alunos - Sem reservas de vagas para sistema de cotas (ampla concorrência)",
-        "name": "IN_RESERVA_NENHUMA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Destinação do lixo - Queima",
-        "name": "IN_LIXO_QUEIMA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Tratamento do lixo/resíduos que a escola realiza - Reaproveitamento/reutilização",
-        "name": "IN_TRATAMENTO_LIXO_REUTILIZA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Mediação didático-pedagógica oferecida pela escola - Semipresencial",
-        "name": "IN_MEDIACAO_SEMIPRESENCIAL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Educação Profissional Técnica - Modo profissionalizante de ensino correspondente às turmas de cursos técnicos de nível médio nas formas articuladas (integrada ou concomitante), ou subsequente ao ensino médio e de normal/magistério (Possui uma ou mais matrículas)",
-        "name": "IN_PROF_TEC",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Código da Região Geográfica",
-        "name": "CO_REGIAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Órgãos colegiados em funcionamento na escola - Outros",
-        "name": "IN_ORGAO_OUTROS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Equipamentos existentes na escola para uso técnico e administrativo - Copiadora",
-        "name": "IN_EQUIP_COPIADORA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Forma de ocupação do Prédio escolar",
-        "name": "TP_OCUPACAO_PREDIO_ESCOLAR",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes da Educação de Jovens e Adultos (EJA) - Ensino Médio",
-        "name": "QT_DOC_EJA_MED",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Educação Especial",
-        "name": "QT_TUR_ESP",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Infantil - Creche",
-        "name": "QT_MAT_INF_CRE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Educação de Jovens e Adultos (EJA)",
-        "name": "QT_TUR_EJA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de Lousas digitais",
-        "name": "QT_EQUIP_LOUSA_DIGITAL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Equipamentos que os alunos usam para acessar a internet da escola - Dispositivos pessoais (computadores portáteis, celulares, tablets etc.)",
-        "name": "IN_ACES_INTERNET_DISP_PESSOAIS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Abastecimento de energia elétrica - Rede pública",
-        "name": "IN_ENERGIA_REDE_PUBLICA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Etapa de Ensino - Educação Infantil (Possui uma ou mais matrículas)",
-        "name": "IN_INF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de Projetores Multimídia (Datashow)",
-        "name": "QT_EQUIP_MULTIMIDIA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Destinação do lixo - Descarta em outra área",
-        "name": "IN_LIXO_DESCARTA_OUTRA_AREA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Almoxarifado",
-        "name": "IN_ALMOXARIFADO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Tratamento do lixo/resíduos que a escola realiza - Não faz tratamento",
-        "name": "IN_TRATAMENTO_LIXO_INEXISTENTE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de salas de aula utilizadas na escola (dentro e fora do prédio)",
-        "name": "QT_SALAS_UTILIZADAS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Educação de Jovens e Adultos (EJA) - Ensino Fundamental  (Possui uma ou mais matrículas)",
-        "name": "IN_EJA_FUND",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Escola Indígena - Língua em que o ensino é ministrado (apenas para escola indígena) - Língua Indígena - Código da língua Indígena 3",
-        "name": "CO_LINGUA_INDIGENA_3",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Sala/estúdio de dança",
-        "name": "IN_SALA_ESTUDIO_DANCA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Acesso à Internet",
-        "name": "IN_INTERNET",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação de Jovens e Adultos (EJA) - Ensino Fundamental",
-        "name": "QT_MAT_EJA_FUND",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Ensino Fundamental",
-        "name": "QT_TUR_FUND",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Bibliotecário(a), auxiliar de biblioteca ou monitor(a) da sala de leitura",
-        "name": "IN_PROF_BIBLIOTECARIO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Instrumentos e materiais socioculturais e/ou pedagógicos em uso na escola para o desenvolvimento de atividades de ensino e aprendizagem - Materiais para prática desportiva e recreação",
-        "name": "IN_MATERIAL_PED_DESPORTIVA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Forma de ocupação do Galpão/Rancho/Paiol/Barracão",
-        "name": "TP_OCUPACAO_GALPAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "O projeto político pedagógico ou a proposta pedagógica da escola (conforme art. 12 da LDB) foi atualizado nos últimos 12 meses até a data de referência",
-        "name": "TP_PROPOSTA_PEDAGOGICA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Prédio compartilhado com outra escola",
-        "name": "IN_PREDIO_COMPARTILHADO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Pátio coberto",
-        "name": "IN_PATIO_COBERTO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Tratamento do lixo/resíduos que a escola realiza - Separação do lixo/resíduos",
-        "name": "IN_TRATAMENTO_LIXO_SEPARACAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Sigla da Unidade da Federação",
-        "name": "SG_UF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Instrumentos e materiais socioculturais e/ou pedagógicos em uso na escola para o desenvolvimento de atividades de ensino e aprendizagem - Nenhum",
-        "name": "IN_MATERIAL_PED_NENHUM",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "A escola compartilha espaços para atividades de integração escola-comunidade",
-        "name": "IN_ESPACO_ATIVIDADE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Sala de repouso para aluno(a)",
-        "name": "IN_SALA_REPOUSO_ALUNO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Cor/Raça Branca",
-        "name": "QT_MAT_BAS_BRANCA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Nenhum dos equipamentos listados para uso técnico e administrativo - Antena parabólica, Computador, Copiadora, Impressora, Impressora Multifuncional ou Scanner",
-        "name": "IN_EQUIP_NENHUM",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola - Técnicos(as), monitores(as), supervisores(as) ou auxiliares de laboratório(s), de apoio a tecnologias educacionais ou em multimeios/multimídias eletrônico/digitais",
-        "name": "QT_PROF_MONITORES",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes da Educação Infantil",
-        "name": "QT_DOC_INF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Computadores em uso pelos alunos - Tablet",
-        "name": "IN_TABLET_ALUNO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de Aparelhos de DVD/Blu-ray",
-        "name": "QT_EQUIP_DVD",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Equipamentos existentes na escola para o processo ensino e aprendizagem - Aparelho de som",
-        "name": "IN_EQUIP_SOM",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Mediação didático-pedagógica oferecida pela escola - Educação a Distância - EAD",
-        "name": "IN_MEDIACAO_EAD",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Bairro",
-        "name": "NO_BAIRRO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Banheiro adequado à educação infantil",
-        "name": "IN_BANHEIRO_EI",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Alimentação escolar para os alunos - PNAE/FNDE",
-        "name": "IN_ALIMENTACAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Destinação do lixo - Enterra",
-        "name": "IN_LIXO_ENTERRA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Educação de Jovens e Adultos (EJA) - Ensino Médio",
-        "name": "QT_TUR_EJA_MED",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes do Ensino Fundamental",
-        "name": "QT_DOC_FUND",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola - Coordenador(a) de turno/disciplina",
-        "name": "QT_PROF_COORDENADOR",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Recursos de acessibilidade para pessoas com deficiência ou mobilidade reduzida nas vias de circulação interna na escola - Corrimão e guarda corpos",
-        "name": "IN_ACESSIBILIDADE_CORRIMAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Mediação didático-pedagógica oferecida pela escola - Presencial",
-        "name": "IN_MEDIACAO_PRESENCIAL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Infantil - Tempo Integral",
-        "name": "QT_MAT_INF_INT",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Nome do Município",
-        "name": "NO_MUNICIPIO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Educação Profissional - Modo profissionalizante de ensino correspondente às turmas de cursos de formação inicial e continuada ou de qualificação profissional (Cursos FIC) articulados à EJA ou concomitantes; ou de cursos técnicos de nível médio nas formas articulada (integrada ou concomitante) ou subsequente ao ensino médio e de normal/magistério (Possui uma ou mais matrículas)",
-        "name": "IN_PROF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Auxiliar de serviços gerais, porteiro(a), zelador(a), faxineiro(a), jardineiro(a)",
-        "name": "IN_PROF_SERVICOS_GERAIS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências existentes na escola - Nenhuma das dependências relacionadas",
-        "name": "IN_DEPENDENCIAS_OUTRAS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Entre 6 e 10 anos de idade",
-        "name": "QT_MAT_BAS_6_10",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Abastecimento de energia elétrica - Não há energia elétrica",
-        "name": "IN_ENERGIA_INEXISTENTE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Reserva de vagas por sistema de cotas para grupos específicos de alunos - Oriundo de escola pública",
-        "name": "IN_RESERVA_PUBLICA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Especial",
-        "name": "QT_MAT_ESP",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas do Ensino Fundamental",
-        "name": "QT_MAT_FUND",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Mantenedora da escola privada - Sistema S (Sesi, Senai, Sesc, outros)",
-        "name": "IN_MANT_ESCOLA_PRIVADA_SIST_S",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Infantil - Pré-Escola - Tempo Integral",
-        "name": "QT_MAT_INF_PRE_INT",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Acesso à Internet - Para uso da comunidade",
-        "name": "IN_INTERNET_COMUNIDADE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola - Psicólogo(a) Escolar",
-        "name": "QT_PROF_PSICOLOGO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Total de profissionais que atuam na escola - Auxiliar de serviços gerais, porteiro(a), zelador(a), faxineiro(a), jardineiro(a)",
-        "name": "QT_PROF_SERVICOS_GERAIS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes do Ensino Médio",
-        "name": "QT_DOC_MED",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Órgão ao qual a escola pública está vinculada - Secretaria de Saúde/Ministério da Saúde",
-        "name": "IN_VINCULO_SECRETARIA_SAUDE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Destinação do lixo - Leva a uma destinação final financiada pelo poder público",
-        "name": "IN_LIXO_DESTINO_FINAL_PUBLICO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Esgoto sanitário - Rede pública",
-        "name": "IN_ESGOTO_REDE_PUBLICA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Equipamentos existentes na escola para uso técnico e administrativo - Impressora",
-        "name": "IN_EQUIP_IMPRESSORA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Ensino Fundamental - Anos Finais",
-        "name": "QT_TUR_FUND_AF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes da Educação Profissional Técnica",
-        "name": "QT_DOC_PROF_TEC",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Código da escola sede",
-        "name": "CO_ESCOLA_SEDE_VINCULADA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Fonoaudiólogo(a)",
-        "name": "IN_PROF_FONAUDIOLOGO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Local de funcionamento da escola - Prédio Escolar",
-        "name": "IN_LOCAL_FUNC_PREDIO_ESCOLAR",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Instrumentos e materiais socioculturais e/ou pedagógicos em uso na escola para o desenvolvimento de atividades de ensino e aprendizagem - Jogos Educativos",
-        "name": "IN_MATERIAL_PED_JOGOS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Orientador(a) comunitário(a) ou assistente social",
-        "name": "IN_PROF_ASSIST_SOCIAL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Cor/Raça Preta",
-        "name": "QT_MAT_BAS_PRETA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Especial Inclusiva",
-        "name": "QT_MAT_ESP_CC",
-        "statisticalType": "quantitativa_discreta",
-        "type": "Num"
-      },
-      {
-        "description": "Complemento",
-        "name": "DS_COMPLEMENTO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola - Orientador(a) comunitário(a) ou assistente social",
-        "name": "QT_PROF_ASSIST_SOCIAL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas do Ensino Fundamental - Anos Finais",
-        "name": "QT_MAT_FUND_AF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Educação Profissional",
-        "name": "QT_TUR_PROF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Equipamentos existentes na escola para uso técnico e administrativo - Computador",
-        "name": "IN_COMPUTADOR",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Equipamentos existentes na escola para o processo ensino e aprendizagem - Aparelho de televisão",
-        "name": "IN_EQUIP_TV",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Educação Especial Inclusiva (em Classes Comuns) - Escola possui um ou mais alunos com deficiência, transtorno global do desenvolvimento ou altas habilidades/superdotação estudando em classes comuns do Ensino Regular e/ou Educação de Jovens e Adultos (Possui uma ou mais matrículas)",
-        "name": "IN_ESP_CC",
-        "statisticalType": "quantitativa_discreta",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Auditório",
-        "name": "IN_AUDITORIO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Órgãos colegiados em funcionamento na escola - Associação de Pais",
-        "name": "IN_ORGAO_ASS_PAIS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de salas de aula utilizadas na escola - Fora do prédio",
-        "name": "QT_SALAS_UTILIZADAS_FORA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Entre 4 e 5 anos de idade",
-        "name": "QT_MAT_BAS_4_5",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Sala de leitura",
-        "name": "IN_SALA_LEITURA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Turno não aplicável para turmas semipresenciais ou de Educação a Distância (EAD)",
-        "name": "IN_EAD",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Banheiro ou vestiário com chuveiro",
-        "name": "IN_BANHEIRO_CHUVEIRO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Computadores em uso pelos alunos - Computador portátil",
-        "name": "IN_COMP_PORTATIL_ALUNO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Despensa",
-        "name": "IN_DESPENSA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola - Fonoaudiólogo(a)",
-        "name": "QT_PROF_FONAUDIOLOGO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Mantenedora da escola privada - Sindicatos de trabalhadores ou patronais, associações e cooperativas",
-        "name": "IN_MANT_ESCOLA_PRIVADA_SIND",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Mantenedora da escola privada - Empresa ou grupo empresarial do setor privado ou pessoa física",
-        "name": "IN_MANT_ESCOLA_PRIVADA_EMP",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Etapa de Ensino - Ensino Médio (Possui uma ou mais matrículas)",
-        "name": "IN_MED",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Etapa de Ensino - Ensino Fundamental (Possui uma ou mais matrículas)",
-        "name": "IN_FUND",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Cor/Raça Parda",
-        "name": "QT_MAT_BAS_PARDA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Recursos de acessibilidade para pessoas com deficiência ou mobilidade reduzida nas vias de circulação interna na escola - Pisos táteis",
-        "name": "IN_ACESSIBILIDADE_PISOS_TATEIS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Equipamentos existentes na escola para uso técnico e administrativo - Impressora Multifuncional",
-        "name": "IN_EQUIP_IMPRESSORA_MULT",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Dormitório de aluno(a)",
-        "name": "IN_DORMITORIO_ALUNO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Dormitório de professor(a)",
-        "name": "IN_DORMITORIO_PROFESSOR",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Mantenedora da escola privada - Organização Não Governamental (ONG) - internacional ou nacional",
-        "name": "IN_MANT_ESCOLA_PRIVADA_ONG",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Abastecimento de água - Não há abastecimento de água",
-        "name": "IN_AGUA_INEXISTENTE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Nome da Unidade da Federação",
-        "name": "NO_UF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Auxiliares de secretaria ou auxiliares administrativos, atendentes",
-        "name": "IN_PROF_ADMINISTRATIVOS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Esgoto sanitário - Fossa Séptica",
-        "name": "IN_ESGOTO_FOSSA_SEPTICA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Recursos de acessibilidade para pessoas com deficiência ou mobilidade reduzida nas vias de circulação interna na escola - Portas com vão livre de, no mínimo, 80 cm",
-        "name": "IN_ACESSIBILIDADE_VAO_LIVRE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Etapa de Ensino - Educação Infantil - Creche (Possui uma ou mais matrículas)",
-        "name": "IN_INF_CRE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola - Secretário(a) escolar",
-        "name": "QT_PROF_SECRETARIO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Equipamentos existentes na escola para uso técnico e administrativo - Scanner",
-        "name": "IN_EQUIP_SCANNER",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica",
-        "name": "QT_MAT_BAS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Educação Especial Exclusiva - Escola exclusivamente especializada e/ou que possui classe especial exclusiva para o atendimento de alunos com deficiência, transtorno global do desenvolvimento ou altas habilidades/superdotação (Possui uma ou mais matrículas)",
-        "name": "IN_ESP_CE",
-        "statisticalType": "quantitativa_discreta",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Quadra de esportes coberta",
-        "name": "IN_QUADRA_ESPORTES_COBERTA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Etapa de Ensino - Ensino Fundamental - Anos Iniciais (Possui uma ou mais matrículas)",
-        "name": "IN_FUND_AI",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Órgão ao qual a escola pública está vinculada - Secretaria de Segurança Pública/Forças Armadas/Militar",
-        "name": "IN_VINCULO_SEGURANCA_PUBLICA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Secretário(a) escolar",
-        "name": "IN_PROF_SECRETARIO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Entre 11 e 14 anos de idade",
-        "name": "QT_MAT_BAS_11_14",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Local de funcionamento da escola - Outros",
-        "name": "IN_LOCAL_FUNC_OUTROS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Código da IES vinculada à escola",
-        "name": "CO_IES_OFERTANTE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Equipamentos existentes na escola para o processo ensino e aprendizagem - Lousa digital",
-        "name": "IN_EQUIP_LOUSA_DIGITAL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Esgoto sanitário - Não há esgotamento sanitário",
-        "name": "IN_ESGOTO_INEXISTENTE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Educação Infantil - Pré-Escola",
-        "name": "QT_TUR_INF_PRE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Sala de Diretoria",
-        "name": "IN_SALA_DIRETORIA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Órgãos colegiados em funcionamento na escola - Não há órgãos colegiados em funcionamento",
-        "name": "IN_ORGAO_NENHUM",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Educação Infantil",
-        "name": "QT_TUR_INF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de computadores em uso pelos alunos - Computador de mesa (desktop)",
-        "name": "QT_DESKTOP_ALUNO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Órgãos colegiados em funcionamento na escola - Associação de Pais e Mestres",
-        "name": "IN_ORGAO_ASS_PAIS_MESTRES",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Escola Indígena - Língua em que o ensino é ministrado (apenas para escola indígena) - Língua Indígena - Código da língua Indígena 2",
-        "name": "CO_LINGUA_INDIGENA_2",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Educação de Jovens e Adultos (EJA) - Modo, maneira ou metodologia de ensino correspondente às turmas destinadas a pessoas que não cursaram o ensino fundamental e/ou médio em idade própria (Possui uma ou mais matrículas)",
-        "name": "IN_EJA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Acesso à Internet - Para uso dos alunos",
-        "name": "IN_INTERNET_ALUNOS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Órgãos colegiados em funcionamento na escola - Conselho Escolar",
-        "name": "IN_ORGAO_CONSELHO_ESCOLAR",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Mantenedora da escola privada - Organização Não Governamental (ONG) - internacional ou nacional.\r\nOrganização da Sociedade Civil de Interesse Público (Oscip)",
-        "name": "IN_MANT_ESCOLA_PRIV_ONG_OSCIP",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Abastecimento de água - Poço artesiano",
-        "name": "IN_AGUA_POCO_ARTESIANO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas do Ensino Fundamental - Anos Finais - Tempo Integral",
-        "name": "QT_MAT_FUND_AF_INT",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Infantil",
-        "name": "QT_MAT_INF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Abastecimento de água - Rede pública",
-        "name": "IN_AGUA_REDE_PUBLICA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola - Bombeiro(a) brigadista, profissionais de assistência à saúde (urgência e emergência), Enfermeiro(a), Técnico(a) de enfermagem e socorrista",
-        "name": "QT_PROF_SAUDE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Condições das salas de aula utilizadas na escola (dentro e fora do prédio escolar) - Número de salas de aula com acessibilidade para pessoas com deficiência ou mobilidade reduzida",
-        "name": "QT_SALAS_UTILIZADAS_ACESSIVEIS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes do Ensino Fundamental - Anos Finais",
-        "name": "QT_DOC_FUND_AF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Educação de Jovens e Adultos (EJA) - Ensino Médio (Possui uma ou mais matrículas)",
-        "name": "IN_EJA_MED",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Infantil - Pré-Escola",
-        "name": "QT_MAT_INF_PRE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Instrumentos e materiais socioculturais e/ou pedagógicos em uso na escola para o desenvolvimento de atividades de ensino e aprendizagem - Conjunto de materiais científicos",
-        "name": "IN_MATERIAL_PED_CIENTIFICO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Mantenedora da escola privada - Instituições sem fins lucrativos",
-        "name": "IN_MANT_ESCOLA_PRIVADA_S_FINS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola - Vice-diretor(a) ou diretor(a) adjunto(a), profissionais responsáveis pela gestão administrativa e/ou financeira",
-        "name": "QT_PROF_GESTAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Nome da Mesorregião",
-        "name": "NO_MESORREGIAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Órgão ao qual a escola pública está vinculada - Secretaria de Educação/Ministério da Educação",
-        "name": "IN_VINCULO_SECRETARIA_EDUCACAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Banheiro exclusivo para os funcionários",
-        "name": "IN_BANHEIRO_FUNCIONARIOS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Internet Banda Larga",
-        "name": "IN_BANDA_LARGA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Instrumentos e materiais socioculturais e/ou pedagógicos em uso na escola para o desenvolvimento de atividades de ensino e aprendizagem - Indígena",
-        "name": "IN_MATERIAL_PED_INDIGENA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Telefone",
-        "name": "NU_TELEFONE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Laboratório de informática",
-        "name": "IN_LABORATORIO_INFORMATICA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Biblioteca",
-        "name": "IN_BIBLIOTECA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Recursos de acessibilidade para pessoas com deficiência ou mobilidade reduzida nas vias de circulação interna na escola - Nenhum dos recursos de acessibilidade listados",
-        "name": "IN_ACESSIBILIDADE_INEXISTENTE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Órgão ao qual a escola pública está vinculada - Outro órgão da administração pública",
-        "name": "IN_VINCULO_OUTRO_ORGAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Turno Noturno",
-        "name": "QT_MAT_BAS_N",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes da Educação Infantil - Pré-Escola",
-        "name": "QT_DOC_INF_PRE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola - Bibliotecário(a), auxiliar de biblioteca ou monitor(a) da sala de leitura",
-        "name": "QT_PROF_BIBLIOTECARIO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Esgoto sanitário - Fossa rudimentar/comum",
-        "name": "IN_ESGOTO_FOSSA_COMUM",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Instrumentos e materiais socioculturais e/ou pedagógicos em uso na escola para o desenvolvimento de atividades de ensino e aprendizagem - Materiais pedagógicos para a educação das relações étnico-raciais",
-        "name": "IN_MATERIAL_PED_ETNICO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Sala de Recursos Multifuncionais para Atendimento Educacional Especializado (AEE)",
-        "name": "IN_SALA_ATENDIMENTO_ESPECIAL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas do Ensino Fundamental - Tempo Integral",
-        "name": "QT_MAT_FUND_INT",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Código do Órgão Regional de Ensino",
-        "name": "CO_ORGAO_REGIONAL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Equipamentos que os alunos usam para acessar a internet da escola - Computadores de mesa, portáteis e tablets da escola (no laboratório de informática, biblioteca, sala de aula etc.)",
-        "name": "IN_ACESSO_INTERNET_COMPUTADOR",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Modo, maneira ou metodologia de ensino correspondente às turmas com etapas de escolarização consecutivas, Creche ao Ensino Médio",
-        "name": "IN_REGULAR",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Recursos de acessibilidade para pessoas com deficiência ou mobilidade reduzida nas vias de circulação interna na escola - Sinalização sonora",
-        "name": "IN_ACESSIBILIDADE_SINAL_SONORO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Educação Básica",
-        "name": "QT_TUR_BAS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes da Educação Profissional",
-        "name": "QT_DOC_PROF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Abastecimento de água - Fonte/Rio/Igarapé/Riacho/Córrego",
-        "name": "IN_AGUA_FONTE_RIO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Técnicos(as), monitores(as), supervisores(as) ou auxiliares de laboratório(s), de apoio a tecnologias educacionais ou em multimeios/multimídias eletrônico/digitais",
-        "name": "IN_PROF_MONITORES",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "DDD",
-        "name": "NU_DDD",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Equipamentos existentes na escola para o processo ensino e aprendizagem - DVD/Blu-ray",
-        "name": "IN_EQUIP_DVD",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Ano do Censo",
-        "name": "NU_ANO_CENSO",
-        "statisticalType": "categorica_temporal_ano",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes da Educação Especial Exclusiva",
-        "name": "QT_DOC_ESP_CE",
-        "statisticalType": "quantitativa_discreta",
-        "type": "Num"
-      },
-      {
-        "description": "Destinação do lixo - Serviço de coleta",
-        "name": "IN_LIXO_SERVICO_COLETA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Pátio descoberto",
-        "name": "IN_PATIO_DESCOBERTO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Nome da Região Geográfica",
-        "name": "NO_REGIAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Local de funcionamento da escola - Unidade Prisional",
-        "name": "IN_LOCAL_FUNC_UNID_PRISIONAL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Atendimento Educacional Especializado (AEE)",
-        "name": "TP_AEE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Cor/Raça Não Declarada",
-        "name": "QT_MAT_BAS_ND",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Reserva de vagas por sistema de cotas para grupos específicos de alunos - Pessoa com deficiência (PCD)",
-        "name": "IN_RESERVA_PCD",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Profissional",
-        "name": "QT_MAT_PROF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Cor/Raça Indígena",
-        "name": "QT_MAT_BAS_INDIGENA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Psicólogo(a) Escolar",
-        "name": "IN_PROF_PSICOLOGO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola - Segurança, guarda ou segurança patrimonial",
-        "name": "QT_PROF_SEGURANCA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "CEP",
-        "name": "CO_CEP",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Nome da Microrregião",
-        "name": "NO_MICRORREGIAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Número de Matrículas do Ensino Médio - Tempo Integral",
-        "name": "QT_MAT_MED_INT",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Reserva de vagas por sistema de cotas para grupos específicos de alunos - Autodeclarado preto, pardo ou indígena (PPI)",
-        "name": "IN_RESERVA_PPI",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Rede local de interligação de computadores",
-        "name": "TP_REDE_LOCAL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola -  Profissionais de apoio e supervisão pedagógica: pedagogo(a), coordenador(a) pedagógico(a), orientador(a) educacional, supervisor(a) escolar e coordenador(a) de área de ensino",
-        "name": "IN_PROF_PEDAGOGIA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Categoria da escola privada",
-        "name": "TP_CATEGORIA_ESCOLA_PRIVADA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola -  Viveiro/criação de animais",
-        "name": "IN_VIVEIRO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Turno não aplicável  para turmas semipresenciais ou de Educação a Distância (EAD)",
-        "name": "QT_MAT_BAS_EAD",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Código da Unidade da Federação",
-        "name": "CO_UF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Educação Especial - Inclui a Educação Especial Inclusiva (em Classes Comuns) e a Educação Especial Exclusiva (Possui uma ou mais matrículas)",
-        "name": "IN_ESP",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Computadores em uso pelos alunos - Computador de mesa (desktop)",
-        "name": "IN_DESKTOP_ALUNO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Local de funcionamento da escola - Galpão/Rancho/Paiol/Barracão",
-        "name": "IN_LOCAL_FUNC_GALPAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Nome da Escola",
-        "name": "NO_ENTIDADE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Equipamentos existentes na escola para o processo ensino e aprendizagem - Projetor Multimídia (Datashow)",
-        "name": "IN_EQUIP_MULTIMIDIA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Docentes da Educação Básica",
-        "name": "QT_DOC_BAS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Etapa de Ensino - Educação Infantil - Pré-Escola (Possui uma ou mais matrículas)",
-        "name": "IN_INF_PRE",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "A escola possui site ou blog ou página em redes sociais para comunicação institucional",
-        "name": "IN_REDES_SOCIAIS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Reserva de vagas por sistema de cotas para grupos específicos de alunos - Outros grupos",
-        "name": "IN_RESERVA_OUTROS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola -  Sala de música/coral",
-        "name": "IN_SALA_MUSICA_CORAL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Sala de professores",
-        "name": "IN_SALA_PROFESSOR",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Etapa de Ensino - Ensino Fundamental - Anos Finais (Possui uma ou mais matrículas)",
-        "name": "IN_FUND_AF",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Turno - Noturno - Maior parte das atividades da turma são realizadas entre 18h e 5:59h",
-        "name": "IN_NOTURNO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Esfera administrativa do conselho ou órgão responsável pela Regulamentação/Autorização",
-        "name": "TP_RESPONSAVEL_REGULAMENTACAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de Aparelhos de televisão",
-        "name": "QT_EQUIP_TV",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de salas de aula utilizadas na escola - Dentro do prédio",
-        "name": "QT_SALAS_UTILIZADAS_DENTRO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola -  Profissionais de apoio e supervisão pedagógica: pedagogo(a), coordenador(a) pedagógico(a), orientador(a) educacional, supervisor(a) escolar e coordenador(a) de área de ensino",
-        "name": "QT_PROF_PEDAGOGIA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Vice-diretor(a) ou diretor(a) adjunto(a), profissionais responsáveis pela gestão administrativa e/ou financeira",
-        "name": "IN_PROF_GESTAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Masculino",
-        "name": "QT_MAT_BAS_MASC",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Atividade Complementar",
-        "name": "TP_ATIVIDADE_COMPLEMENTAR",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de computadores em uso pelos alunos - Tablet",
-        "name": "QT_TABLET_ALUNO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de computadores em uso pelos alunos - Computador portátil",
-        "name": "QT_COMP_PORTATIL_ALUNO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Ensino Fundamental - Anos Iniciais",
-        "name": "QT_TUR_FUND_AI",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Abastecimento de água - Cacimba/Cisterna/Poço",
-        "name": "IN_AGUA_CACIMBA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Local de funcionamento da escola - Unidade Prisional ou Unidade de atendimento socioeducativo",
-        "name": "IN_LOCAL_FUNC_PRISIONAL_SOCIO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Turmas de Educação Profissional Técnica",
-        "name": "QT_TUR_PROF_TEC",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Regulamentação/Autorização no conselho ou órgão municipal, estadual ou federal de educação",
-        "name": "TP_REGULAMENTACAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Órgãos colegiados em funcionamento na escola - Grêmio Estudantil",
-        "name": "IN_ORGAO_GREMIO_ESTUDANTIL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Instrumentos e materiais socioculturais e/ou pedagógicos em uso na escola para o desenvolvimento de atividades de ensino e aprendizagem - Materiais pedagógicos para a educação do campo",
-        "name": "IN_MATERIAL_PED_CAMPO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Abastecimento de energia elétrica - Fontes de energia renováveis ou alternativas (gerador a biocombustível e/ou biodigestores, eólica, solar, outras)",
-        "name": "IN_ENERGIA_RENOVAVEL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Terreirão (área para prática desportiva e recreação sem cobertura, sem piso e sem edificações)",
-        "name": "IN_TERREIRAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Biblioteca e/ou Sala de leitura",
-        "name": "IN_BIBLIOTECA_SALA_LEITURA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Parque infantil",
-        "name": "IN_PARQUE_INFANTIL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas do Ensino Médio",
-        "name": "QT_MAT_MED",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Endereço",
-        "name": "DS_ENDERECO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "Número de Matrículas da Educação Infantil - Creche - Tempo Integral",
-        "name": "QT_MAT_INF_CRE_INT",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Profissionais que atuam na escola - Segurança, guarda ou segurança patrimonial",
-        "name": "IN_PROF_SEGURANCA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Quantidade de profissionais que atuam na escola -  Profissionais de preparação e segurança alimentar, cozinheiro(a), merendeiro(a) e auxiliar de cozinha",
-        "name": "QT_PROF_ALIMENTACAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas da Educação Básica - Entre 15 e 17 anos de idade",
-        "name": "QT_MAT_BAS_15_17",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Escola Indígena",
-        "name": "IN_EDUCACAO_INDIGENA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número do CNPJ da mantenedora principal da escola privada",
-        "name": "NU_CNPJ_MANTENEDORA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Char"
-      },
-      {
-        "description": "A escola faz exame de seleção para ingresso de seus alunos (avaliação por prova e/ou análise curricular)",
-        "name": "IN_EXAME_SELECAO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Banheiro",
-        "name": "IN_BANHEIRO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Escola Indígena - Língua em que o ensino é ministrado (apenas para escola indígena)",
-        "name": "TP_INDIGENA_LINGUA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Localização diferenciada da escola",
-        "name": "TP_LOCALIZACAO_DIFERENCIADA",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "A escola usa espaços e equipamentos do entorno escolar para atividades regulares com os alunos",
-        "name": "IN_ESPACO_EQUIPAMENTO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Recursos de acessibilidade para pessoas com deficiência ou mobilidade reduzida nas vias de circulação interna na escola - Sinalização visual (piso/paredes)",
-        "name": "IN_ACESSIBILIDADE_SINAL_VISUAL",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Dependências físicas existentes e utilizadas na escola - Sala multiuso (música, dança e artes)",
-        "name": "IN_SALA_MULTIUSO",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Instrumentos e materiais socioculturais e/ou pedagógicos em uso na escola para o desenvolvimento de atividades de ensino e aprendizagem - Materiais para atividades culturais e artísticas",
-        "name": "IN_MATERIAL_PED_ARTISTICAS",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      },
-      {
-        "description": "Número de Matrículas do Ensino Fundamental - Anos Iniciais - Tempo Integral",
-        "name": "QT_MAT_FUND_AI_INT",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Num"
-      }
-    ]
-  },
-  {
-    "dictionary": "dicionário_dados_educação_básica.xlsx",
-    "files": [
-      "microdados_ed_basica_2024.csv",
-      "microdados_ed_basica_2023.csv",
-      "microdados_ed_basica_2022.csv",
-      "microdados_ed_basica_2021.csv"
-    ],
-    "groupName": "Censo Escolar INEP",
     "id": "6b45b519-501e-4f1c-8245-4560ecd76876",
     "name": "Matriculas Alun Especiais",
     "publishedArtifacts": [
@@ -2152,6 +187,312 @@
         "name": "QT_MAT_ESP_CE",
         "statisticalType": "quantitativa_discreta",
         "type": "Num"
+      }
+    ]
+  },
+  {
+    "dictionary": "dicionário_dados_educação_básica.xlsx",
+    "files": [
+      "microdados_ed_basica_2024.csv",
+      "microdados_ed_basica_2023.csv",
+      "microdados_ed_basica_2022.csv",
+      "microdados_ed_basica_2021.csv"
+    ],
+    "groupName": "Censo Escolar INEP",
+    "id": "14524b94-3f79-4213-94e5-20eba7488f6b",
+    "name": "Evolução Matrículas Ed Esp",
+    "publishedArtifacts": [
+      {
+        "createdAt": "2026-05-23T03:34:35.332Z",
+        "data": {
+          "x": [
+            "2022",
+            "2024",
+            "2023",
+            "2021"
+          ],
+          "y": [
+            178346,
+            179286,
+            178476,
+            221140
+          ]
+        },
+        "id": "4d2427c2-f317-4a8a-bdd2-6b45914e699b",
+        "label": "Num Registros In_ESP_CC",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "count",
+          "statisticalType": "qualitativa_ordinal",
+          "valueVar": "IN_ESP_CC"
+        },
+        "type": "barchart"
+      },
+      {
+        "createdAt": "2026-05-23T03:35:34.285Z",
+        "data": {
+          "x": [
+            "2022",
+            "2024",
+            "2023",
+            "2021"
+          ],
+          "y": [
+            224649,
+            215545,
+            217625,
+            221140
+          ]
+        },
+        "id": "51c930ab-e286-4754-a1f3-726135ec700d",
+        "label": "Num Registros NU_ANO_CENSO por NU_ANO_CENSO",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "count",
+          "statisticalType": "qualitativa_ordinal",
+          "valueVar": null
+        },
+        "type": "barchart"
+      },
+      {
+        "createdAt": "2026-05-23T03:36:16.424Z",
+        "data": {
+          "x": [
+            "2022",
+            "2021",
+            "2024",
+            "2023"
+          ],
+          "y": [
+            178346,
+            221140,
+            179286,
+            178476
+          ]
+        },
+        "id": "464d21c8-d45a-4d51-99a4-3b7885c0643c",
+        "label": "Num Registros IN_ESP_CE por Ano Censo",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "count",
+          "statisticalType": "qualitativa_ordinal",
+          "valueVar": "IN_ESP_CE"
+        },
+        "type": "barchart"
+      },
+      {
+        "createdAt": "2026-05-23T03:37:00.841Z",
+        "data": {
+          "x": [
+            "2022",
+            "2021",
+            "2024",
+            "2023"
+          ],
+          "y": [
+            178346,
+            221140,
+            179286,
+            178476
+          ]
+        },
+        "id": "be9f7737-79f6-4a7e-b25e-d29401ddb572",
+        "label": "Num registros QT_MAT_ESP por Ano Censo",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "count",
+          "statisticalType": "qualitativa_ordinal",
+          "valueVar": "QT_MAT_ESP_CC"
+        },
+        "type": "barchart"
+      }
+    ],
+    "updatedAt": "2026-05-23T03:37:00.846715123+00:00",
+    "variables": [
+      {
+        "description": "Número de Docentes da Educação Especial Exclusiva",
+        "name": "QT_DOC_ESP_CE",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Ano do Censo",
+        "name": "NU_ANO_CENSO",
+        "statisticalType": "qualitativa_ordinal",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Turmas de Educação Especial Inclusiva",
+        "name": "QT_TUR_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Educação Especial Exclusiva - Escola exclusivamente especializada e/ou que possui classe especial exclusiva para o atendimento de alunos com deficiência, transtorno global do desenvolvimento ou altas habilidades/superdotação (Possui uma ou mais matrículas)",
+        "name": "IN_ESP_CE",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Turmas de Educação Especial Exclusiva",
+        "name": "QT_TUR_ESP_CE",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Docentes da Educação Especial Inclusiva",
+        "name": "QT_DOC_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Educação Especial Inclusiva (em Classes Comuns) - Escola possui um ou mais alunos com deficiência, transtorno global do desenvolvimento ou altas habilidades/superdotação estudando em classes comuns do Ensino Regular e/ou Educação de Jovens e Adultos (Possui uma ou mais matrículas)",
+        "name": "IN_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Matrículas da Educação Especial Inclusiva",
+        "name": "QT_MAT_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Matrículas da Educação Especial Exclusiva",
+        "name": "QT_MAT_ESP_CE",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      }
+    ]
+  },
+  {
+    "dictionary": null,
+    "files": [
+      "titanic.csv"
+    ],
+    "groupName": "Titanic Data",
+    "id": "1847900e-fa26-4a49-95c0-5cd9e89ad576",
+    "name": "Titanic_Alives_Study",
+    "publishedArtifacts": [
+      {
+        "createdAt": "2026-05-23T23:07:53.097Z",
+        "data": {
+          "x": [
+            "no",
+            "yes"
+          ],
+          "y": [
+            549,
+            342
+          ]
+        },
+        "id": "e4b6cbef-2967-4560-84e5-2bca6283397b",
+        "label": "Qtde Sobreviventes",
+        "params": {
+          "categoryVar": "alive",
+          "metric": "count",
+          "showBarValues": true,
+          "statisticalType": "qualitativa_nominal",
+          "valueVar": null
+        },
+        "type": "barchart",
+        "xLabelMap": {
+          "no": "Não",
+          "yes": "Sim"
+        },
+        "xTitle": "alive",
+        "yPrefix": "",
+        "ySuffix": "",
+        "yTitle": "Num Sobreviventes"
+      },
+      {
+        "createdAt": "2026-05-24T14:28:35.919Z",
+        "data": {
+          "x": [
+            "1",
+            "0"
+          ],
+          "y": [
+            28.343689655172415,
+            30.62617924528302
+          ]
+        },
+        "id": "181761e0-75f6-45cb-ae08-39eeb8154adc",
+        "label": "Idade media",
+        "params": {
+          "categoryVar": "survived",
+          "metric": "avg",
+          "showBarValues": true,
+          "statisticalType": "qualitativa_nominal",
+          "valueVar": "age"
+        },
+        "type": "barchart",
+        "xLabelMap": {
+          "0": "Não",
+          "1": "Sim"
+        },
+        "xTitle": "Sobreviventes",
+        "yPrefix": "",
+        "ySuffix": "",
+        "yTitle": "Média"
+      }
+    ],
+    "updatedAt": "2026-05-24T19:30:21.321364646+00:00",
+    "variables": [
+      {
+        "name": "class",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "age",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Número"
+      },
+      {
+        "name": "embark_town",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "alone",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "survived",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Número"
+      },
+      {
+        "name": "sibsp",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Número"
+      },
+      {
+        "name": "fare",
+        "statisticalType": "quantitativa_continua",
+        "type": "Número"
+      },
+      {
+        "name": "parch",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Número"
+      },
+      {
+        "name": "alive",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "sex",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "embarked",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
       }
     ]
   }

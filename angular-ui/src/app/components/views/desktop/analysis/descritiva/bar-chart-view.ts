@@ -11,6 +11,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
 import { DatasetStateService } from '../../../../../services/dataset-state.service';
 import { Router } from '@angular/router';
@@ -38,6 +39,7 @@ declare var Plotly: any;
     MatButtonToggleModule,
     MatTooltipModule,
     MatDividerModule,
+    MatSlideToggleModule,
     FormsModule,
     PlotlyModule,
   ],
@@ -81,6 +83,12 @@ declare var Plotly: any;
                   <mat-button-toggle value="sum">Soma</mat-button-toggle>
                   <mat-button-toggle value="avg">Média</mat-button-toggle>
                 </mat-button-toggle-group>
+              </div>
+
+              <div class="options-selector">
+                <mat-slide-toggle [checked]="showBarValues()" (change)="toggleBarValues($event.checked)">
+                  Mostrar valores nas barras
+                </mat-slide-toggle>
               </div>
 
               <button mat-flat-button color="accent" class="publish-btn" [disabled]="!categoryVar()" (click)="publishArtifact()">
@@ -188,6 +196,7 @@ declare var Plotly: any;
     .selection-slot.active .slot-value mat-icon { color: #3f51b5; }
     
     .metric-selector { margin-bottom: 20px; }
+    .options-selector { margin-bottom: 20px; padding: 0 4px; }
     .publish-btn { width: 100%; height: 48px; }
 
     /* Variable List Card */
@@ -240,6 +249,7 @@ export class BarChartView implements OnInit {
   categoryVar = signal<string | null>(null);
   valueVar = signal<string | null>(null);
   metric = signal<string>('count');
+  showBarValues = signal<boolean>(false);
   isLoading = signal(false);
 
   graphData: any = null;
@@ -256,6 +266,18 @@ export class BarChartView implements OnInit {
   ngOnInit() {
     if (!this.config()) {
       this.router.navigate(['/desktop/analysis/descritiva']);
+    }
+  }
+
+  toggleBarValues(show: boolean) {
+    this.showBarValues.set(show);
+    if (this.lastResultData && this.categoryVar()) {
+      this.preparePlotlyData(
+        this.lastResultData.categories, 
+        this.lastResultData.values, 
+        this.categoryVar()!, 
+        this.metric()
+      );
     }
   }
 
@@ -331,13 +353,20 @@ export class BarChartView implements OnInit {
     const sortedX = paired.map(p => p.x);
     const sortedY = paired.map(p => p.y);
 
+    const trace: any = {
+      x: sortedX,
+      y: sortedY,
+      type: 'bar',
+      marker: { color: '#3f51b5' }
+    };
+
+    if (this.showBarValues()) {
+      trace.text = sortedY.map(v => Number.isInteger(v) ? v.toString() : v.toFixed(2));
+      trace.textposition = 'auto';
+    }
+
     this.graphData = {
-      data: [{
-        x: sortedX,
-        y: sortedY,
-        type: 'bar',
-        marker: { color: '#3f51b5' }
-      }],
+      data: [trace],
       layout: {
         title: `${this.metricLabel()} de ${this.valueVar() || title} por ${title}`,
         xaxis: { 
@@ -389,7 +418,8 @@ export class BarChartView implements OnInit {
         categoryVar: cat,
         valueVar: this.valueVar(),
         metric: this.metric(),
-        statisticalType: xVarInfo?.statisticalType // Persist for rendering
+        statisticalType: xVarInfo?.statisticalType, // Persist for rendering
+        showBarValues: this.showBarValues()
       },
       data: {
         x: this.lastResultData.categories,

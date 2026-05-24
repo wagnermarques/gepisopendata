@@ -114,6 +114,10 @@ export class App implements OnInit, OnDestroy {
     }
 
     if (route) {
+      if (this.router.url === route) {
+        if (isDevMode()) console.log(`Already on route: ${route}, skipping navigation.`);
+        return;
+      }
       if (isDevMode()) {
         console.log(`Attempting to navigate to: ${route}`);
       }

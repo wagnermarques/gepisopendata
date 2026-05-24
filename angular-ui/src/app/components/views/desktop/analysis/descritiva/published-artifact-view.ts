@@ -7,6 +7,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FormsModule } from '@angular/forms';
 import { DatasetStateService, AnalysisArtifact, AnalysisConfig } from '../../../../../services/dataset-state.service';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,6 +28,7 @@ import { PlotlyModule } from 'angular-plotly.js';
     MatFormFieldModule,
     MatInputModule,
     MatSnackBarModule,
+    MatSlideToggleModule,
     FormsModule,
     PlotlyModule,
   ],
@@ -47,7 +49,7 @@ import { PlotlyModule } from 'angular-plotly.js';
         <ng-template #editHeader>
           <mat-form-field appearance="outline" class="edit-title-field">
             <mat-label>Título do Gráfico</mat-label>
-            <input matInput [(ngModel)]="tempLabel" (keyup.enter)="saveChanges()">
+            <input matInput [(ngModel)]="tempLabel" (ngModelChange)="updatePreview()" (keyup.enter)="saveChanges()">
           </mat-form-field>
           <div class="edit-actions">
             <button mat-button (click)="cancelEdit()">Cancelar</button>
@@ -104,12 +106,12 @@ import { PlotlyModule } from 'angular-plotly.js';
                   <h4>Títulos dos Eixos</h4>
                   <mat-form-field appearance="outline">
                     <mat-label>Título do Eixo X</mat-label>
-                    <input matInput [(ngModel)]="tempXTitle" placeholder="Ex: Categorias">
+                    <input matInput [(ngModel)]="tempXTitle" (ngModelChange)="updatePreview()" placeholder="Ex: Categorias">
                   </mat-form-field>
 
                   <mat-form-field appearance="outline">
                     <mat-label>Título do Eixo Y</mat-label>
-                    <input matInput [(ngModel)]="tempYTitle" placeholder="Ex: Valores">
+                    <input matInput [(ngModel)]="tempYTitle" (ngModelChange)="updatePreview()" placeholder="Ex: Valores">
                   </mat-form-field>
                 </div>
 
@@ -120,13 +122,22 @@ import { PlotlyModule } from 'angular-plotly.js';
                   <div class="row-fields">
                     <mat-form-field appearance="outline">
                       <mat-label>Prefixo (ex: $)</mat-label>
-                      <input matInput [(ngModel)]="tempYPrefix">
+                      <input matInput [(ngModel)]="tempYPrefix" (ngModelChange)="updatePreview()">
                     </mat-form-field>
                     <mat-form-field appearance="outline">
                       <mat-label>Sufixo (ex: %)</mat-label>
-                      <input matInput [(ngModel)]="tempYSuffix">
+                      <input matInput [(ngModel)]="tempYSuffix" (ngModelChange)="updatePreview()">
                     </mat-form-field>
                   </div>
+                </div>
+
+                <mat-divider></mat-divider>
+
+                <div class="section-group">
+                  <h4>Exibição de Dados</h4>
+                  <mat-slide-toggle [(ngModel)]="tempShowBarValues" (change)="updatePreview()">
+                    Mostrar valores nas barras
+                  </mat-slide-toggle>
                 </div>
 
                 <mat-divider></mat-divider>
@@ -139,7 +150,7 @@ import { PlotlyModule } from 'angular-plotly.js';
                         <span class="orig-cat" [title]="cat">{{ cat }}</span>
                         <mat-icon>arrow_forward</mat-icon>
                         <mat-form-field appearance="outline" subscriptSizing="dynamic">
-                          <input matInput [placeholder]="cat" [(ngModel)]="tempXLabelMap[cat]">
+                          <input matInput [placeholder]="cat" [(ngModel)]="tempXLabelMap[cat]" (ngModelChange)="updatePreview()">
                         </mat-form-field>
                       </div>
                     }
@@ -215,6 +226,7 @@ export class PublishedArtifactView implements OnInit {
   tempYTitle = '';
   tempYPrefix = '';
   tempYSuffix = '';
+  tempShowBarValues = false;
   tempXLabelMap: Record<string, string> = {};
 
   graphData: any = null;
@@ -262,8 +274,9 @@ export class PublishedArtifactView implements OnInit {
     }
   }
 
-  preparePlotlyData(artifact: AnalysisArtifact) {
+  preparePlotlyData(artifact: AnalysisArtifact, useTempValues = false) {
     const { categoryVar, metric, statisticalType } = artifact.params;
+    const showValues = useTempValues ? this.tempShowBarValues : artifact.params.showBarValues;
     
     // Initial mapping of labels (renaming)
     const xValues = artifact.data?.x.map(val => 
@@ -290,31 +303,44 @@ export class PublishedArtifactView implements OnInit {
 
     const plotlyType = this.mapToPlotlyType(statisticalType);
 
+    const trace: any = {
+      x: sortedX,
+      y: sortedY,
+      type: 'bar',
+      marker: { color: '#3f51b5' }
+    };
+
+    if (showValues) {
+      trace.text = sortedY.map(v => Number.isInteger(v) ? v.toString() : v.toFixed(2));
+      trace.textposition = 'auto';
+    }
+
     this.graphData = {
-      data: [{
-        x: sortedX,
-        y: sortedY,
-        type: 'bar',
-        marker: { color: '#3f51b5' }
-      }],
+      data: [trace],
       layout: {
-        title: artifact.label,
+        title: useTempValues ? this.tempLabel : artifact.label,
         xaxis: { 
-          title: artifact.xTitle || categoryVar, 
+          title: useTempValues ? this.tempXTitle : (artifact.xTitle || categoryVar), 
           type: plotlyType,
           categoryorder: (statisticalType === 'qualitativa_ordinal' || statisticalType === 'categorica_temporal_ano') ? 'category ascending' : 'trace',
           automargin: true 
         },
         yaxis: { 
-          title: artifact.yTitle || this.getMetricLabel(metric), 
-          tickprefix: artifact.yPrefix || '',
-          ticksuffix: artifact.ySuffix || '',
+          title: useTempValues ? this.tempYTitle : (artifact.yTitle || this.getMetricLabel(metric)), 
+          tickprefix: useTempValues ? this.tempYPrefix : (artifact.yPrefix || ''),
+          ticksuffix: useTempValues ? this.tempYSuffix : (artifact.ySuffix || ''),
           automargin: true 
         },
         margin: { t: 50, b: 100, l: 60, r: 20 }
       },
       config: { responsive: true, displayModeBar: false }
     };
+  }
+
+  updatePreview() {
+    const art = this.artifact();
+    if (!art) return;
+    this.preparePlotlyData(art, true);
   }
 
   mapToPlotlyType(statType?: string): string {
@@ -350,6 +376,7 @@ export class PublishedArtifactView implements OnInit {
     this.tempYTitle = art.yTitle || this.getMetricLabel(art.params.metric) || '';
     this.tempYPrefix = art.yPrefix || '';
     this.tempYSuffix = art.ySuffix || '';
+    this.tempShowBarValues = !!art.params.showBarValues;
     
     // Clone label map or initialize
     this.tempXLabelMap = art.xLabelMap ? { ...art.xLabelMap } : {};
@@ -373,6 +400,7 @@ export class PublishedArtifactView implements OnInit {
     art.yTitle = this.tempYTitle;
     art.yPrefix = this.tempYPrefix;
     art.ySuffix = this.tempYSuffix;
+    art.params.showBarValues = this.tempShowBarValues;
     art.xLabelMap = { ...this.tempXLabelMap };
 
     // Update analysis config

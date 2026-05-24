@@ -478,7 +478,7 @@ async fn get_excel_files(app_handle: tauri::AppHandle, group_name: String) -> Re
         
     if group_items.is_empty() { return Err("Grupo não encontrado".into()); }
 
-    let mut excel_files = Vec::new();
+    let mut excel_files = std::collections::HashSet::new();
 
     let base_downloads_path = get_base_downloads_path(&app_handle)?;
 
@@ -501,11 +501,16 @@ async fn get_excel_files(app_handle: tauri::AppHandle, group_name: String) -> Re
         
         for file_path in item_files {
             let rel_path = file_path.strip_prefix(&local_path).unwrap_or(&file_path).to_string_lossy().into_owned();
-            excel_files.push(rel_path);
+            // Filter out Excel temporary files
+            if !rel_path.starts_with("~$") {
+                excel_files.insert(rel_path);
+            }
         }
     }
 
-    Ok(excel_files)
+    let mut result: Vec<String> = excel_files.into_iter().collect();
+    result.sort();
+    Ok(result)
 }
 
 #[tauri::command]
@@ -827,6 +832,105 @@ async fn get_registry(app_handle: tauri::AppHandle) -> Result<Vec<serde_json::Va
     } else {
         Ok(vec![])
     }
+}
+
+#[tauri::command]
+async fn import_local_dataset(app_handle: tauri::AppHandle, file_paths: Vec<String>, metadata: serde_json::Value) -> Result<String, String> {
+    tracing::info!("Starting import_local_dataset: files={:?}", file_paths);
+    
+    // 1. Extract info from metadata
+    let titulo_curto = metadata["tituloCurto"].as_str().unwrap_or("sem-titulo");
+    let grupo = metadata["grupo"].as_str().unwrap_or("sem-grupo");
+    
+    let grupo_folder = if grupo.trim().is_empty() { "sem-grupo".to_string() } else { sanitize_filename(grupo) };
+    let dataset_folder = sanitize_filename(titulo_curto);
+
+    // 2. Resolve Base Downloads Directory
+    let base_downloads_path = get_base_downloads_path(&app_handle)?;
+    let target_dir = base_downloads_path.join("datasets").join(&grupo_folder).join(&dataset_folder);
+    fs::create_dir_all(&target_dir).map_err(|e| format!("Erro ao criar pastas: {}", e))?;
+
+    let mut final_files = Vec::new();
+
+    // 3. Copy files to target directory
+    for path_str in file_paths {
+        let src_path = PathBuf::from(&path_str);
+        if !src_path.exists() {
+            continue;
+        }
+
+        let file_name = src_path.file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("arquivo_desconhecido");
+            
+        let dest_path = target_dir.join(file_name);
+        fs::copy(&src_path, &dest_path).map_err(|e| format!("Erro ao copiar arquivo {}: {}", file_name, e))?;
+        
+        final_files.push(file_name.to_string());
+    }
+
+    if final_files.is_empty() {
+        return Err("Nenhum arquivo válido foi selecionado para importação.".into());
+    }
+
+    // 4. Update Registry
+    let app_data_dir = app_handle.path().app_data_dir().map_err(|e| e.to_string())?;
+    #[allow(unused_mut)]
+    let mut registry_paths = vec![app_data_dir.join("datasets-registry.json")];
+    
+    #[cfg(debug_assertions)]
+    {
+        if let Ok(manifest_dir) = std::env::var("CARGO_MANIFEST_DIR") {
+            registry_paths.push(PathBuf::from(manifest_dir.clone()).join("angular-ui").join("data").join("datasets-registry.json"));
+            registry_paths.push(PathBuf::from(manifest_dir).join("angular-ui").join("public").join("data").join("datasets-registry.json"));
+        }
+    }
+
+    for path in registry_paths {
+        if let Some(parent) = path.parent() { let _ = fs::create_dir_all(parent); }
+
+        let mut registry: Vec<serde_json::Value> = if path.exists() {
+            let file = File::open(&path).map_err(|e| e.to_string())?;
+            serde_json::from_reader(file).unwrap_or_else(|_| vec![])
+        } else { vec![] };
+
+        let entry_id = format!("{}-{}", sanitize_filename(grupo), sanitize_filename(titulo_curto));
+        let mut entry_exists = false;
+        
+        for item in registry.iter_mut() {
+            if item["id"].as_str() == Some(&entry_id) {
+                if let Some(files) = item["files"].as_array_mut() {
+                    for f in &final_files {
+                        if !files.contains(&serde_json::json!(f)) { files.push(serde_json::json!(f)); }
+                    }
+                }
+                let relative_path = target_dir.strip_prefix(&base_downloads_path).unwrap_or(&target_dir);
+                item["localPath"] = serde_json::json!(relative_path.to_string_lossy());
+                entry_exists = true;
+                break;
+            }
+        }
+
+        if !entry_exists {
+            let mut entry = metadata.clone();
+            if let Some(obj) = entry.as_object_mut() {
+                obj.insert("id".to_string(), serde_json::json!(entry_id));
+                obj.insert("dateAdded".to_string(), serde_json::json!(chrono::Utc::now().to_rfc3339()));
+                obj.insert("files".to_string(), serde_json::json!(final_files));
+                
+                let relative_path = target_dir.strip_prefix(&base_downloads_path).unwrap_or(&target_dir);
+                obj.insert("localPath".to_string(), serde_json::json!(relative_path.to_string_lossy()));
+                obj.insert("urls".to_string(), serde_json::json!("")); 
+            }
+            registry.push(entry);
+        }
+
+        let mut file = File::create(&path).map_err(|e| e.to_string())?;
+        let json = serde_json::to_string_pretty(&registry).map_err(|e| e.to_string())?;
+        file.write_all(json.as_bytes()).map_err(|e| e.to_string())?;
+    }
+
+    Ok(format!("{} arquivos importados com sucesso!", final_files.len()))
 }
 
 #[tauri::command]
@@ -1270,6 +1374,7 @@ fn main() {
         .plugin(tauri_plugin_mcp_gui::init())
         .invoke_handler(tauri::generate_handler![
             download_dataset, 
+            import_local_dataset,
             get_registry, 
             check_path_exists, 
             get_group_columns, 

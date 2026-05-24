@@ -12,8 +12,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { invoke } from '@tauri-apps/api/core';
-import { message } from '@tauri-apps/plugin-dialog';
+import { message, open } from '@tauri-apps/plugin-dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { startWith } from 'rxjs/operators';
 
@@ -34,6 +35,7 @@ import { startWith } from 'rxjs/operators';
     MatDividerModule,
     MatAutocompleteModule,
     MatChipsModule,
+    MatButtonToggleModule,
   ],
   template: `
     <div class="container">
@@ -44,7 +46,18 @@ import { startWith } from 'rxjs/operators';
         </mat-card-header>
         
         <mat-card-content>
-          <form [formGroup]="datasetForm" (ngSubmit)="downloadDataset()" class="form-container">
+          <div class="mode-selector">
+            <mat-button-toggle-group [value]="sourceMode()" (change)="sourceMode.set($event.value)" aria-label="Fonte dos Dados">
+              <mat-button-toggle value="url">
+                <mat-icon>cloud_download</mat-icon> Baixar da Web (URL)
+              </mat-button-toggle>
+              <mat-button-toggle value="local">
+                <mat-icon>folder_open</mat-icon> Importar Local
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+
+          <form [formGroup]="datasetForm" (ngSubmit)="submitDataset()" class="form-container">
             
             <div class="section-title">Agrupamento e Série</div>
             <div class="row multi-col">
@@ -150,16 +163,38 @@ import { startWith } from 'rxjs/operators';
               </mat-form-field>
             </div>
 
-            <div class="section-title">Download</div>
-            <div class="row">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>URLs para Download (uma por linha)</mat-label>
-                <textarea matInput formControlName="urls" rows="3" placeholder="https://exemplo.gov.br/dados.zip"></textarea>
-                <mat-error *ngIf="datasetForm.get('urls')?.hasError('required')">Pelo menos uma URL é obrigatória</mat-error>
-              </mat-form-field>
-            </div>
+            @if (sourceMode() === 'url') {
+              <div class="section-title">Download</div>
+              <div class="row">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>URLs para Download (uma por linha)</mat-label>
+                  <textarea matInput formControlName="urls" rows="3" placeholder="https://exemplo.gov.br/dados.zip"></textarea>
+                  <mat-error *ngIf="datasetForm.get('urls')?.hasError('required')">Pelo menos uma URL é obrigatória</mat-error>
+                </mat-form-field>
+              </div>
+            } @else {
+              <div class="section-title">Arquivos Locais</div>
+              <div class="local-files-container">
+                <button type="button" mat-stroked-button color="accent" (click)="selectLocalFiles()">
+                  <mat-icon>add_box</mat-icon> Selecionar Arquivos Desktop
+                </button>
+                
+                @if (selectedLocalFiles().length > 0) {
+                  <div class="selected-files-list">
+                    <p><strong>Arquivos selecionados:</strong></p>
+                    <ul>
+                      @for (file of selectedLocalFiles(); track file) {
+                        <li>{{ file.split('/').pop() }} <span class="path-hint">({{ file }})</span></li>
+                      }
+                    </ul>
+                  </div>
+                } @else {
+                  <p class="no-files-hint">Nenhum arquivo selecionado.</p>
+                }
+              </div>
+            }
 
-            <div class="row multi-col">
+            <div class="row multi-col" style="margin-top: 16px;">
               <mat-form-field appearance="outline">
                 <mat-label>Autor/Responsável</mat-label>
                 <input matInput formControlName="autor">
@@ -171,16 +206,17 @@ import { startWith } from 'rxjs/operators';
               </mat-form-field>
             </div>
 
-            @if (isDownloading()) {
+            @if (isProcessing()) {
               <div class="progress-section">
-                <p>Processando via Rust (Download, Extração e Metadados)... por favor aguarde.</p>
+                <p>Processando via Rust (Cópia/Download, Extração e Metadados)... por favor aguarde.</p>
                 <mat-progress-bar mode="indeterminate"></mat-progress-bar>
               </div>
             }
 
             <div class="actions">
-              <button mat-raised-button color="primary" type="submit" [disabled]="datasetForm.invalid || isDownloading()">
-                <mat-icon>cloud_download</mat-icon> Registrar e Baixar
+              <button mat-raised-button color="primary" type="submit" [disabled]="isSubmitDisabled()">
+                <mat-icon>{{ sourceMode() === 'url' ? 'cloud_download' : 'save_alt' }}</mat-icon> 
+                {{ sourceMode() === 'url' ? 'Registrar e Baixar' : 'Registrar e Importar' }}
               </button>
             </div>
           </form>
@@ -200,11 +236,20 @@ import { startWith } from 'rxjs/operators';
     .existing-datasets { margin: 8px 0; padding: 8px; background: #f5f5f5; border-radius: 4px; }
     .small-label { font-size: 0.75rem; color: #777; margin-bottom: 4px; }
     mat-card-title { font-weight: bold; color: #3f51b5; }
+    .mode-selector { margin-bottom: 10px; display: flex; justify-content: center; }
+    .local-files-container { padding: 10px; border: 1px dashed #ccc; border-radius: 4px; background: #fafafa; }
+    .selected-files-list { margin-top: 10px; font-size: 0.9rem; }
+    .selected-files-list ul { margin: 5px 0; padding-left: 20px; }
+    .path-hint { color: #888; font-size: 0.8rem; }
+    .no-files-hint { color: #999; font-size: 0.85rem; margin-top: 10px; font-style: italic; }
   `]
 })
 export class DatasetGetView implements OnInit {
   private fb = inject(FormBuilder);
-  isDownloading = signal(false);
+  
+  sourceMode = signal<'url' | 'local'>('url');
+  selectedLocalFiles = signal<string[]>([]);
+  isProcessing = signal(false);
   
   // Entire registry data
   registry = signal<any[]>([]);
@@ -223,7 +268,7 @@ export class DatasetGetView implements OnInit {
     dataReferencia: ['', Validators.required],
     frequencia: ['Anual'],
     licenca: [''],
-    urls: ['', [Validators.required]],
+    urls: [''], // Required removed from here, handled in submit check
     autor: [''],
     tags: [''],
   });
@@ -265,28 +310,75 @@ export class DatasetGetView implements OnInit {
     }
   }
 
-  async downloadDataset() {
-    if (this.datasetForm.invalid) return;
-
-    const { urls, tituloCurto } = this.datasetForm.value;
-    const urlList = urls!.split('\n').map(u => u.trim()).filter(u => u.length > 0);
+  async selectLocalFiles() {
+    const format = this.datasetForm.get('formato')?.value;
+    let extensions: string[] = [];
     
-    if (urlList.length === 0) {
-      await message('Por favor, insira pelo menos uma URL válida.', { title: 'Erro', kind: 'error' });
-      return;
+    switch(format) {
+      case 'csv': extensions = ['csv']; break;
+      case 'parquet': extensions = ['parquet']; break;
+      case 'json': extensions = ['json']; break;
+      case 'xlsx': extensions = ['xlsx', 'xls']; break;
+      case 'zip': extensions = ['zip']; break;
+      default: extensions = ['*'];
     }
 
-    this.isDownloading.set(true);
+    try {
+      const selected = await open({
+        multiple: true,
+        filters: [{
+          name: 'Arquivos de Dados',
+          extensions: extensions
+        }]
+      });
+
+      if (selected && Array.isArray(selected)) {
+        this.selectedLocalFiles.set(selected);
+      } else if (selected && typeof selected === 'string') {
+        this.selectedLocalFiles.set([selected]);
+      }
+    } catch (err) {
+      console.error('Error opening file dialog:', err);
+    }
+  }
+
+  isSubmitDisabled(): boolean {
+    if (this.datasetForm.invalid || this.isProcessing()) return true;
+    
+    if (this.sourceMode() === 'url') {
+      const urls = this.datasetForm.get('urls')?.value;
+      return !urls || urls.trim().length === 0;
+    } else {
+      return this.selectedLocalFiles().length === 0;
+    }
+  }
+
+  async submitDataset() {
+    if (this.isSubmitDisabled()) return;
+
+    this.isProcessing.set(true);
+    const { tituloCurto } = this.datasetForm.value;
 
     try {
-      for (const url of urlList) {
-        await invoke('download_dataset', { 
-          url, 
-          metadata: this.datasetForm.value 
+      if (this.sourceMode() === 'url') {
+        const { urls } = this.datasetForm.value;
+        const urlList = urls!.split('\n').map(u => u.trim()).filter(u => u.length > 0);
+        
+        for (const url of urlList) {
+          await invoke('download_dataset', { 
+            url, 
+            metadata: this.datasetForm.value 
+          });
+        }
+      } else {
+        await invoke('import_local_dataset', {
+          filePaths: this.selectedLocalFiles(),
+          metadata: this.datasetForm.value
         });
       }
 
-      await message(`Conjunto de dados "${tituloCurto}" registrado, baixado e processado com sucesso!`, {
+      const actionText = this.sourceMode() === 'url' ? 'baixado' : 'importado';
+      await message(`Conjunto de dados "${tituloCurto}" registrado e ${actionText} com sucesso!`, {
         title: 'Sucesso',
         kind: 'info',
       });
@@ -294,21 +386,23 @@ export class DatasetGetView implements OnInit {
       // Refresh registry and groups
       await this.loadRegistry();
 
+      // Reset form and selection
       this.datasetForm.reset({
         frequencia: 'Anual',
         isSerieHistorica: false,
         grupo: '',
         formato: 'csv'
       });
+      this.selectedLocalFiles.set([]);
 
     } catch (err) {
-      console.error('Download/Registry error:', err);
+      console.error('Process error:', err);
       await message(`Erro no processamento: ${err}`, {
         title: 'Erro',
         kind: 'error',
       });
     } finally {
-      this.isDownloading.set(false);
+      this.isProcessing.set(false);
     }
   }
 }
