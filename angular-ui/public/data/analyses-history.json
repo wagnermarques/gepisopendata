@@ -434,10 +434,10 @@
         "xTitle": "Idade média de sobreviventes s não sobreviventes",
         "yPrefix": "",
         "ySuffix": "",
-        "yTitle": "Idade Média"
+        "yTitle": "Idade média!!!"
       }
     ],
-    "updatedAt": "2026-05-24T20:18:41.321902216+00:00",
+    "updatedAt": "2026-05-25T12:46:57.702183014+00:00",
     "variables": [
       {
         "name": "class",
