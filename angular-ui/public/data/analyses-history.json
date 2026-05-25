@@ -495,5 +495,66 @@
         "type": "Texto"
       }
     ]
+  },
+  {
+    "dictionary": "dicionário_dados_educação_básica.xlsx",
+    "files": [
+      "microdados_ed_basica_2024.csv",
+      "microdados_ed_basica_2023.csv",
+      "microdados_ed_basica_2022.csv",
+      "microdados_ed_basica_2021.csv"
+    ],
+    "groupName": "Censo Escolar INEP",
+    "id": "bdebd1b6-aa92-4011-8ef6-66c336e10601",
+    "name": "ComRafa",
+    "publishedArtifacts": [
+      {
+        "createdAt": "2026-05-25T13:11:26.584Z",
+        "data": {
+          "x": [
+            "2022",
+            "2021",
+            "2023",
+            "2024"
+          ],
+          "y": [
+            130901,
+            122261,
+            138382,
+            143689
+          ]
+        },
+        "id": "858f0c1c-74b7-4f99-aa3c-2c3455d162bb",
+        "label": "ComRafaEFabio",
+        "params": {
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "sum",
+          "showBarValues": true,
+          "statisticalType": "qualitativa_ordinal",
+          "valueVar": "IN_ESP_CC"
+        },
+        "type": "barchart",
+        "xLabelMap": {},
+        "xTitle": "NU_ANO_CENSO",
+        "yPrefix": "",
+        "ySuffix": "",
+        "yTitle": "Soma Num Matrículas"
+      }
+    ],
+    "updatedAt": "2026-05-25T13:12:55.684557203+00:00",
+    "variables": [
+      {
+        "description": "Educação Especial Inclusiva (em Classes Comuns) - Escola possui um ou mais alunos com deficiência, transtorno global do desenvolvimento ou altas habilidades/superdotação estudando em classes comuns do Ensino Regular e/ou Educação de Jovens e Adultos (Possui uma ou mais matrículas)",
+        "name": "IN_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Ano do Censo",
+        "name": "NU_ANO_CENSO",
+        "statisticalType": "qualitativa_ordinal",
+        "type": "Num"
+      }
+    ]
   }
 ]
