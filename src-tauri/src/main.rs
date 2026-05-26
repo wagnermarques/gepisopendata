@@ -1302,7 +1302,8 @@ async fn publish_analysis(app_handle: tauri::AppHandle, id: Option<String>) -> R
 
     // 4) Check existing remote file to get sha (if present)
     let contents_url = format!("https://api.github.com/repos/{}/{}/contents/angular-ui/public/data/analyses-history.json", config.owner, config.repo);
-    let contents_resp = client.get(&contents_url)
+    let contents_get_url = format!("{}?ref={}", contents_url, branch);
+    let contents_resp = client.get(&contents_get_url)
         .header("Authorization", format!("token {}", config.token))
         .send().await.map_err(|e| e.to_string())?;
 
