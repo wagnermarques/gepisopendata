@@ -525,7 +525,7 @@
           ]
         },
         "id": "858f0c1c-74b7-4f99-aa3c-2c3455d162bb",
-        "label": "ComRafaEFabio",
+        "label": "ComRafaEFabioEditado1",
         "params": {
           "categoryVar": "NU_ANO_CENSO",
           "metric": "sum",
@@ -535,13 +535,13 @@
         },
         "type": "barchart",
         "xLabelMap": {},
-        "xTitle": "NU_ANO_CENSO",
+        "xTitle": "NU_ANO_CENSOEditado1",
         "yPrefix": "",
         "ySuffix": "",
-        "yTitle": "Soma Num Matrículas"
+        "yTitle": "Soma Num MatrículasEditado1"
       }
     ],
-    "updatedAt": "2026-05-25T13:12:55.684557203+00:00",
+    "updatedAt": "2026-05-28T12:13:50.348256+00:00",
     "variables": [
       {
         "description": "Educação Especial Inclusiva (em Classes Comuns) - Escola possui um ou mais alunos com deficiência, transtorno global do desenvolvimento ou altas habilidades/superdotação estudando em classes comuns do Ensino Regular e/ou Educação de Jovens e Adultos (Possui uma ou mais matrículas)",
