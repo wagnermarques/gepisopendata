@@ -1,1 +1,134 @@
-[]
+[
+  {
+    "dictionary": null,
+    "files": [
+      "titanic.csv"
+    ],
+    "groupName": "Titanic",
+    "id": "d77151ca-8e8d-42ce-baa5-c276e1785fe8",
+    "name": "Titanic",
+    "publishedArtifacts": [
+      {
+        "createdAt": "2026-06-06T22:58:00.954Z",
+        "data": {
+          "x": [
+            "1",
+            "0"
+          ],
+          "y": [
+            28.343689655172415,
+            30.62617924528302
+          ]
+        },
+        "id": "faccdd0e-7821-47a5-aa1b-dc2f987bf44c",
+        "label": "Idade Média por Sobreviventes",
+        "params": {
+          "categoryVar": "Survived",
+          "metric": "avg",
+          "showBarValues": true,
+          "statisticalType": "quantitativa_discreta",
+          "valueVar": "Age"
+        },
+        "type": "barchart",
+        "xLabelMap": {},
+        "xTitle": "Sobreviventes",
+        "yPrefix": "",
+        "ySuffix": "",
+        "yTitle": "Média de Idade"
+      },
+      {
+        "createdAt": "2026-06-06T22:58:58.912Z",
+        "data": {
+          "x": [
+            "2",
+            "3",
+            "1"
+          ],
+          "y": [
+            29.87763005780347,
+            25.14061971830986,
+            38.233440860215055
+          ]
+        },
+        "id": "ef639473-186f-401a-8be1-08e521e4d596",
+        "label": "Idade Média por Classe de Embarque",
+        "params": {
+          "categoryVar": "Pclass",
+          "metric": "avg",
+          "showBarValues": true,
+          "statisticalType": "qualitativa_ordinal",
+          "valueVar": "Age"
+        },
+        "type": "barchart",
+        "xLabelMap": {},
+        "xTitle": "Pclass",
+        "yPrefix": "",
+        "ySuffix": "",
+        "yTitle": "Média de Idade"
+      }
+    ],
+    "updatedAt": "2026-06-06T23:00:47.923057424+00:00",
+    "variables": [
+      {
+        "name": "Ticket",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "PassengerId",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Número"
+      },
+      {
+        "name": "Age",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Número"
+      },
+      {
+        "name": "Parch",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Número"
+      },
+      {
+        "name": "Survived",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Número"
+      },
+      {
+        "name": "Sex",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "Fare",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Número"
+      },
+      {
+        "name": "Pclass",
+        "statisticalType": "qualitativa_ordinal",
+        "type": "Número"
+      },
+      {
+        "name": "SibSp",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Número"
+      },
+      {
+        "name": "Name",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "Cabin",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      },
+      {
+        "name": "Embarked",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Texto"
+      }
+    ]
+  }
+]
