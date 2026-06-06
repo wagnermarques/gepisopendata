@@ -63,7 +63,12 @@ declare var Plotly: any;
                   <span class="slot-label">Eixo X (Categorias)</span>
                   <div class="slot-value">
                     <mat-icon>label</mat-icon>
-                    <span>{{ categoryVar() || 'Nenhuma variável' }}</span>
+                    <div class="var-details">
+                      <span class="var-name-display">{{ categoryVar() || 'Nenhuma variável' }}</span>
+                      @if (categoryDesc()) {
+                        <span class="var-description-display">{{ categoryDesc() }}</span>
+                      }
+                    </div>
                   </div>
                 </div>
                 
@@ -71,7 +76,12 @@ declare var Plotly: any;
                   <span class="slot-label">Eixo Y (Valores)</span>
                   <div class="slot-value">
                     <mat-icon>numbers</mat-icon>
-                    <span>{{ valueVar() || (metric() === 'count' ? 'Contagem Automática' : 'Nenhuma variável') }}</span>
+                    <div class="var-details">
+                      <span class="var-name-display">{{ valueVar() || (metric() === 'count' ? 'Contagem Automática' : 'Nenhuma variável') }}</span>
+                      @if (valueDesc()) {
+                        <span class="var-description-display">{{ valueDesc() }}</span>
+                      }
+                    </div>
                   </div>
                 </div>
               </div>
@@ -115,7 +125,12 @@ declare var Plotly: any;
                        [class.is-y]="valueVar() === v.name">
                     <div class="var-info">
                       <span class="var-name">{{ v.name }}</span>
-                      <span class="var-type" [class.number]="v.type === 'Número'">{{ v.type }}</span>
+                      <div class="var-meta">
+                        <span class="var-type" [class.number]="v.type === 'Número'">{{ v.type }}</span>
+                        @if (v.description) {
+                          <span class="var-desc-inline">{{ v.description }}</span>
+                        }
+                      </div>
                     </div>
                     <div class="var-actions">
                       <button mat-icon-button (click)="setX(v.name)" 
@@ -195,6 +210,11 @@ declare var Plotly: any;
     .selection-slot.active .slot-value { color: #3f51b5; }
     .selection-slot.active .slot-value mat-icon { color: #3f51b5; }
     
+    .var-details { display: flex; flex-direction: column; gap: 2px; }
+    .var-name-display { font-weight: 600; font-size: 1rem; }
+    .var-description-display { font-size: 0.8rem; color: #666; line-height: 1.2; }
+    .selection-slot.active .var-description-display { color: #5c6bc0; }
+
     .metric-selector { margin-bottom: 20px; }
     .options-selector { margin-bottom: 20px; padding: 0 4px; }
     .publish-btn { width: 100%; height: 48px; }
@@ -207,11 +227,13 @@ declare var Plotly: any;
     .variable-row:hover { background: #f5f5f5; }
     .variable-row.is-x { background: rgba(63, 81, 181, 0.05); }
     .variable-row.is-y { background: rgba(0, 150, 136, 0.05); }
-    .var-info { display: flex; flex-direction: column; gap: 2px; }
+    .var-info { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
     .var-name { font-weight: 500; font-size: 0.9rem; }
-    .var-type { font-size: 0.7rem; color: #777; padding: 2px 6px; background: #eee; border-radius: 4px; width: fit-content; }
+    .var-meta { display: flex; align-items: center; gap: 8px; }
+    .var-type { font-size: 0.7rem; color: #777; padding: 2px 6px; background: #eee; border-radius: 4px; width: fit-content; flex-shrink: 0; }
     .var-type.number { background: #e3f2fd; color: #1976d2; }
-    .var-actions { display: flex; gap: 4px; }
+    .var-desc-inline { font-size: 0.75rem; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .var-actions { display: flex; gap: 4px; flex-shrink: 0; }
     .empty-list { padding: 24px; text-align: center; color: #999; font-style: italic; }
 
     /* Preview Card */
@@ -251,6 +273,18 @@ export class BarChartView implements OnInit {
   metric = signal<string>('count');
   showBarValues = signal<boolean>(false);
   isLoading = signal(false);
+
+  categoryDesc = computed(() => {
+    const cat = this.categoryVar();
+    if (!cat) return null;
+    return this.config()?.variables.find(v => v.name === cat)?.description || null;
+  });
+
+  valueDesc = computed(() => {
+    const val = this.valueVar();
+    if (!val) return null;
+    return this.config()?.variables.find(v => v.name === val)?.description || null;
+  });
 
   graphData: any = null;
   lastResultData: { categories: string[], values: number[] } | null = null;

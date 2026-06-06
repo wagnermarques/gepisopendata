@@ -9,3 +9,9 @@
   .spacer {
     flex: 1 1 auto;
   }
+  
+  .app-logo {
+    height: 40px;
+    margin: 0 12px;
+    object-fit: contain;
+  }
