@@ -556,5 +556,50 @@
         "type": "Num"
       }
     ]
+  },
+  {
+    "dictionary": "dicionário_dados_educação_básica.xlsx",
+    "files": [
+      "microdados_ed_basica_2024.csv",
+      "microdados_ed_basica_2023.csv",
+      "microdados_ed_basica_2022.csv",
+      "microdados_ed_basica_2021.csv"
+    ],
+    "groupName": "Censo Escolar INEP",
+    "id": "a998699b-2148-4b92-9c43-698dd2e40018",
+    "name": "teste123",
+    "updatedAt": "2026-06-06T16:28:52.894720193+00:00",
+    "variables": [
+      {
+        "description": "Número de Matrículas da Educação Especial Inclusiva",
+        "name": "QT_MAT_ESP_CC",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Número de Docentes da Educação Especial Exclusiva",
+        "name": "QT_DOC_ESP_CE",
+        "statisticalType": "quantitativa_discreta",
+        "type": "Num"
+      },
+      {
+        "description": "Educação Especial Exclusiva - Escola exclusivamente especializada e/ou que possui classe especial exclusiva para o atendimento de alunos com deficiência, transtorno global do desenvolvimento ou altas habilidades/superdotação (Possui uma ou mais matrículas)",
+        "name": "IN_ESP_CE",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Num"
+      },
+      {
+        "description": "Ano do Censo",
+        "name": "NU_ANO_CENSO",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Num"
+      },
+      {
+        "description": "Educação Especial Inclusiva (em Classes Comuns) - Escola possui um ou mais alunos com deficiência, transtorno global do desenvolvimento ou altas habilidades/superdotação estudando em classes comuns do Ensino Regular e/ou Educação de Jovens e Adultos (Possui uma ou mais matrículas)",
+        "name": "IN_ESP_CC",
+        "statisticalType": "qualitativa_nominal",
+        "type": "Num"
+      }
+    ]
   }
 ]
