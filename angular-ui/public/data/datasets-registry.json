@@ -131,23 +131,23 @@
   },
   {
     "autor": "",
-    "dataReferencia": "2000",
-    "dateAdded": "2026-05-23T20:39:40.044323950+00:00",
-    "descricao": "Csv de dados sobreviventes do titanic",
+    "dataReferencia": "xxx",
+    "dateAdded": "2026-06-06T22:52:50.766967478+00:00",
+    "descricao": "Dados sobre Titanic (From Kagle)",
     "files": [
       "titanic.csv"
     ],
     "formato": "csv",
     "frequencia": "Anual",
-    "grupo": "Titanic Data",
-    "id": "titanic_data-titanicdatasample",
+    "grupo": "Titanic",
+    "id": "titanic-titanic",
     "isSerieHistorica": false,
     "licenca": "",
-    "localPath": "datasets/titanic_data/titanicdatasample",
-    "orgaoEmissao": "my",
+    "localPath": "datasets/titanic/titanic",
+    "orgaoEmissao": "Kagle",
     "tags": "",
-    "tituloCurto": "titanicdatasample",
-    "tituloLongo": "Exemplo dados titanic",
+    "tituloCurto": "Titanic",
+    "tituloLongo": "Dados sobre Titanic (From Kagle)",
     "urls": ""
   }
 ]
