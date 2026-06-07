@@ -50,6 +50,17 @@ jobs:
         run: npm run build -- --configuration production
         working-directory: ./angular-ui
 
+      - name: Inject version from tag
+        shell: bash
+        run: |
+          # If triggered by a tag like v0.1.3, use 0.1.3. 
+          # Otherwise use the version in tauri.conf.json.
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            TAG_VERSION=${GITHUB_REF_NAME#v}
+            echo "Setting version to $TAG_VERSION"
+            jq ".version = \"$TAG_VERSION\"" tauri.conf.json > tauri.conf.json.tmp && mv tauri.conf.json.tmp tauri.conf.json
+          fi
+
       - name: Build Tauri bundle
         env:
           TAURI_DIR: .
