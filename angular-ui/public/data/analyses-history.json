@@ -1,133 +1,69 @@
 [
   {
-    "dictionary": null,
+    "dictionary": "dicionário_dados_educação_básica.xlsx",
     "files": [
-      "titanic.csv"
+      "microdados_ed_basica_2024.csv",
+      "microdados_ed_basica_2023.csv",
+      "microdados_ed_basica_2022.csv",
+      "microdados_ed_basica_2021.csv"
     ],
-    "groupName": "Titanic",
-    "id": "d77151ca-8e8d-42ce-baa5-c276e1785fe8",
-    "name": "Titanic",
+    "groupName": "Censo Escolar INEP",
+    "id": "2482755f-6fba-403f-818c-1ffedaa3f5e2",
+    "name": "Teste Rafael",
     "publishedArtifacts": [
       {
-        "createdAt": "2026-06-06T22:58:00.954Z",
+        "createdAt": "2026-06-08T12:01:50.069Z",
         "data": {
           "x": [
-            "1",
-            "0"
+            "2024",
+            "2021",
+            "2022",
+            "2023"
           ],
           "y": [
-            28.343689655172415,
-            30.62617924528302
+            15899952,
+            14860060,
+            15126703,
+            15285746
           ]
         },
-        "id": "faccdd0e-7821-47a5-aa1b-dc2f987bf44c",
-        "label": "Idade Média por Sobreviventes",
+        "id": "de4d257f-8125-4942-ab11-f25a4cd5b205",
+        "label": "teste-rafael",
         "params": {
-          "categoryVar": "Survived",
-          "metric": "avg",
+          "categoryVar": "NU_ANO_CENSO",
+          "metric": "sum",
           "showBarValues": true,
           "statisticalType": "quantitativa_discreta",
-          "valueVar": "Age"
+          "valueVar": "QT_MAT_BAS_BRANCA"
         },
-        "type": "barchart",
-        "xLabelMap": {},
-        "xTitle": "Sobreviventes",
-        "yPrefix": "",
-        "ySuffix": "",
-        "yTitle": "Média de Idade"
-      },
-      {
-        "createdAt": "2026-06-06T22:58:58.912Z",
-        "data": {
-          "x": [
-            "2",
-            "3",
-            "1"
-          ],
-          "y": [
-            29.87763005780347,
-            25.14061971830986,
-            38.233440860215055
-          ]
-        },
-        "id": "ef639473-186f-401a-8be1-08e521e4d596",
-        "label": "Idade Média por Classe de Embarque",
-        "params": {
-          "categoryVar": "Pclass",
-          "metric": "avg",
-          "showBarValues": true,
-          "statisticalType": "qualitativa_ordinal",
-          "valueVar": "Age"
-        },
-        "type": "barchart",
-        "xLabelMap": {},
-        "xTitle": "Pclass",
-        "yPrefix": "",
-        "ySuffix": "",
-        "yTitle": "Média de Idade"
+        "type": "barchart"
       }
     ],
-    "updatedAt": "2026-06-06T23:00:47.923057424+00:00",
+    "updatedAt": "2026-06-08T12:01:50.074883500+00:00",
     "variables": [
       {
-        "name": "Ticket",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Texto"
-      },
-      {
-        "name": "PassengerId",
+        "description": "Número de Matrículas da Educação Básica - Turno Noturno",
+        "name": "QT_MAT_BAS_N",
         "statisticalType": "quantitativa_discreta",
-        "type": "Número"
+        "type": "Num"
       },
       {
-        "name": "Age",
+        "description": "Número de Matrículas da Educação Básica - Cor/Raça Branca",
+        "name": "QT_MAT_BAS_BRANCA",
         "statisticalType": "quantitativa_discreta",
-        "type": "Número"
+        "type": "Num"
       },
       {
-        "name": "Parch",
+        "description": "Número de Matrículas da Educação Básica - Cor/Raça Não Declarada",
+        "name": "QT_MAT_BAS_ND",
         "statisticalType": "quantitativa_discreta",
-        "type": "Número"
+        "type": "Num"
       },
       {
-        "name": "Survived",
+        "description": "Ano do Censo",
+        "name": "NU_ANO_CENSO",
         "statisticalType": "quantitativa_discreta",
-        "type": "Número"
-      },
-      {
-        "name": "Sex",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Texto"
-      },
-      {
-        "name": "Fare",
-        "statisticalType": "quantitativa_discreta",
-        "type": "Número"
-      },
-      {
-        "name": "Pclass",
-        "statisticalType": "qualitativa_ordinal",
-        "type": "Número"
-      },
-      {
-        "name": "SibSp",
-        "statisticalType": "quantitativa_discreta",
-        "type": "Número"
-      },
-      {
-        "name": "Name",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Texto"
-      },
-      {
-        "name": "Cabin",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Texto"
-      },
-      {
-        "name": "Embarked",
-        "statisticalType": "qualitativa_nominal",
-        "type": "Texto"
+        "type": "Num"
       }
     ]
   }
