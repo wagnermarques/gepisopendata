@@ -1278,11 +1278,26 @@ async fn publish_analysis(app_handle: tauri::AppHandle, id: Option<String>) -> R
     let ref_json: serde_json::Value = ref_resp.json().await.map_err(|e| e.to_string())?;
     let base_sha = ref_json["object"]["sha"].as_str().ok_or("Cannot determine base sha")?;
 
-    // 3) Create a branch
-    let branch = if let Some(ref aid) = id {
-        format!("contrib/analysis-{}-{}", aid, chrono::Utc::now().format("%Y%m%d%H%M%S"))
+    let analysis_info = if let Some(ref aid) = id {
+        history.iter().find(|item| item["id"].as_str() == Some(aid))
     } else {
-        format!("contrib/sync-all-{}", chrono::Utc::now().format("%Y%m%d%H%M%S"))
+        None
+    };
+
+    // 3) Create a branch
+    let branch = if let Some(info) = analysis_info {
+        let name = info["name"].as_str().unwrap_or("unknown");
+        let sanitized_name = name.to_lowercase()
+            .chars()
+            .map(|c| if c.is_alphanumeric() { c } else { '-' })
+            .collect::<String>()
+            .split('-')
+            .filter(|s| !s.is_empty())
+            .collect::<Vec<_>>()
+            .join("-");
+        format!("contrib/analysis-{}", sanitized_name)
+    } else {
+        format!("contrib/sync-all-{}", chrono::Utc::now().format("%Y%m%d%H%M"))
     };
 
     let create_ref_url = format!("https://api.github.com/repos/{}/{}/git/refs", config.owner, config.repo);
@@ -1292,7 +1307,7 @@ async fn publish_analysis(app_handle: tauri::AppHandle, id: Option<String>) -> R
         .json(&create_ref_body)
         .send().await.map_err(|e| e.to_string())?;
     if !create_ref_resp.status().is_success() {
-        // If branch exists, continue; otherwise return error
+        // If branch exists, we can still update the file there
         let status = create_ref_resp.status();
         if status.as_u16() != 422 {
             let text = create_ref_resp.text().await.unwrap_or_default();
@@ -1300,10 +1315,11 @@ async fn publish_analysis(app_handle: tauri::AppHandle, id: Option<String>) -> R
         }
     }
 
-    // 4) Check existing remote file to get sha (if present)
+    // 4) Check existing remote file on the NEW branch to get sha (if present)
     let contents_url = format!("https://api.github.com/repos/{}/{}/contents/angular-ui/public/data/analyses-history.json", config.owner, config.repo);
     let contents_resp = client.get(&contents_url)
         .header("Authorization", format!("token {}", config.token))
+        .query(&[("ref", &branch)])
         .send().await.map_err(|e| e.to_string())?;
 
     let mut remote_sha: Option<String> = None;
@@ -1313,8 +1329,8 @@ async fn publish_analysis(app_handle: tauri::AppHandle, id: Option<String>) -> R
     }
 
     // 5) Put file to new branch
-    let message = if let Some(ref aid) = id {
-        format!("Contribuição: adicionando/atualizando análise {}", aid)
+    let message = if let Some(info) = analysis_info {
+        format!("Contribuição: adicionando/atualizando análise '{}'", info["name"].as_str().unwrap_or("sem nome"))
     } else {
         "Contribuição: sincronização total das análises".to_string()
     };
@@ -1336,14 +1352,27 @@ async fn publish_analysis(app_handle: tauri::AppHandle, id: Option<String>) -> R
     }
 
     // 6) Create Pull Request
-    let title = if let Some(ref aid) = id {
-        format!("Contribuição: análise {}", aid)
+    let title = if let Some(info) = analysis_info {
+        format!("Contribuição: Análise '{}'", info["name"].as_str().unwrap_or("Sem Nome"))
     } else {
         "Contribuição: Sincronização de Análises".to_string()
     };
 
-    let body = if let Some(ref aid) = id {
-        format!("Contribuição automática da análise {} via aplicação desktop.", aid)
+    let body = if let Some(info) = analysis_info {
+        let name = info["name"].as_str().unwrap_or("Sem Nome");
+        let group = info["groupName"].as_str().unwrap_or("Desconhecido");
+        let file_count = info["files"].as_array().map(|a| a.len()).unwrap_or(0);
+        let var_count = info["variables"].as_array().map(|a| a.len()).unwrap_or(0);
+        
+        format!(
+            "### Nova Contribuição de Análise\n\n\
+            **Nome:** {}\n\
+            **Grupo:** {}\n\
+            **Arquivos processados:** {}\n\
+            **Variáveis configuradas:** {}\n\n\
+            Esta contribuição foi gerada automaticamente via Gepis OpenData Desktop.",
+            name, group, file_count, var_count
+        )
     } else {
         "Sincronização automática de todas as análises locais via aplicação desktop.".to_string()
     };
