@@ -26,9 +26,7 @@
     "active": true,
     "targets": ["rpm", "deb", "nsis", "msi"],
     "windows": {
-      "nsis": {
-        "installerName": "Gepis-Dados-Abertos-v{{version}}-Setup"
-      }
+      "nsis": {}
     },
     "icon": [
       "icons/32x32.png",

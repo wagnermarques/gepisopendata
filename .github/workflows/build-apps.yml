@@ -86,6 +86,23 @@ jobs:
           name: linux-bundles
           path: ./target/release/bundle/*
 
+      - name: Rename Windows Installer
+        if: matrix.platform == 'windows-latest'
+        shell: bash
+        run: |
+          # Get version from tag or tauri.conf.json
+          VERSION=$(jq -r .version tauri.conf.json)
+          OLD_FILE="target/release/bundle/nsis/Gepis Dados Abertos_${VERSION}_x64-setup.exe"
+          NEW_FILE="target/release/bundle/nsis/Gepis-Dados-Abertos-v${VERSION}-Setup.exe"
+          
+          if [ -f "$OLD_FILE" ]; then
+            mv "$OLD_FILE" "$NEW_FILE"
+            echo "Renamed $OLD_FILE to $NEW_FILE"
+          else
+            echo "Warning: Could not find $OLD_FILE"
+            ls -R target/release/bundle/nsis/
+          fi
+
       - name: Create GitHub Release and upload Windows installers
         if: matrix.platform == 'windows-latest'
         uses: softprops/action-gh-release@v1

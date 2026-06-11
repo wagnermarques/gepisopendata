@@ -65,9 +65,34 @@
         "yPrefix": "",
         "ySuffix": "",
         "yTitle": "Média de Idade"
+      },
+      {
+        "createdAt": "2026-06-11T17:57:10.832Z",
+        "data": {
+          "x": [
+            "3",
+            "1",
+            "2"
+          ],
+          "y": [
+            491,
+            216,
+            184
+          ]
+        },
+        "id": "6954eb84-2aab-4f34-ad77-e09addd3552c",
+        "label": "Num Pass por Classe",
+        "params": {
+          "categoryVar": "Pclass",
+          "metric": "count",
+          "showBarValues": true,
+          "statisticalType": "qualitativa_ordinal",
+          "valueVar": null
+        },
+        "type": "barchart"
       }
     ],
-    "updatedAt": "2026-06-06T23:00:47.923057424+00:00",
+    "updatedAt": "2026-06-11T17:57:10.836487324+00:00",
     "variables": [
       {
         "name": "Ticket",
